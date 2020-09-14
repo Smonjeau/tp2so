@@ -5,6 +5,7 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <lib.h>
+#include <mem_manager.h>
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     MEMDUMP
@@ -16,4 +17,19 @@ int sysMemDump(void *src, void *dest){
 
     return 0;
 
+}
+
+void sysMalloc (int size,void ** ptr){
+    malloc(size,ptr);
+}
+
+
+
+
+void sysFree (void * ptr){
+    free(ptr);
+}
+
+void sysMemStatus(int * memory_size, int * free_space, int * occupied_space){
+    mem_status(memory_size,free_space,occupied_space);
 }

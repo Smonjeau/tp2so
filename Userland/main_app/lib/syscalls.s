@@ -22,3 +22,9 @@ syscall getTime, 4
 syscall cpuInfo, 5
 syscall cpuTemp, 6
 syscall getRegBkp, 7
+
+syscall malloc, 8
+
+syscall free, 9
+
+syscall memStatus, 10

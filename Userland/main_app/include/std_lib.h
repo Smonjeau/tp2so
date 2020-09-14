@@ -2,6 +2,12 @@
 
 void * memcpy(void * destination, const void * source, int length);
 
+void * memalloc (int size);
+
+void free_mem(void * ptr);
+
+void mem_status (char * buffer);
+
 // CHAR METHODS
 
 int isAlpha(char);

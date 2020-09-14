@@ -8,6 +8,7 @@
 #include <windows_lib.h>
 #include <stdarg.h>
 #include <std_lib.h>
+#include <syscalls.h>
 #include <stdint.h>
 
 
@@ -40,6 +41,16 @@ void * memcpy(void * destination, const void * source, int length){
 	return destination;
 }
 
+void * memalloc (int size){
+    void * ptr;
+    malloc(size,&ptr);
+    return ptr;
+
+}
+
+void free_mem (void * ptr){
+    free(ptr);
+}
 
 /* ------------------------------------------------------------------------------------------------------------------
                                                 CHAR FUNCTIONS

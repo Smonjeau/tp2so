@@ -13,6 +13,9 @@
 .extern sysCpuInfo
 .extern sysCPUTemp
 .extern sysGetRegBkp
+.extern sysMalloc 
+.extern sysMemStatus 
+.extern sysFree
 
 .intel_syntax noprefix
 
@@ -39,6 +42,15 @@ _syscallDispatcher:
 
     cmp rax, 7
     je _getRegBkp
+
+    cmp rax, 8
+    je _malloc
+
+    cmp rax,9
+    je _free 
+
+    cmp rax,10 
+    je _memStatus
 
     iretq
 
@@ -68,4 +80,15 @@ _cpuTemp:
 
 _getRegBkp:
     call sysGetRegBkp
+    iretq
+_malloc:
+    call sysMalloc 
+    iretq
+
+_free:
+    call sysFree
+    iretq
+
+_memStatus:
+    call sysMemStatus 
     iretq

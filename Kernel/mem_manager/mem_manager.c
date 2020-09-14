@@ -1,12 +1,14 @@
 #include  <lib.h>
 #define BYTE_SIZE 8
-#define MEM_SIZE 256
-#define BLOCK_SIZE 8
+#define MEM_SIZE 10*1024*1024
+#define BLOCK_SIZE 1024
 #define BITMAP_SIZE (MEM_SIZE/BLOCK_SIZE)/BYTE_SIZE
 #define NULL ((void*)0)
+#define FIRST_HEAP_ADRESS ((char*) 0x700000)
+//#define LAST_HEAP_ADRESS 0x170000 Creo q no hace falta
 
 
-char memory[MEM_SIZE] = {0};
+//char memory[MEM_SIZE] = {0};
 
 char bitmap[BITMAP_SIZE] = {0};
 
@@ -20,19 +22,19 @@ typedef struct Assignation{
 Assignation assignations[BITMAP_SIZE];
 int assignationCounter = 0;
 
-
+int occupied_blocks = 0;
 char oneMasks[] = {1, 2, 4, 8, 16, 32, 64, 128};
     
 char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
     0b11101111, 0b11011111, 0b10111111, 0b01111111};
 
 
-void *malloc(int size){
+void malloc(int size, void ** ptr){
 
     int nblocks = div_ceil(size , BLOCK_SIZE);    // Number of blocks to assing
 
     int freeBlocks = 0;
-    void *blockAdress = memory, *candidateAddress = NULL;
+    void *blockAdress = FIRST_HEAP_ADRESS, *candidateAddress = NULL;
     int bytePos = 0, bitPos = 0;
 
     for(bytePos=0; freeBlocks<nblocks && bytePos<BITMAP_SIZE; bytePos+=1){
@@ -80,14 +82,13 @@ void *malloc(int size){
         newAssignation.startAddress = candidateAddress;
 
         assignations[assignationCounter++] = newAssignation;
+    
+        *ptr = candidateAddress;
+        occupied_blocks += nblocks;
 
-        return candidateAddress;
+    }else
 
-    }else{
-
-        return NULL;    // Not enough space
-
-    }
+      *ptr = NULL;    // Not enough space
 
     
 
@@ -110,9 +111,9 @@ void free(void *address){
 
     int nblocks = assignationRecord.size; int k=0;
 
-    int bytePos = (((char *)address-memory)/BLOCK_SIZE) / BYTE_SIZE;
+    int bytePos = (((char *)address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) / BYTE_SIZE;
 
-    int bitPos = (((char *)address-memory)/BLOCK_SIZE) % BYTE_SIZE;
+    int bitPos = (((char *)address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
 
     for(int j=bitPos; k<nblocks && j<BYTE_SIZE; j++, k++){
         bitmap[bytePos] &= zeroMasks[j];
@@ -123,11 +124,18 @@ void free(void *address){
             bitmap[i] &= zeroMasks[j];
         }
     }
-
+    occupied_blocks -= nblocks;
     // Remove the assignation record
 
     memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
     assignationCounter -= 1;
+
+}
+
+void mem_status(int * memory_size, int * free_space, int * occupied_space){
+    *memory_size = MEM_SIZE;
+    *occupied_space = occupied_blocks * BLOCK_SIZE;
+    *free_space = (BITMAP_SIZE - occupied_blocks) * BLOCK_SIZE;
 
 }
 
