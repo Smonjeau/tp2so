@@ -41,15 +41,20 @@ void * memcpy(void * destination, const void * source, int length){
 	return destination;
 }
 
-void * memalloc (int size){
-    void * ptr;
-    malloc(size,&ptr);
-    return ptr;
+void print_mem_status(){
+    //char msgs [3][20] = {"Total memory: ","Available memory:","Occupied memory:"};
+    int total_mem=1;
+    int  avail_mem=1;
+    int occ_mem=1;
+    memStatus(&total_mem,&avail_mem,&occ_mem);
+    char buffer [30];
+    printLine(itoa(total_mem,buffer,10,-1));
+    printLine(itoa(avail_mem,buffer,10,-1));
+    printLine(itoa(occ_mem,buffer,10,-1));
 
-}
+    
 
-void free_mem (void * ptr){
-    free(ptr);
+
 }
 
 /* ------------------------------------------------------------------------------------------------------------------
@@ -293,7 +298,7 @@ void printf(char *format, int nargs, ...)
 
             if (format[pos] == 'd')
             {
-                char str[20];
+                char str[20]={0};
                 print(itoa(va_arg(valist, int), str, 10, fixLen));
                 formatChar = 0;
                 continue;
@@ -301,7 +306,7 @@ void printf(char *format, int nargs, ...)
 
             if (format[pos] == 'x')
             {
-                char str[20];
+                char str[20]={0};
                 print("0x");
                 print(itoa(va_arg(valist, int), str, 16, fixLen));
                 formatChar = 0;
@@ -310,7 +315,7 @@ void printf(char *format, int nargs, ...)
 
             if (format[pos] == 'f')
             {
-                char str[20];
+                char str[20]={0};
                 print(dtoa(va_arg(valist, double), str));
                 formatChar = 0;
                 continue;

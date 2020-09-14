@@ -35,4 +35,5 @@ void sysFree (void * ptr){
 
 void sysMemStatus(int * memory_size, int * free_space, int * occupied_space){
     mem_status(memory_size,free_space,occupied_space);
+
 }

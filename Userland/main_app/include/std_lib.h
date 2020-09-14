@@ -2,11 +2,7 @@
 
 void * memcpy(void * destination, const void * source, int length);
 
-void * memalloc (int size);
-
-void free_mem(void * ptr);
-
-void mem_status (char * buffer);
+void  print_mem_status ();
 
 // CHAR METHODS
 
