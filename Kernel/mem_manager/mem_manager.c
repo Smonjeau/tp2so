@@ -3,7 +3,7 @@
 #define NULL ((void*)0)
 #define FIRST_HEAP_ADRESS ((char*) 0x800000)
 #define MEM_SIZE (8*1024*1024)
-#ifndef BUDDY
+#if buddy ==0
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                 BITMAP IMPLEMENTATION
@@ -11,6 +11,8 @@
 #define BYTE_SIZE 8
 #define BLOCK_SIZE 1024
 #define BITMAP_SIZE ((MEM_SIZE/BLOCK_SIZE)/BYTE_SIZE)
+
+
 
 char bitmap[BITMAP_SIZE] = {0};
 
@@ -93,6 +95,8 @@ void * malloc(int size){
 
     return NULL;    // Not enough space
 
+    
+
 }
 
 
@@ -143,38 +147,57 @@ void mem_status(int * memory_size, int * free_space, int * occupied_space){
 
 }
 
+#elif buddy == 1
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     BUDDY SYSTEM IMPLEMENTATION
 --------------------------------------------------------------------------------------------------------------------------- */
-#else
+
 #define TOTAL_NODES (MEM_SIZE -1) //Este cálculo viene de hacer la fórmula para la cantidad de nodos de un arbol binario completo
 #define TRUE 1
 #define FALSE 0
 
-typedef struct node
+typedef  struct Node
 {
-    node* left;
-    node* right;
+    struct node* left;
+    struct  node* right;
     int size;
     char free;
-}node;
-node buddy_tree [TOTAL_NODES];
+    char leaf;
+}Node;
+
+Node buddy_tree [TOTAL_NODES];
 
 int nodes_counter =0;
 //root node
-buddy_tree[nodes_counter++] = {NULL,NULL,MEM_SIZE,TRUE};
+Node root;
+root.left=NULL;
+root.right=NULL;
+root.size=MEM_SIZE;
+root.free=TRUE;
+root.leaf=FALSE;
+node buddy_tree [nodes_counter++] = root;
 
 
 
-void  recursive_malloc (int size, node * node){
+void *  recursive_malloc (int size, Node * node,int offset){
     if((node->size)/2 < size){
-        //retornamos
+        return FIRST_HEAP_ADRESS + offset;
     }
+    if(node->leaf){
+        buddy_tree[nodes_counter++] = (Node){NULL,NULL,node->size / 2, TRUE,TRUE};
+        buddy_tree[nodes_counter++] = (Node) {NULL,NULL,node->size / 2, TRUE,TRUE};
+        node->left = buddy_tree[nodes_counter-2];
+        node->right = buddy_tree[nodes_counter-1];
+        node->leaf=FALSE;
+        recursive_malloc(size,node->left,0);
+    }
+
+
 }
 
 void * malloc (int size){
-    recursive_malloc(size,buddy_tree[0]);
+    return recursive_malloc(size,buddy_tree[0],0);
 }
 
 

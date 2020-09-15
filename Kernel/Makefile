@@ -12,8 +12,9 @@ STATICLIBS=
 all: $(KERNEL)		# Default rule, requisite is kernel rule
 
 $(KERNEL): $(SOURCES) $(STATICLIBS)	# All .o's are requisite
-	$(GCC) $(GCCFLAGS) -I./include -T kernel.ld -o $(KERNEL) $(SOURCES) $(STATICLIBS)
-	$(GCC) $(GCCFLAGS) -I./include -T kernel.ld $(DEBUGFLAGS) -o $(KERNEL_ELF) $(SOURCES) $(STATICLIBS)
+	$(GCC) $(GCCFLAGS) $(CFLAGS) -I./include -T kernel.ld -o $(KERNEL) $(SOURCES) $(STATICLIBS)
+	$(GCC) $(GCCFLAGS) $(CFLAGS) -I./include -T kernel.ld $(DEBUGFLAGS) -o $(KERNEL_ELF) $(SOURCES) $(STATICLIBS)
+
 	
 clean:
 	rm -rf */*.o *.elf *.bin
