@@ -11,7 +11,7 @@
 
 int main(){
 
-	test();
+	// test();
 
 	initWindow1();
 	initWindow2();
