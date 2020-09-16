@@ -1,0 +1,12 @@
+MSR:
+ia32_THERM_STATUS
+Manual - Page 4549
+https://github.com/cyring/WinMSR/blob/master/driver.c
+https://wiki.osdev.org/Model_Specific_Registers
+https://stackoverflow.com/questions/5327203/how-to-access-cpus-heat-sensors
+https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3b-part-2-manual.pdf - Page 28
+
+ACPI:
+_TMP
+https://github.com/ReturnInfinity/Pure64/tree/master/docs
+https://uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf - Page 787

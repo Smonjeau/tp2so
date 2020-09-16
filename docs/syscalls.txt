@@ -1,0 +1,18 @@
+Syscalls follow the System V AMD64 ABI calling convention/
+A function that returns 0/-1 on success/failure will be refered as "s/f".
+
+NAME        RDI     RSI                RDX                      RCX            DESCRIPTION
+DRAW        1       uint8_t xcord      uint8_t ycord            uint8 rgb      Draws a pixel at (x,y) with rgb color (in hex), returns -2/-1 on invalid color/coordinate, 0 if ok
+GETRES      2       ScreenRes * res                                            Load screen resolution into res, returns void.
+MEMDUMP     3       void * src         void * dest                             Loads 32 bytes of memory from src to dest, returns s/f.
+GETTIME     4       Time * time                                                Loads system time into time, returns void.
+CPUINFO     5       CpuInfo * name                                             Loads processor brand name, and description, with a max length of 50 and 70 bytes each.
+CPUTEMP     6                                                                  Returns the temperature of the CPU in Celsius.
+GETREGBKP   7       RegBkp *RegBkp                                             Loads the status of the registers from the last time TAB was pressed or an exception was produced.
+
+STRUCTURES:
+
+ScreenRes { int height, int width}
+Time { int hours, int minutes, int seconds }
+CpuInfo { char * brandName, char * brandDesc }
+RegBkp { uint64_t rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15 }
