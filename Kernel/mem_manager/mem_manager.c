@@ -1,56 +1,153 @@
+#include "include/lib.h"
+
 #define BYTE_SIZE 8
 #define MEM_SIZE 256
 #define BLOCK_SIZE 8
 #define BITMAP_SIZE (MEM_SIZE/BLOCK_SIZE)/BYTE_SIZE
-//#include <stdio.h>
-//#include <math.h>
+#define NULL ((void*)0)
+
 
 char memory[MEM_SIZE] = {0};
 
 char bitmap[BITMAP_SIZE] = {0};
 
-void *malloco(int size){
 
-    int nblocks = ceil(size / BLOCK_SIZE);
-    char masks[] = {0x80,0x40,0x20,0x10,0x8,0x4,0x2,0x1};
-    int freeBlocks = 0; void *address = memory;
-    void * candidate_adrdress=NULL;
-    int i,j;
+typedef struct Assignation{
+    void *startAddress;
+    int size;
+} Assignation;
 
-    for( i=0; freeBlocks<nblocks && i<BITMAP_SIZE; i+=1){
 
-        char blocksByte = bitmap[i];
+Assignation assignations[BITMAP_SIZE];
+int assignationCounter = 0;
+
+
+char oneMasks[] = {1, 2, 4, 8, 16, 32, 64, 128};
+    
+char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
+    0b11101111, 0b11011111, 0b10111111, 0b01111111};
+
+
+void *malloc(int size){
+
+    int nblocks = ceil(size / BLOCK_SIZE);    // Number of blocks to assing
+
+    int freeBlocks = 0;
+    void *blockAdress = memory, *candidateAddress = NULL;
+    int bytePos = 0, bitPos = 0;
+
+    for(bytePos=0; freeBlocks<nblocks && bytePos<BITMAP_SIZE; bytePos+=1){
+
+        char blocksByte = bitmap[bytePos];
 
         // Count free contiguous blocks in this byte
 
-        for(j=0; freeBlocks<nblocks && j<BYTE_SIZE; j++,address++){
+        for(bitPos=0; freeBlocks<nblocks && bitPos<BYTE_SIZE; bitPos++, blockAdress+=BLOCK_SIZE){
 
-            if(((blocksByte & masks[j] ) / (int)pow(2,BYTE_SIZE-1-j))  % 2 == 0){
+            if((blocksByte >> bitPos) % 2 == 0){
                 freeBlocks++;
-                candidate_adrdress = address;
-
+                candidateAddress = candidateAddress==NULL ? blockAdress : candidateAddress;
             }else{
-                candidate_adrdress =NULL;
+                candidateAddress =NULL;
                 freeBlocks=0;
             }
+
         }
 
     }
-
-
 
     if(freeBlocks == nblocks) {
-        int k=0,l;
-        while (k<nblocks){
-            for(l=j;k<nblocks && l<BYTE_SIZE;l++){
-                //vamos poniendo unos
-                bitmap[i] |= masks[l];
-                k++;
-            }
-            j=0;
-            i++;
+
+        int k=0;
+
+        // Fill with ones the last blocks byte to assign
+
+        for(int j=bitPos-1; k<nblocks && j>=0; j--, k++){
+            bitmap[bytePos-1] |= oneMasks[j];
         }
+
+        // Fill with ones the lefting blocks bytes to assign
+
+        for(int i=bytePos-2; k<nblocks && i>=0; i--){
+            for(int j=BYTE_SIZE-1; k<nblocks && j>=0; j--, k++){
+                bitmap[i] |= oneMasks[j];
+            }
+        }
+
+        // Create an assignation record
+
+        Assignation newAssignation;
+        newAssignation.size = nblocks;
+        newAssignation.startAddress = candidateAddress;
+
+        assignations[assignationCounter++] = newAssignation;
+
+        return candidateAddress;
+
+    }else{
+
+        return NULL;    // Not enough space
+
     }
-    return  candidate_adrdress;
+
+    
 
 }
+
+
+void free(void *address){
+
+    // Get the assignation record
+
+    Assignation assignationRecord; int i;
+    for(i=0; i<assignationCounter; i++){
+        if(assignations[i].startAddress == address){
+            assignationRecord = assignations[i];
+            break;
+        }
+    }
+
+    // Free the memory
+
+    int nblocks = assignationRecord.size; int k=0;
+
+    int bytePos = (((char *)address-memory)/BLOCK_SIZE) / BYTE_SIZE;
+
+    int bitPos = (((char *)address-memory)/BLOCK_SIZE) % BYTE_SIZE;
+
+    for(int j=bitPos; k<nblocks && j<BYTE_SIZE; j++, k++){
+        bitmap[bytePos] &= zeroMasks[j];
+    }
+
+    for(int i=bytePos+1; k<nblocks; i++){
+        for(int j=0; k<nblocks && j<BYTE_SIZE; j++, k++){
+            bitmap[i] &= zeroMasks[j];
+        }
+    }
+
+    // Remove the assignation record
+
+    memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
+    assignationCounter -= 1;
+
+}
+
+
+// nblocks=3
+// freeBlocks=3
+// blockAddress=0x7  candidateAddress=0x6
+// bytePos=2  bitPos=1
+
+// bitmap = 00110011 00001110
+// blocksByte = 00001100
+
+// i=0  j=5  k=3
+
+// bitmap = 11110011 00001111
+
+
+// Fixed the filling of ones
+// Fixed bug on block address increment and candidate address update
+// Implemented free method
+// Changed mask usage with more simple shift on free memory count
+// Changed some variable names for better legibility
