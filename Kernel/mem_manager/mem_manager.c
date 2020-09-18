@@ -1,5 +1,4 @@
-#include "include/lib.h"
-
+#include  <lib.h>
 #define BYTE_SIZE 8
 #define MEM_SIZE 256
 #define BLOCK_SIZE 8
@@ -30,7 +29,7 @@ char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
 
 void *malloc(int size){
 
-    int nblocks = ceil(size / BLOCK_SIZE);    // Number of blocks to assing
+    int nblocks = div_ceil(size , BLOCK_SIZE);    // Number of blocks to assing
 
     int freeBlocks = 0;
     void *blockAdress = memory, *candidateAddress = NULL;

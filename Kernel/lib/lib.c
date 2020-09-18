@@ -35,3 +35,9 @@ void * memcpy(void * destination, const void * source, uint64_t length){
 
 	return destination;
 }
+int div_ceil(int dividend, int divisor){
+    if (dividend%divisor == 0)
+        return  dividend / divisor;
+    else
+        return (dividend / divisor) +1;
+}

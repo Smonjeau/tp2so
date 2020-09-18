@@ -10,4 +10,6 @@ void * malloc(int bytes);
 
 char *cpuVendor(char *result);
 
+int div_ceil(int dividend, int divisor);
+
 #endif
