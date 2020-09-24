@@ -19,16 +19,19 @@ int sysMemDump(void *src, void *dest){
 
 }
 
-void sysMalloc (int size,void ** ptr){
-    malloc(size,ptr);
+/* ---------------------------------------------------------------------------------------------------------------------------
+                                                MEMORY ALLOCATION
+--------------------------------------------------------------------------------------------------------------------------- */
+
+void * sysMalloc (int size){
+    return malloc(size);
 }
-
-
 
 
 void sysFree (void * ptr){
     free(ptr);
 }
+
 
 void sysMemStatus(int * memory_size, int * free_space, int * occupied_space){
     mem_status(memory_size,free_space,occupied_space);

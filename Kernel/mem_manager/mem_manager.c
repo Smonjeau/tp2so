@@ -29,7 +29,7 @@ char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
     0b11101111, 0b11011111, 0b10111111, 0b01111111};
 
 
-void malloc(int size, void ** ptr){
+void * malloc(int size){
 
     int nblocks = div_ceil(size , BLOCK_SIZE);    // Number of blocks to assing
 
@@ -83,12 +83,12 @@ void malloc(int size, void ** ptr){
 
         assignations[assignationCounter++] = newAssignation;
     
-        *ptr = candidateAddress;
         occupied_blocks += nblocks;
+        return candidateAddress;
 
     }else
 
-      *ptr = NULL;    // Not enough space
+    return NULL;    // Not enough space
 
     
 
@@ -133,28 +133,9 @@ void free(void *address){
 }
 
 void mem_status(int * memory_size, int * free_space, int * occupied_space){
+    
     *memory_size = MEM_SIZE;
     *occupied_space = occupied_blocks * BLOCK_SIZE;
     *free_space = (BITMAP_SIZE - occupied_blocks) * BLOCK_SIZE;
 
 }
-
-
-// nblocks=3
-// freeBlocks=3
-// blockAddress=0x7  candidateAddress=0x6
-// bytePos=2  bitPos=1
-
-// bitmap = 00110011 00001110
-// blocksByte = 00001100
-
-// i=0  j=5  k=3
-
-// bitmap = 11110011 00001111
-
-
-// Fixed the filling of ones
-// Fixed bug on block address increment and candidate address update
-// Implemented free method
-// Changed mask usage with more simple shift on free memory count
-// Changed some variable names for better legibility

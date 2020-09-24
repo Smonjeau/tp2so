@@ -1,0 +1,9 @@
+Almacenar el arreglo de memmanager en la memoria libre después de sample code data, es decir, desde los 8 MB
+
+Para ver los símbolos de un binario: readelf --symbols FILE
+
+Para debuggear el process switching cuando se crea un nuevo proceso, es buena idea inicializar sus registros con una secuencia numérica creciente, de manera tal que sea fácil de identificar en un dump de la memoria.
+
+Recordar que el stack crece hacia abajo, por tanto cuando asignamos espacio a un nuevo proceso, tanto SP como BP deben apuntar a la dirección más alta de dicho segmento.
+
+El process block de los procesos actuales pueden tener un flag que indique que están inactivos, en cuyo caso el scheduler no debe asignarles tiempo.
