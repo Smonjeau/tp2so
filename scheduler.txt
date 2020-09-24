@@ -1,0 +1,593 @@
+context switching, scheduling, procesos
+#################################################################
+
+¿qué forma parte del contexto de un proceso?
+
+¿qué hacer con este contexto cuando no está ejecutando?
+
+							¿Qué ocurre con un call y un ret?
+
+							stack antes call:
+
+							|	s	|
+							|	t	|
+							|	a	|
+							|	c	|
+							|	k	|
+
+							stack luego del call:
+							¿qué hace call?
+
+							|	s	|
+							|	t	|
+							|	a	|
+							|	c	|
+							|	k	|
+							|RetAdd | 
+
+							stack luego del ret:
+							¿qué hace ret?
+
+							|	s	|
+							|	t	|
+							|	a	|
+							|	c	|
+							|	k	|
+
+CONTEXT SWITCH ON THE FLY
+#################################################################
+
+¿qué ocurre cuando el timer interrumpe?
+
+stack antes de la interrupción:
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+
+stack luego de la interrupción:
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+| Align	|
+| SS	|
+| RSP	|
+| RFLAGS|
+| CS	|
+| RIP	|
+
+stack luego de iretq:
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+
+Entonces, iretq es a una interrupción lo que ret es al call
+
+Un handler dummy podría ser
+
+dummy_handler
+	
+	//Send EOI
+	mov al, 20h
+	out 20h, al
+
+	iretq
+
+Antes dijimos que tenemos que guardar el contexto...
+¿dónde?
+
+still_dummy_handler
+	
+	pushState
+
+	//TODO
+
+	//Send EOI
+	mov al, 20h
+	out 20h, al
+
+	popState
+
+	iretq
+
+¿por qué Send EOI antes de popState?
+
+stack justo en //TODO
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+| Align	|
+| SS	|
+| RSP	|
+| RFLAGS|
+| CS	|
+| RIP	|
+| Regs	| 
+| ...	|
+| uso	|
+| ...	|
+| gene	|
+
+stack al volver de la interrupción
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+
+Tenemos el estado en el stack, pero...
+en cuanto cambiemos el SP para que ejecutemos otro proceso vamos a perder la referencia
+
+¿qué es lo único que necesitamos para poder restaurar su estado?
+
+SIMULEMOS
+	
+P1 está ejecutando:
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+| Align	|
+| SS	|
+| RSP	|
+| RFLAGS|
+| CS	|
+| RIP	|
+| Regs	|
+| ...	|
+| uso	|
+| ...	|
+| gene	|
+
+ocurre la interrupción (y frenamos en //TODO):
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+| Align	|			| Align	|
+| SS	|			| SS	|
+| RSP	|			| RSP	|
+| RFLAGS|			| RFLAGS|
+| CS	|			| CS	|
+| RIP	|			| RIP	|
+| Regs	|			| Regs	|
+| ...	|			| ...	|
+| uso	|			| uso	|
+| ...	|			| ...	|
+| gene	|			| gene	|
+		<-SP					
+	|			P0 			| 	  |			P1 			 	|
+|	|-------stack-----------|     |--------stack------------|	|
+							^bp+sp 							^bp+sp
+
+ocurre el switch (magia)
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+					| Align	|
+					| SS	| 
+					| RSP	|
+					| RFLAGS|
+					| CS	|
+					| RIP	|
+					| Regs	|
+					| ...	|
+					| uso	|
+					| ...	|
+					| gene	|
+
+¿qué debería ocurrir en //TODO para producir esta magia?
+
+Process Control Block (PCB)
+P1->RSP = RSP
+RSP = P0->RSP
+
+o mejor, medularizando
+
+mov rdi, rsp
+call schedule
+mov rsp, rax
+
+not_so_dummy_handler <- RIP
+	
+	pushState
+
+	mov rdi, rsp // gene + 1
+	call schedule
+	mov rsp, rax
+
+	//Send EOI
+	mov al, 20h
+	out 20h, al
+
+	popState
+
+	iretq // se vuelve a pisar el RIP
+
+schedule:
+	-guardar rsp actual en el PCB de proceso actual
+	-retornar rsp del siguiente proceso
+
+Lo que acabamos de ver es el context switch on the fly. (Analogía motor funcionando)
+
+CREACIÓN DE PROCESO
+#################################################################
+
+¿y cómo creamos un proceso?
+
+Ya tenemos un mecanismo que puede ejecutar un proceso con un stack en determinadas condiciones.
+
+Imitemos esas condiciones y aprovechemos este mecanismo que ya tenemos
+
+¿cómo está el stack de un proceso nuevo?
+
+Stack de proceso nuevo
+
+| Align	| -> ?
+| SS	| -> 0x0
+| RSP	| -> ?
+| RFLAGS| -> 0x202
+| CS	| -> 0x8
+| RIP	| -> ?
+| Regs	| -> ?
+| ...	| -> ?
+| uso	| -> ?
+| ...	| -> ?
+| gene	| -> ?
+
+De cuánto es el Align
+
+Stack alineado:
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+| SS	|
+| RSP	|
+| RFLAGS|
+| CS	|
+| RIP	|
+
+Stack no alineado:
+
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|k|Align|
+| SS	|
+| RSP	|
+| RFLAGS|
+| CS	|
+| RIP	|
+
+Respuesta: No importa. El rsp al que hay que retornar está en el mismo stack. Solo hay que asegurar que el stack comienza en una dirección alineada, y eso es responsabilidad de...
+
+¡OJO ALINEAR!
+
+| SS	| -> 0x0
+| RSP	| -> BP
+| RFLAGS| -> 0x202
+| CS	| -> 0x8
+| RIP	| -> main
+| Regs	| -> 0
+| ...	| -> (rdi) argc
+| uso	| -> 0
+| ...	| -> (rsi) argv
+| gene	| -> 0
+
+Con el stack en estas condiciones, ejecutamos ...
+
+popState
+iretq
+
+100=malloc(4KB)
+
+|		Gene ... Uso ... Reg	RIP CS RFLAGS RSP SS|
+	   ^SP 											^-BP
+100							200
+
+yo todo queda:
+
+|		|	<- BP y SP
+
+rip: main
+rdi: argc
+rsi: argv
+
+//con int deshabilitadas
+crear proceso(shell)
+lo metemos en la cola de procesos
+el estado es READY
+
+agregar proceso hlt
+
+sti
+hlt <- cuelga
+printf(si estoy aca hay problemas)
+
+
+
+
+
+Para el primer proceso (shell) se podría guardar el proceso en la lista de procesos, y habilitar las interrupciones.
+Así se ejecutaría nuestro handler y el scheduler deberá reconocer que es el primero proceso y no guardar nada o guardarlo en un lugar especial del kernel. ¿qué pasa con el "hilo de ejecución" del kernel ahora?
+
+FINALIZACIÓN DE PROCESO
+#################################################################
+
+El proceso empezó con un stack vacío
+
+|		|	<- BP y SP
+
+En la mitad de la ejecución estará más o menos así
+
+|	s	|	<- BP
+|	t	|
+|	a	|
+|	c	|	
+|	k	|	
+			<- SP
+
+Justo antes de return estará así
+
+|basura|	<- BP y SP
+
+¿qué pasa si hago ret sobre este stack?
+
+¿opciones?
+
+syscall exit en todos los procesos o wrapper que haga exit
+
+¿qué pasa cuando un proceso hace exit?
+
+Lo más importante es el switch de procesos. Eliminar al proceso de una lista es fácil
+
+exit puede ser solo un cambio de estado a "killed" y más tarde se limpian los recursos
+
+syscall_handler
+	
+	pushStateNoRax
+
+	//Alguna syscall que setea el rax
+
+	popStateNoRax
+	iretq
+
+
+syscall_handler
+	
+	pushStateNoRax
+
+	//getpid // setear rax con el pid del current
+
+	//exit - setear el estado a killed
+	//o bien hacemos un sti hlt para esperar al timer
+	//o bien forzamos el timer ejecutando la interrupción
+		int 0x20
+	//salvo por la espera, el resultado es el mismo
+
+	popStateNoRax
+	iretq
+
+SIMULEMOS
+
+									A partir de ahora esto:
+
+									| Align	|
+									| SS	|
+									| RSP	|
+									| RFLAGS|
+									| CS	|
+									| RIP	|
+
+									lo represento como:
+
+									|-iretq	|
+
+									y esto:
+
+									| Regs	|
+									| ...	|
+									| uso	|
+									| ...	|
+									| gene	|
+
+									como esto:
+
+									| State	| o |SNoRax | según corresponda
+
+									Para simplificar los diagramas
+
+P1 está ejecutando y ejecuta exit
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+|-iretq	|
+| State	|
+
+
+ocurre la interrupción de software (y frenamos justo después de pushStateNoRax):
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+|-iretq	|			|-iretq	|
+| State	|			|SNoRax |
+
+forzamos (o esperamos) la int 0x20 (y frenamos justo antes de llamar al scheduler)
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+|-iretq	|			|-iretq	|	-> int 0x80
+| State	|			|SNoRax |	-> handler syscall
+					|-iretq	|	-> int 0x20
+					| State	|	-> handler timer
+
+El scheduler elige a P0 y el handler ejecuta popState e iretq
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+					|-iretq	|	-> int 0x80
+					|SNoRax |	-> handler syscall
+					|-iretq	|	-> int 0x20
+					| State	|	-> handler timer
+
+Eventualmente el proceso P1 desaparece
+¿cómo?
+
+	P0
+|	s	|
+|	t	|
+|	a	|
+|	c	|
+|	k	|
+
+
+BLOQUEO DE PROCESO
+#################################################################
+
+El caso de exit parece simple, pero, ¿qué pasa si un proceso se bloquea?
+
+¿Ejemplos?
+
+syscall_handler
+	
+	pushStateNoRax
+
+	//alguna syscall que bloquea
+		...
+		state = BLOQUEADO; -> READY
+		...
+		int20(); <- RIP
+->
+		PASA "MUCHO" TIEMPO
+
+	//cambiamos el estado a BLOQUEADO
+
+	//o bien hacemos un sti hlt para esperar al timer
+	//o bien forzamos el timer ejecutando la interrupción 0x20
+	//salvo por la espera, el resultado es el mismo
+
+	popStateNoRax
+	iretq
+
+La diferencia con el diagrama anterior es que, eventualemente, vamos a retomar la ejecución de P1,
+es decir, en algún momento algún evento cambiará el estado de P1 de BLOQUEADO a READY
+
+¿Ejemplos?
+
+P0 está ejecutando:
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+					|-iretq	|	-> int 0x80
+					|SNoRax |	-> handler syscall
+					|-iretq	|	-> int 0x20
+					| State	|	-> handler timer
+
+
+P0 puede ejecutar una syscall que cambia el estado de P1, la syscall retorna y cuando llega la interrupción del timer se cambia a P1:
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+					|-iretq	|	-> int 0x80
+					|SNoRax |	-> handler syscall
+					|-iretq	|	-> int 0x20
+					| State	|	-> handler timer
+
+					Otra opción es que la syscall cambie el estado de P1 pero antes de que retorne se llama al scheduler inmediatamente (como con exit)
+
+						P0					P1
+					|	s	|			|	s	|
+					|	t	|			|	t	|
+					|	a	|			|	a	|
+					|	c	|			|	c	|
+					|	k	|			|	k	|
+					|-iretq	|			|-iretq	|	-> int 0x80
+					|SNoRax |			|SNoRax |	-> handler syscall
+					|-iretq	|			|-iretq	|	-> int 0x20
+					| State	|			| State	|	-> handler timer
+
+					(Ambos casos son iguales desde lo que intentamos entender aquí, nos quedamos con el primero)
+
+Eventualmente el scheduler elige a P1. Veamos que pasa...
+
+El handler ejecuta popState e iretq
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+|-iretq	|			|-iretq	|	-> int 0x80
+| State	|			|SNoRax |	-> handler syscall
+
+¿dónde estaba ejecutando P1 cuando ocurrió la int 0x20 que lo desplazó del CPU?
+
+En el handler de la syscall, en particular, en la línea siguiente a int 0x20. Todo este tiempo estuvo bloqueado ahí mismo. Ahora la syscall está en condiciones de retornar, retorna y volvemos al handler de syscalls, el cual ejecuta popStateNoRAX y luego iretq, dejando el stack de P1 como sigue
+
+	P0					P1
+|	s	|			|	s	|
+|	t	|			|	t	|
+|	a	|			|	a	|
+|	c	|			|	c	|
+|	k	|			|	k	|
+|-iretq	|
+| State	|
+
+¿cómo le podemos dar más prioridad a un proceso?
+
+Vimos:
+- Cómo switchear entre 2 procesos READY - llamar scheduler
+- Cómo crear un proceso - simular stack del caso anterior y llamar scheduler
+- Cómo finalizar un proceso - exit cambia estado (KILLED) y llamar scheduler, luego se puede borrar el proceso.
+- Cómo bloquear un proceso - wait/read cambia estado (BLOCKED) y llama scheduler, eventualmente algún proceso cambiará su estado a READY
