@@ -87,7 +87,7 @@ int exception(va_list args){
                     draw(x, y, 0x000000);
                 }
             }
-            main(START);
+            shell();
         }
     }
 

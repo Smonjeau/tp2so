@@ -24,7 +24,7 @@ syscall cpuTemp, 6
 syscall getRegBkp, 7
 
 syscall malloc, 8
-
 syscall free, 9
-
 syscall memStatus, 10
+
+syscall startProcess, 11

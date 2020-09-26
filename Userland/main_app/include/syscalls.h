@@ -1,20 +1,24 @@
 #include <stdint.h>
 
-// ------------------------------------------------ MEMSTATUS -------------------------------------------------------------
-void memStatus(int * total_mem, int * available_mem , int * occ_mem);
+// ------------------------------------ MEMORY MANAGEMENT ------------------------------------
 
-// ------------------------------------------------ MALLOC ----------------------------------------------------------
+void memStatus(int * total_mem, int * available_mem , int * occ_mem);
 
 void * malloc (int size);
 
-// ------------------------------------------------ FREE ----------------------------------------------------------
+void free(void * ptr);
 
-void free (void * ptr);
-// ------------------------------------------------ DRAW -------------------------------------------------------------
+int memDump(void *src, void *dest);
+
+
+// ------------------------------------ PROCESS MANAGEMENT ------------------------------------
+
+int startProcess(void *main, int argc, char **argv);
+
+
+// ------------------------------------- SCREEN MANAGEMENT -------------------------------------
 
 int draw(int x, int y, int rgb);
-
-// ------------------------------------------------ GETRES -------------------------------------------------------------
 
 typedef struct ScreenRes{
     int height, width;
@@ -23,19 +27,8 @@ typedef struct ScreenRes{
 
 int getRes(ScreenRes * res);
 
-// ------------------------------------------------ MEMDUMP -------------------------------------------------------------
 
-int memDump(void *src, void *dest);
-
-// ------------------------------------------------ GETTIME -------------------------------------------------------------
-
-typedef struct Time{
-    int hours, minutes, seconds;
-} Time;
-
-int getTime(Time * time);
-
-// ------------------------------------------------ CPUINFO -------------------------------------------------------------
+// ------------------------------------- CPU INFO -------------------------------------
 
 typedef struct CPUInfo{
     char *brandName, *brandDesc;
@@ -43,14 +36,19 @@ typedef struct CPUInfo{
 
 int cpuInfo(CPUInfo * info);
 
-// ------------------------------------------------ CPUTEMP -------------------------------------------------------------
-
 int cpuTemp();
-
-// ------------------------------------------------ GETREGBKP ----------------------------------------------------------
 
 typedef struct RegBkp{
     uint64_t rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15;
 } RegBkp;
 
 int getRegBkp(RegBkp * dest);
+
+
+// ------------------------------------- OTHERS -------------------------------------
+
+typedef struct Time{
+    int hours, minutes, seconds;
+} Time;
+
+int getTime(Time * time);

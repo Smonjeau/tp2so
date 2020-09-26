@@ -2,6 +2,7 @@
 //#include <context_manager.h> No existe este archivo
 #include <mem_manager.h>
 #include <stddef.h>
+#include <screen_driver.h>
 
 /*
 	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100,
@@ -56,6 +57,8 @@ void swapQueues() {
 
 
 void * schedule(void *currContextRSP) {
+
+	return currContextRSP;
 
 	/*Gran parte de este scheduler deberá ser alterado en próxima
 	entrega pues no se está considerando caso de proceso bloqueado.*/
@@ -114,22 +117,26 @@ void * schedule(void *currContextRSP) {
 }
 
 
-int newProc(int argc, char **argv, void *main){
+int newProcess(void *main, int argc, char **argv){
+
+	static int pid=0;
 
     void *contextRSP = createContext(argc, argv, main);
 
 	PCB new = malloc(sizeof(struct PCB));
+	
 	if (new == NULL)
-		return -1;
-
+		return 1;
+	
 	new->procState = READY;
     new->contextRSP = contextRSP;
+	new->pid = pid++;
 
 	assignQuantumTime(new);
 
 	int priority = getPriorityLevel(new) - 100;
 	queueProc(actives[priority], new);
 
-	return 0;
+	return pid;
 
 }

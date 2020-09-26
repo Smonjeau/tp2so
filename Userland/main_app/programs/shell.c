@@ -109,13 +109,12 @@ static void drawIndicator(int color)
 }
 
 
+/* -------------------------------------------------------------
+ Method that activates when this window becomes selected
+ it waits for a key press constantly and handles it appropiately
+---------------------------------------------------------------- */
 
-/* -----------------------------------------------------------
- Creates the window, and draws the title
--------------------------------------------------------------- */
-
-void main()
-{
+void shell(){
 
 	createWindow();
 	setWindow(&w);
@@ -124,17 +123,6 @@ void main()
 	printLine("Shell");
 
 	drawIndicator(indicatorColor);
-
-	shell();
-}
-
-/* -------------------------------------------------------------
- Method that activates when this window becomes selected
- it waits for a key press constantly and handles it appropiately
----------------------------------------------------------------- */
-
-void shell()
-{
 
 	char bufferw2[W2_BUFFER_LEN + 1];
 	cleanBuffer(bufferw2, W2_BUFFER_LEN);

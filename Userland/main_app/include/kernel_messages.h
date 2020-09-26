@@ -4,7 +4,7 @@
 | This file defines numbers that are used by the kernel to send messages to userspace apps.  	    |
 ---------------------------------------------------------------------------------------------------*/
 
-#define START 0
+#define START_SHELL 0
 #define IRQ_PRODUCED 1
 #define EXCEPTION_PRODUCED 2
 

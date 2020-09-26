@@ -14,4 +14,6 @@ regDumpTestSet:
 
 .section .data
 
-invalidOpcode: .byte 6
+invalidOpcode:
+    .byte 6
+    ret

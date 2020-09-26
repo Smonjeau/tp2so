@@ -5,7 +5,7 @@
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
 
 typedef struct PCB {
-    //int pid;
+    int pid;
     ProcState procState;
     void * contextRSP;
     unsigned char remainingTicks;
@@ -20,22 +20,22 @@ typedef struct ProcQueue {
 
 
 
-/* Updates de RSP of the running process and returns the RSP of the next process */
+// Updates de RSP of the running process and returns the RSP of the next process
 
 void *schedule(void *currProcRSP);
 
-/* Calls scheduler and updates the RSP to the chosen process context */
+// Calls scheduler and updates the RSP to the chosen process context
 
 void switchProcess();
 
 
-/* Creates a context for a new process and returns its RSP */
+// Creates a context for a new process and returns its RSP
 
 void *createContext(int argc, char **argv, void *main);
 
-/* Creates a new process and returns */
+// Creates a new process and returns its PID
 
-int newProcess(int argc, char **argv, void * main);
+int newProcess(void * main, int argc, char **argv);
 
 
 /* Kills a process and returns */

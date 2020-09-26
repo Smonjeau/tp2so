@@ -11,6 +11,8 @@
 #include <idt_loader.h>
 #include <screen_driver.h>
 #include <kernel_messages.h>
+#include <process_manager.h>
+#include <mem_manager.h>
 
 extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
@@ -46,11 +48,27 @@ void * initializeKernelBinary(){
 }
 
 
+int test(int argc, char **argv){
+	for(int x=0; x<1024; x++)
+		draw(x,500,0x00ff00);
+	while(1);
+}
+
+
 int main(){
 
 	load_idt();
 
-	((EntryPoint) mainApp)(START, 0);
+	newProcess(test, 0, (void*)0);
+
+	#pragma GCC diagnostic ignored "-Wunused-variable"
+	void *nextRSP = schedule((void *) 0);
+
+	// __asm__ ("hlt\n\t");
+
+	__asm__ ("sti\n\t");
+
+	((EntryPoint) mainApp)(START_SHELL, 0);
 		
 	return 0;
 

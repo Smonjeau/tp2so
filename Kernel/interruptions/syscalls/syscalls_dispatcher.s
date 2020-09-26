@@ -52,6 +52,9 @@ _syscallDispatcher:
     cmp rax,10 
     je _memStatus
 
+    cmp rax,11
+    je _startProcess
+
     iretq
 
 _draw:
@@ -91,4 +94,8 @@ _free:
 
 _memStatus:
     call sysMemStatus 
+    iretq
+
+_startProcess:
+    call sysStartProcess 
     iretq

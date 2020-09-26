@@ -1,8 +1,8 @@
 #include <stdarg.h>
 
-int main();
-
 int test();
+
+int shell();
 
 int exception(va_list args);
 

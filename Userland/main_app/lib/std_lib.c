@@ -51,10 +51,6 @@ void print_mem_status(){
     printLine(itoa(total_mem,buffer,10,-1));
     printLine(itoa(avail_mem,buffer,10,-1));
     printLine(itoa(occ_mem,buffer,10,-1));
-
-    
-
-
 }
 
 /* ------------------------------------------------------------------------------------------------------------------

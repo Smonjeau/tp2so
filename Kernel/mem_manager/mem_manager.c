@@ -1,7 +1,7 @@
 #include  <lib.h>
 
 #define NULL ((void*)0)
-#define FIRST_HEAP_ADRESS ((char*) 0x100000)
+#define FIRST_HEAP_ADRESS ((char*) 0x800000)
 #define MEM_SIZE (8*1024*1024)
 #ifndef BUDDY
 
@@ -11,8 +11,6 @@
 #define BYTE_SIZE 8
 #define BLOCK_SIZE 1024
 #define BITMAP_SIZE ((MEM_SIZE/BLOCK_SIZE)/BYTE_SIZE)
-
-
 
 char bitmap[BITMAP_SIZE] = {0};
 
@@ -94,8 +92,6 @@ void * malloc(int size){
     }else
 
     return NULL;    // Not enough space
-
-    
 
 }
 

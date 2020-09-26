@@ -8,11 +8,10 @@
 #include <stdint.h>
 #include <kernel_messages.h>
 #include <programs.h>
+#include <syscalls.h>
 
 extern char bss;
 extern char endOfBinary;
-
-int main();
 
 void * memset(void * destiny, int32_t c, uint64_t length);
 
@@ -22,8 +21,9 @@ int _start(int message, int nargs, ...) {
     va_start(valist, nargs);
 
 	switch(message){
-		case START:
-			return main();
+		case START_SHELL:
+			return shell();
+			//startProcess(shell, 0, (void*) 0);
 
 		case EXCEPTION_PRODUCED:
 			return exception(valist);
@@ -32,7 +32,7 @@ int _start(int message, int nargs, ...) {
 			return interruption(valist);
 
 		default:
-			return main();
+			return shell();
 	}
 
 }

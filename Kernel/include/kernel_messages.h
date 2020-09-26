@@ -5,7 +5,7 @@
 | Also, it defines the address at which the main app of userspace is loaded.                  	    |
 ---------------------------------------------------------------------------------------------------*/
 
-#define START 0
+#define START_SHELL 0
 #define IRQ_PRODUCED 1
 #define EXCEPTION_PRODUCED 2
 
