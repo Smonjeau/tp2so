@@ -12,17 +12,18 @@ typedef struct PCB {
 } * PCB;
 
 
-typedef struct procQueue {
+typedef struct ProcQueue {
 	PCB first;
 	PCB last;
-} procQueue;
+} ProcQueue;
 
 
-/*  Debe ser llamada al crearse un nuevo proceso.
-	En caso de exito retorna 0.
-	En caso de error retorna -1 (por falta de memoria dinamica).
-*/
-int newProc(void * contextRSP);
+/* Returns the RSP of the next process */
 
+void *schedule();
+
+/* Creates a new process and returns */
+
+int newProc(int argc, char **argv, void * main);
 
 #endif /* SCHEDULER_H_ */
