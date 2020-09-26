@@ -1,6 +1,5 @@
-#include "include/scheduler.h"
-#include "include/context_manager.h"
-#include "include/mem_manager.h"
+#include <process_manager.h>
+#include <mem_manager.h>
 #include <stddef.h>
 
 /*
@@ -18,15 +17,18 @@ PCB *pcbList = NULL;
 ProcQueue actives[40];
 ProcQueue expireds[40];
 
+
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
 	pcb->remainingTicks = 10;
 }
 
+
 // Decide el nivel de prioridad del proceso.
 int getPriorityLevel(PCB pcb) {
 	return 100;
 }
+
 
 // Añade proceso a una cola particular.
 void queueProc(ProcQueue queue, PCB pcb) {
@@ -40,7 +42,8 @@ void queueProc(ProcQueue queue, PCB pcb) {
 	}
 }
 
-void * schedule() {
+
+void *schedule(void *currProcRSP) {
 /*
 	if(currentPCB == NULL)
 		return NULL; //No hay procesos aún
@@ -85,12 +88,11 @@ void * schedule() {
 
     // Return the contextRSP of the chosen process
 
-    
 */
 }
 
 
-int newProc(int argc, char **argv, void *main){
+int newProcess(int argc, char **argv, void *main){
 
     void *contextRSP = createContext(argc, argv, main);
 
@@ -107,5 +109,10 @@ int newProc(int argc, char **argv, void *main){
 	queueProc(actives[priority], new);
 
 	return 0;
+
+}
+
+
+int killProcess(int pid){
 
 }

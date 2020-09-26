@@ -1,17 +1,19 @@
 extern schedule;
 
-switchContext:
-    mov rsp, rsi
+switchProcess:
+	mov rsi, rsp
+	call schedule;
+    mov rsp, rax
 
 createContext:
-    ; Control registers
+    ; Interrupt data
     push 0      ; SS
     push rbp    ; RSP
     push 0x202  ; RFLAGS
     push 0x8    ; CS
-    push rdx ; RIP
+    push rdx 	; RIP
 
-    ; General registers
+    ; State data
     push 0      ; r15
 	push 0      ; r14
 	push 0      ; r13

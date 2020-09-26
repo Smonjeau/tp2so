@@ -5,7 +5,6 @@
 | Also, the main app module is launched here.                 	    								|
 ---------------------------------------------------------------------------------------------------*/
 
-
 #include <stdint.h>
 #include <lib.h>
 #include <module_loader.h>
