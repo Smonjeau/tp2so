@@ -1,5 +1,5 @@
-#ifndef SCHEDULER_H_
-#define SCHEDULER_H_
+#ifndef PROCESS_MANAGER_H_
+#define PROCESS_MANAGER_H_
 
 
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
@@ -43,4 +43,4 @@ int newProcess(int argc, char **argv, void * main);
 int killProcess(int pid);
 
 
-#endif /* SCHEDULER_H_ */
+#endif /* PROCESS_MANAGER_H_ */
