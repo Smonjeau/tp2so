@@ -76,7 +76,7 @@ static void createWindow()
 	ScreenRes res;
 	getRes(&res);
 
-	w.xi = res.width / 2 + 10;
+	w.xi = 0;
 	w.xf = res.width;
 	w.yi = 0;
 	w.yf = res.height;
@@ -108,11 +108,13 @@ static void drawIndicator(int color)
 		drawPoint(x, indicatorY, indicatorHeight, color);
 }
 
+
+
 /* -----------------------------------------------------------
  Creates the window, and draws the title
 -------------------------------------------------------------- */
 
-void initWindow2()
+void main()
 {
 
 	createWindow();
@@ -120,6 +122,10 @@ void initWindow2()
 
 	w.activeCursor = titleCursor;
 	printLine("Shell");
+
+	drawIndicator(indicatorColor);
+
+	shell();
 }
 
 /* -------------------------------------------------------------
@@ -127,13 +133,8 @@ void initWindow2()
  it waits for a key press constantly and handles it appropiately
 ---------------------------------------------------------------- */
 
-void window2()
+void shell()
 {
-
-	setWindow(&w);
-	drawIndicator(indicatorColor);
-
-	//newLine();
 
 	char bufferw2[W2_BUFFER_LEN + 1];
 	cleanBuffer(bufferw2, W2_BUFFER_LEN);
@@ -147,14 +148,6 @@ void window2()
 	{
 
 		char c = getChar();
-
-		// Switch to Window 1
-		if (c == f1Code)
-		{
-			drawIndicator(0);
-			drawCursor(0);
-			return;
-		}
 
 		if(c == f3Code)
 		{

@@ -8,10 +8,6 @@
 	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
 */
 
-#include "include/mem_manager.h"
-
-#define NULL ((void*)0)
-
 PCB *pcbList = NULL;
 
 ProcQueue actives[40];
@@ -89,6 +85,7 @@ void *schedule(void *currProcRSP) {
     // Return the contextRSP of the chosen process
 
 */
+	return NULL;
 }
 
 
@@ -114,5 +111,7 @@ int newProcess(int argc, char **argv, void *main){
 
 
 int killProcess(int pid){
+
+	return 0;
 
 }
