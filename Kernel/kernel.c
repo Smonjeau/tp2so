@@ -64,7 +64,7 @@ int main(){
 	#pragma GCC diagnostic ignored "-Wunused-variable"
 	void *nextRSP = schedule((void *) 0);
 
-	// __asm__ ("hlt\n\t");
+	//__asm__ ("hlt\n\t");
 
 	__asm__ ("sti\n\t");
 

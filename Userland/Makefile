@@ -7,7 +7,7 @@ mainApp:
 
 clean:
 	cd main_app; make clean
-	rm -rf *.bin
+	rm -rf *.bin *.elf
 
 
 .PHONY: mainApp all clean
