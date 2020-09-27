@@ -10,9 +10,11 @@
 	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
 */
 
+int firstProc = 0; //Recibimos primer proceso?
 
-ProcQueue queue1[40];
-ProcQueue queue2[40];
+
+ProcQueue queue1[40] = {{0}};
+ProcQueue queue2[40] = {{0}};
 
 //De esta forma será facil hacer swap
 ProcQueue * actives = queue1;
@@ -29,14 +31,14 @@ int getPriorityLevel(PCB pcb) {
 }
 
 // Añade proceso a una cola particular.
-void queueProc(ProcQueue queue, PCB pcb) {
-	if(queue.last == NULL) {
+void queueProc(ProcQueue * queue, PCB pcb) {
+	if(queue->last == NULL) {
 		//Empty queue
-		queue.first = pcb;
-		queue.last = pcb;
+		queue->first = pcb;
+		queue->last = pcb;
 	} else {
-		(queue.last)->nextPCB = pcb;
-		queue.last = pcb;
+		(queue->last)->nextPCB = pcb;
+		queue->last = pcb;
 	}
 	pcb->nextPCB = NULL;
 }
@@ -45,7 +47,8 @@ void sendToExpired(PCB pcb) {
 	assignQuantumTime(pcb); //Le reseteamos su quantum time
 	int priority = getPriorityLevel(pcb) - 100; //Recalculamos su priority
 	pcb->procState = READY;
-	queueProc(expireds[priority], pcb);
+	//queueProc(expireds[priority], pcb);
+	queueProc(expireds + priority, pcb);
 }
 
 void swapQueues() {
@@ -58,7 +61,6 @@ void swapQueues() {
 
 void * schedule(void *currContextRSP) {
 
-	return currContextRSP;
 
 	/*Gran parte de este scheduler deberá ser alterado en próxima
 	entrega pues no se está considerando caso de proceso bloqueado.*/
@@ -67,7 +69,7 @@ void * schedule(void *currContextRSP) {
 	int priorityIdx;
 	for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
 		currentPCB = actives[priorityIdx].first;
-		if(currentPCB != NULL && currentPCB->procState == RUN)
+		if(currentPCB != NULL)// && currentPCB->procState == RUN)
 			break; //Lo encontré
 		
 	}
@@ -75,10 +77,17 @@ void * schedule(void *currContextRSP) {
 	if(priorityIdx == 40)
 		return NULL; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
 
-	currentPCB->contextRSP = currContextRSP; //Por si cambió
-	currentPCB->remainingTicks--;
+
+	if(currentPCB->procState == RUN) {
+		currentPCB->remainingTicks--;
+		currentPCB->contextRSP = currContextRSP; //Por si cambió
+	} else if(currentPCB->procState == READY) { //Primer proceso
+		currentPCB->procState = RUN;
+	}
+
+	
 	if(currentPCB->remainingTicks > 0)
-		return currContextRSP; //Continua el mismo proceso de antes.
+		return currentPCB->contextRSP; //Continua el mismo proceso de antes.
 
 
 	//Se terminó el tiempo asignado del proceso.
@@ -118,24 +127,33 @@ void * schedule(void *currContextRSP) {
 
 
 int newProcess(void *main, int argc, char **argv){
-
 	static int pid=0;
 
-    void *contextRSP = createContext(argc, argv, main);
+    void * contextRSP = createContext(argc, argv, main);
 
 	PCB new = malloc(sizeof(struct PCB));
 	
 	if (new == NULL)
-		return 1;
+		return -1;
 	
-	new->procState = READY;
+	
     new->contextRSP = contextRSP;
 	new->pid = pid++;
+	new->nextPCB = NULL;
 
 	assignQuantumTime(new);
 
 	int priority = getPriorityLevel(new) - 100;
-	queueProc(actives[priority], new);
+	
+
+	if(firstProc == 0) {
+		new->procState = READY;
+		firstProc = 1;
+	} else {
+		new->procState = READY;
+	}
+
+	queueProc(actives + priority, new);
 
 	return pid;
 

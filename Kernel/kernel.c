@@ -61,12 +61,13 @@ int main(){
 
 	newProcess(test, 0, (void*)0);
 
-	#pragma GCC diagnostic ignored "-Wunused-variable"
-	void *nextRSP = schedule((void *) 0);
+	//#pragma GCC diagnostic ignored "-Wunused-variable"
+	//void * nextRSP = schedule((void *) 0);
 
 	//__asm__ ("hlt\n\t");
 
 	__asm__ ("sti\n\t");
+	while(1);
 
 	((EntryPoint) mainApp)(START_SHELL, 0);
 		
