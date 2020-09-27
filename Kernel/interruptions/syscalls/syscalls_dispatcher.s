@@ -16,6 +16,7 @@
 .extern sysMalloc 
 .extern sysMemStatus 
 .extern sysFree
+.extern sysPS
 
 .intel_syntax noprefix
 
@@ -55,6 +56,9 @@ _syscallDispatcher:
     cmp rax,11
     je _startProcess
 
+    cmp rax, 12
+    je _ps
+
     iretq
 
 _draw:
@@ -90,6 +94,10 @@ _malloc:
 
 _free:
     call sysFree
+    iretq
+
+_ps:
+    call sysPS
     iretq
 
 _memStatus:

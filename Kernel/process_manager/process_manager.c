@@ -1,5 +1,5 @@
 #include <process_manager.h>
-//#include <context_manager.h> No existe este archivo
+#include <lib.h>
 #include <mem_manager.h>
 #include <stddef.h>
 #include <screen_driver.h>
@@ -56,6 +56,33 @@ void swapQueues() {
 	aux = expireds;
 	expireds = actives;
 	actives = aux;
+}
+
+void ps(void * buffer) {
+	int structSize = sizeof(struct PCB);
+	int count = 0;
+	ProcQueue * queue;
+	PCB pcb;
+	//Recorro activos
+	for(int priority = 0; priority < 40; priority++) {
+		queue = actives + priority;
+		pcb = queue->first;
+		while(pcb != NULL) {
+			memcpy(buffer + structSize * count++, pcb, structSize);
+			pcb = pcb->nextPCB;
+		}
+	}
+
+	//Recorro expirados
+	for(int priority = 0; priority < 40; priority++) {
+		queue = expireds + priority;
+		pcb = queue->first;
+		while(pcb != NULL) {
+			memcpy(buffer + structSize * count++, pcb, structSize);
+			pcb = pcb->nextPCB;
+		}
+	}
+	
 }
 
 
