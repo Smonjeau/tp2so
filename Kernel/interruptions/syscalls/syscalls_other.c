@@ -4,7 +4,6 @@
 | These functions implement miscellaneous syscalls.           	                                    |
 ---------------------------------------------------------------------------------------------------*/
 
-#include <keyboard_driver.h>
 #include <rtc_driver.h>
 #include <stdint.h>
 

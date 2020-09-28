@@ -15,6 +15,7 @@
     ret
 .endm
 
+syscall read, 0
 syscall draw, 1
 syscall getRes, 2
 syscall memDump, 3

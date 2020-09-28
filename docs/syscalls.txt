@@ -2,6 +2,7 @@ Syscalls follow the System V AMD64 ABI calling convention/
 A function that returns 0/-1 on success/failure will be refered as "s/f".
 
 NAME          RAX     RDI                RSI                   RDX               DESCRIPTION
+READ          0                                                                  Returns a keycode from buffer, or -1 if empty
 DRAW          1       uint8_t xcord      uint8_t ycord         uint8 rgb         Draws a pixel at (x,y) with rgb color (in hex), returns -2/-1 on invalid color/coordinate, 0 if ok
 GETRES        2       ScreenRes * res                                            Load screen resolution into res, returns void.
 MEMDUMP       3       void * src         void * dest                             Loads 32 bytes of memory from src to dest, returns s/f.

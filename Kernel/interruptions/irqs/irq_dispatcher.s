@@ -90,11 +90,11 @@ _irq00Handler:			# Timer Tick
 _irq01Handler:			# Keyboard
 	pushState
 
-	call read			# Before lending control to dispatcher, it checks if TAB key has been pressed
-	cmp rax, 15			# If so, it stores the state of the registers, this state can be accessed later through a syscall
-	jne _skipStore
+	; call read			# Before lending control to dispatcher, it checks if TAB key has been pressed
+	; cmp rax, 15			# If so, it stores the state of the registers, this state can be accessed later through a syscall
+	; jne _skipStore
 
-	call storeState
+	; call storeState
 
 	_skipStore: mov rdi, 1
 	call irqDispatcher

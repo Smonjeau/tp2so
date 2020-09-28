@@ -45,6 +45,6 @@ void int_20() {
 // Keyboard
 void int_21() {
 
-	((EntryPoint) mainApp)(IRQ_PRODUCED, 2, KEYBOARD_IRQ, read());
+	handleKeyStroke();
 
 }

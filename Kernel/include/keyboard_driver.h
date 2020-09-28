@@ -1,5 +1,5 @@
 int read();
 
-void keyPressed();
+void handleKeyStroke();
 
 int getKey();

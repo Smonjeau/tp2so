@@ -6,6 +6,7 @@
 
 .globl _syscallDispatcher
 
+.extern sysRead
 .extern sysDraw
 .extern sysGetRes
 .extern sysMemDump
@@ -23,6 +24,9 @@
 .section .text
 
 _syscallDispatcher:
+    cmp rax, 0
+    je _read
+
     cmp rax, 1
     je _draw
 
@@ -59,6 +63,10 @@ _syscallDispatcher:
     cmp rax, 12
     je _ps
 
+    iretq
+
+_read:
+    call sysRead
     iretq
 
 _draw:

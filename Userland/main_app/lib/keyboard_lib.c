@@ -30,25 +30,14 @@ char shifted_keyboard_map[64] = {
 int shift=0;
 int caps=0;
 
-#define BUFFER_LEN 8
-
-int buffer[BUFFER_LEN]={0};
-int pos=-1;
-
-
-void libKeyboardListener(int keyPos){
-    buffer[++pos] = keyPos;
-}
-
 
 char getChar(){
 
-    while(pos<0){
+    int keyCode;
+    while((keyCode=read())<0){
         sti();
         halt();
     }
-
-    int keyCode = buffer[pos--];
 
     // Shift in
     if(keyCode == 42 || keyCode == 54){

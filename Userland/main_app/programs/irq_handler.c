@@ -17,11 +17,6 @@ int interruption(va_list valist){
         winTimerTickListener();
     }
 
-    if(id == KEYBOARD_IRQ){
-        int keyPos = va_arg(valist, int);
-        libKeyboardListener(keyPos);
-    }
-
     return 1;
 
 }
