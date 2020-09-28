@@ -84,13 +84,6 @@ void ps(void * buffer, int * procCant) {
 			pcb = pcb->nextPCB;
 		}
 	}
-	//SACAR ESTO ...
-	PCB new = malloc(sizeof(struct PCB));
-	
-	if (new == NULL)
-		return ;
-	
-
 
 
 	*procCant = count;

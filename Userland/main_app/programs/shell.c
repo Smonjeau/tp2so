@@ -53,6 +53,7 @@ typedef enum
 	INVOPCODE,
 	CLEAR,
 	PS,
+	MEM,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
 	WRONG
@@ -76,6 +77,7 @@ static void printWarning(int num);
 static int parseHexa(char *);
 
 static void printProcData();
+static void printMemStatus();
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	WINDOW METHODS
@@ -243,6 +245,9 @@ void shell(){
 			case PS:
 				printProcData();
 				break;
+			case MEM:
+				printMemStatus();
+				break;
 
 			case DISPLAY_ANON:
 				displayImage(ANONYMOUS, 20, 200);
@@ -297,6 +302,8 @@ static void help(void)
 	printLine("- display anon      to show an image of Anonymous");
 	printLine("- display matrix    to show an image of Matrix");
 	printLine("- clear             to clear the screen");
+	printLine("- mem               to print heap status");
+	printLine("- ps                to print procceses data");
 
 	newLine();
 	
@@ -405,7 +412,7 @@ void printProcData(){
 	for(int i=0;i<count;i++){
 		pcb=buffer [i];
 		print("Pid: ");
-		print(itoa(pcb.pid,str,10,-1));
+		print(itoa(pcb.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
 		print("        State: ");
 		switch (pcb.procState)
 		{
@@ -462,6 +469,13 @@ void printMemDump(char *sourceStr)
 			   src[i + 4], src[i + 5], src[i + 6], src[i + 7]);
 	}
 	
+}
+
+/* -------------------------------------------------------------
+						PRINTMEMSTATUS
+---------------------------------------------------------------- */
+void printMemStatus(){
+	print_mem_status();
 }
 
 /* -------------------------------------------------------------
@@ -703,12 +717,20 @@ static int isPs(char * buffer, int length){
 	return checkEmptySpace(buffer,2,length);
 }
 
+static int isPrintMemData(char*buffer,int length){
+	if(!strcmp("mem",buffer))
+		return 0;
+	return checkEmptySpace(buffer,3,length);
+}
+
 static int isAllowedChar(char c)
 {
 	if (isAlpha(c) || isDigit(c) || isSpace(c) || c == 0)
 		return 1;
 	return 0;
 }
+
+
 
 command parseCommand(char *buffer, int length, char *string)
 {
@@ -756,6 +778,8 @@ command parseCommand(char *buffer, int length, char *string)
 		return CLEAR;
 	if (isPs(buffer,length))
 		return PS;
+	if (isPrintMemData(buffer,length))
+		return MEM;    
 
 	return NOCOMMAND;
 }
