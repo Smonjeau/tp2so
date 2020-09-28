@@ -247,7 +247,7 @@ void killProcess(int pid) {
 		}
 		if(found) {
 
-			//priorityIdx--; //Para comensar el ultimo ++ del for
+			priorityIdx--; //Para comensar el ultimo ++ del for
 			if((actives[priorityIdx].first)->pid == pid) {
 				//Es el primero
 				actives[priorityIdx].first = currentPCB->nextPCB;
