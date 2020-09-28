@@ -40,6 +40,9 @@ switchProcessContext:
 createProcessContext:
 	pop retAddress
 
+	# Reserve 1kb for previous process stack growth
+	sub rsp, 1024
+
     # Interrupt data
     push 0      # SS
     push rbp    # RSP

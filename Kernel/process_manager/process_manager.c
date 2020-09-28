@@ -88,7 +88,6 @@ void ps(void * buffer) {
 
 void * schedule(void *currContextRSP) {
 
-
 	/*Gran parte de este scheduler deberá ser alterado en próxima
 	entrega pues no se está considerando caso de proceso bloqueado.*/
 
@@ -149,6 +148,7 @@ void * schedule(void *currContextRSP) {
 		currentPCB->procState = RUN;
 		return currentPCB->contextRSP;
 	}
+
 
 }
 
