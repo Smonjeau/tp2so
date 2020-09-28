@@ -15,3 +15,7 @@ int sysStartProcess(void *main, int argc, char **argv){
     return createProcessContext(argc, argv, main);
 
 }
+
+void sysPS(void * buffer) {
+	ps(buffer);
+}

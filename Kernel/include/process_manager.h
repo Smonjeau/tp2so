@@ -43,4 +43,8 @@ int createProcessContext(int argc, char **argv, void *main);
 int killProcess(int pid);
 
 
+/* PS devuelve arreglo de structs PCB existentes y numero de procesos */
+void ps(void * buffer);
+
+
 #endif /* PROCESS_MANAGER_H_ */
