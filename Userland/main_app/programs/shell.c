@@ -56,7 +56,8 @@ typedef enum
 	MEM,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
-	WRONG
+	WRONG,
+	PS
 } command;
 
 command parseCommand(char *buffer, int length, char *string);
@@ -75,6 +76,7 @@ static void clearWindow(void);
 
 static void printWarning(int num);
 static int parseHexa(char *);
+static void psInfo();
 
 static void printProcData();
 static void printMemStatus();
@@ -261,6 +263,9 @@ void shell(){
 				printWarning(WRONG);
 				break;
 
+			case PS:
+				psInfo();
+
 			default:
 				printWarning(NOCOMMAND);
 			}
@@ -327,6 +332,14 @@ static void printTime(void)
 	getTime(&t);
 
 	printf("\\nTime now: %2d:%2d:%2d\\n", 3, t.hours, t.minutes, t.seconds);
+}
+
+/* -------------------------------------------------------------
+						PS
+--------------------------------------------------------------- */
+static void psInfo() {
+	//Acá hay que reservar espacio para el buffer
+	//Llamar a la syscall
 }
 
 /* -------------------------------------------------------------

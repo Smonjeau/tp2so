@@ -40,7 +40,7 @@ int createProcessContext(int argc, char **argv, void *main);
 
 /* Kills a process and returns */
 
-int killProcess(int pid);
+void killProcess(int pid);
 
 
 /* PS devuelve arreglo de structs PCB existentes y numero de procesos */

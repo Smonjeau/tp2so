@@ -3,6 +3,7 @@
 #include <mem_manager.h>
 #include <stddef.h>
 #include <screen_driver.h>
+#include <interrupts.h>
 
 /*
 	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100,
@@ -10,7 +11,6 @@
 	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
 */
 
-int firstProc = 0; //Recibimos primer proceso?
 
 
 ProcQueue queue1[40] = {{0}};
@@ -90,6 +90,18 @@ void ps(void * buffer, int * procCant) {
 	
 }
 
+void swapIfNeeded() {
+	int idx;
+	PCB auxPCB = NULL;
+	for(idx = 0; idx < 40 && auxPCB == NULL; idx++)
+		auxPCB = actives[idx].first;
+
+	if(auxPCB == NULL)
+		swapQueues();
+
+	
+}
+
 
 void * schedule(void *currContextRSP) {
 
@@ -159,6 +171,7 @@ void * schedule(void *currContextRSP) {
 
 
 int createProcessPCB(void *contextRSP){
+	_cli();	
 	static int pid=0;
 
 	PCB new = malloc(sizeof(struct PCB));
@@ -174,22 +187,120 @@ int createProcessPCB(void *contextRSP){
 
 	int priority = getPriorityLevel(new) - 100;
 
-	if(firstProc == 0) {
-		new->procState = READY;
-		firstProc = 1;
-	} else {
-		new->procState = READY;
-	}
+	
+	new->procState = READY;
 
 	queueProc(actives + priority, new);
+	_sti();	
 
 	return pid;
 
 }
 
 
-// void killProcess(int pid){
 
-// 	// PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
+void killProcess(int pid) {
+	_cli(); //La hacemos atomica
+
+	PCB currentPCB;
+	int priorityIdx;
+	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
+		//Buscamos proceso en estado RUN
+		for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
+			currentPCB = actives[priorityIdx].first;
+			if(currentPCB != NULL)// && currentPCB->procState == RUN)
+				break; //Lo encontré. Se que está en estado RUN porque aun no consideramos estado bloqueado.
+		}
+
+		
+
+
+		actives[priorityIdx].first = currentPCB->nextPCB;
+
+
+		if(actives[priorityIdx].first == NULL) {
+
+			actives[priorityIdx].last = NULL;
+			swapIfNeeded();
+
+			
+			
+		}
+
+
+	} else {
+		//Buscamos proceso con el mismo pid
+		//Vamos por los activos
+		int found = 0;
+		PCB prevPCB = NULL; //Lo encesitamos para el proceso de borrado en una cola
+		for(priorityIdx = 0; priorityIdx < 40 && !found; priorityIdx++) {
+			currentPCB = actives[priorityIdx].first;
+			
+			while(currentPCB != NULL && !found) {
+				if(currentPCB->pid == pid) {
+					found = 1;
+				} else {
+					prevPCB = currentPCB;
+					currentPCB = currentPCB->nextPCB;
+				}
+			}			
+		}
+		if(found) {
+
+			//priorityIdx--; //Para comensar el ultimo ++ del for
+			if((actives[priorityIdx].first)->pid == pid) {
+				//Es el primero
+				actives[priorityIdx].first = currentPCB->nextPCB;
+				if(actives[priorityIdx].first == NULL)
+					actives[priorityIdx].last = NULL;
+			} else {
+				//No es el primero
+				if((actives[priorityIdx].last)->pid == pid)
+					actives[priorityIdx].last = prevPCB; //Es el ultimo	
+				prevPCB->nextPCB = currentPCB->nextPCB;
+			}
+
+		} else {
+			//Vamos por los expirados
+			for(priorityIdx = 0; priorityIdx < 40 && !found; priorityIdx++) {
+				currentPCB = expireds[priorityIdx].first;
+				while(currentPCB != NULL && !found) {
+					if(currentPCB->pid == pid) {
+						found = 1;
+					} else {
+						prevPCB = currentPCB;
+						currentPCB = currentPCB->nextPCB;
+					}
+				}			
+			}
+			
+			priorityIdx--; //Para comensar el ultimo ++ del for
+			if((expireds[priorityIdx].first)->pid == pid) {
+				//Es el primero
+				expireds[priorityIdx].first = currentPCB->nextPCB;
+				if(expireds[priorityIdx].first == NULL)
+					expireds[priorityIdx].last = NULL;
+			} else {
+				//No es el primero
+				if((expireds[priorityIdx].last)->pid == pid)
+					expireds[priorityIdx].last = prevPCB; //Es el ultimo	
+				prevPCB->nextPCB = currentPCB->nextPCB;
+			}
+
+		}
+
+		swapIfNeeded();
+
+				
+	}
+
 	
-// }
+
+	//free(currentPCB);
+
+	_sti();	
+
+	switchProcessContext();
+
+	
+}
