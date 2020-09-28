@@ -74,15 +74,10 @@ int main(){
 
 	load_idt();
 
-	createProcessContext(0, (void*)0, test1);
-
-	createProcessContext(0, (void*)0, test2);
-
-	createProcessContext(0, (void*)0, test3);
-
-	__asm__("sti\n\t");
-
-	while(1);
+	// createProcessContext(0, (void*)0, test1);
+	// createProcessContext(0, (void*)0, test2);
+	// createProcessContext(0, (void*)0, test3);
+	// __asm__("sti\n\t");
 
 	((EntryPoint) mainApp)(START_SHELL, 0);
 		

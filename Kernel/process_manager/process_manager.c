@@ -101,7 +101,7 @@ void * schedule(void *currContextRSP) {
 	}
 
 	if(priorityIdx == 40)
-		return NULL; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
+		return currContextRSP; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
 
 
 	if(currentPCB->procState == RUN) {
@@ -181,3 +181,10 @@ int createProcessPCB(void *contextRSP){
 	return pid;
 
 }
+
+
+// void killProcess(int pid){
+
+// 	// PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
+	
+// }
