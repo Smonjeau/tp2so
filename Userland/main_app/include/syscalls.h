@@ -16,6 +16,9 @@ int memDump(void *src, void *dest);
 int startProcess(void *main, int argc, char **argv);
 
 
+void ps (void * buffer, int * procCant);
+
+
 // ------------------------------------- SCREEN MANAGEMENT -------------------------------------
 
 int draw(int x, int y, int rgb);

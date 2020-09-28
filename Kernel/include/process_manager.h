@@ -44,7 +44,7 @@ int killProcess(int pid);
 
 
 /* PS devuelve arreglo de structs PCB existentes y numero de procesos */
-void ps(void * buffer);
+void ps(void * buffer, int * procCant);
 
 
-#endif /* PROCESS_MANAGER_H_ */
+#endif 

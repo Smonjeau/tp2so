@@ -12,6 +12,19 @@
 #include <asm_lib.h>
 #include <syscalls.h>
 #include <image_lib.h>
+#include <stdint.h>
+
+
+typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
+
+
+typedef struct PCB {
+    int pid;
+    ProcState procState;
+    void * contextRSP;
+    unsigned char remainingTicks;
+    struct PCB * nextPCB;
+}  PCB;
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		WINDOW DEFINITIONS
@@ -39,6 +52,7 @@ typedef enum
 	DIVZERO,
 	INVOPCODE,
 	CLEAR,
+	PS,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
 	WRONG
@@ -60,6 +74,8 @@ static void clearWindow(void);
 
 static void printWarning(int num);
 static int parseHexa(char *);
+
+static void printProcData();
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	WINDOW METHODS
@@ -224,6 +240,9 @@ void shell(){
 			case CLEAR:
 				clearWindow();
 				break;
+			case PS:
+				printProcData();
+				break;
 
 			case DISPLAY_ANON:
 				displayImage(ANONYMOUS, 20, 200);
@@ -366,6 +385,54 @@ static void printStoredReg(void)
 	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
 }
 
+/* -------------------------------------------------------------
+						PRINTPROCDATA
+---------------------------------------------------------------- */
+void printProcData(){
+	int structSize = sizeof(struct PCB);
+	int count=0;
+	//char  msgs [3][10] = {"Pid:","State:","RSP:"};
+	PCB * buffer = malloc(structSize*50);
+	PCB  pcb;
+	char str [10];
+	if(buffer==NULL)
+		return;
+	ps(buffer,&count);
+	if(count==0){
+		printLine("The are no procceses");
+		return;
+	}
+	for(int i=0;i<count;i++){
+		pcb=buffer [i];
+		print("Pid: ");
+		print(itoa(pcb.pid,str,10,-1));
+		print("        State: ");
+		switch (pcb.procState)
+		{
+		case READY:
+			print("READY");
+			break;
+		case RUN:
+			print("RUNNING");
+			break;
+		case BLOCKED:
+			print("BLOCKED");
+
+			break;
+		case DEAD:
+			print("DEAD");
+
+			break;
+
+		}	
+		printf("       RSP: %x \\n", 1, (uint64_t)pcb.contextRSP);
+
+
+
+	}
+
+	free(buffer);
+}
 /* -------------------------------------------------------------
 						PRINTMEM
 ---------------------------------------------------------------- */
@@ -629,6 +696,13 @@ static int isClearScreen(char *buffer, int length)
 	return checkEmptySpace(buffer, 5, length);
 }
 
+static int isPs(char * buffer, int length){
+	char * str = "ps";
+	if(!strncmp(str,buffer,2))
+		return 0;
+	return checkEmptySpace(buffer,2,length);
+}
+
 static int isAllowedChar(char c)
 {
 	if (isAlpha(c) || isDigit(c) || isSpace(c) || c == 0)
@@ -680,6 +754,8 @@ command parseCommand(char *buffer, int length, char *string)
 
 	if (isClearScreen(buffer, length))
 		return CLEAR;
+	if (isPs(buffer,length))
+		return PS;
 
 	return NOCOMMAND;
 }

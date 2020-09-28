@@ -58,15 +58,17 @@ void swapQueues() {
 	actives = aux;
 }
 
-void ps(void * buffer) {
+void ps(void * buffer, int * procCant) {
 	int structSize = sizeof(struct PCB);
 	int count = 0;
 	ProcQueue * queue;
 	PCB pcb;
 	//Recorro activos
+
 	for(int priority = 0; priority < 40; priority++) {
 		queue = actives + priority;
 		pcb = queue->first;
+		pcb->pid = 12;
 		while(pcb != NULL) {
 			memcpy(buffer + structSize * count++, pcb, structSize);
 			pcb = pcb->nextPCB;
@@ -82,6 +84,16 @@ void ps(void * buffer) {
 			pcb = pcb->nextPCB;
 		}
 	}
+	//SACAR ESTO ...
+	PCB new = malloc(sizeof(struct PCB));
+	
+	if (new == NULL)
+		return ;
+	
+
+
+
+	*procCant = count;
 	
 }
 
