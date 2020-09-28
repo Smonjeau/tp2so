@@ -59,14 +59,10 @@ int main(){
 
 	load_idt();
 
-	newProcess(test, 0, (void*)0);
-
-	//#pragma GCC diagnostic ignored "-Wunused-variable"
-	//void * nextRSP = schedule((void *) 0);
-
-	//__asm__ ("hlt\n\t");
+	createProcessContext(0, (void*)0, test);
 
 	__asm__ ("sti\n\t");
+
 	while(1);
 
 	((EntryPoint) mainApp)(START_SHELL, 0);
@@ -74,3 +70,8 @@ int main(){
 	return 0;
 
 }
+
+/*
+test: 0x1011db
+testRSP: 0x110F98 --PUSH--> 0x110EF8
+*/

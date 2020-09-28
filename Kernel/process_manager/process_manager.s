@@ -1,6 +1,7 @@
 .extern schedule
-.global switchProcess
-.global createContext
+.extern createProcessPCB
+.global switchProcessContext
+.global createProcessContext
 .intel_syntax noprefix
 
 .section .text
@@ -28,15 +29,15 @@ setProcess:
 	iretq
 */
 
-switchProcess:
+switchProcessContext:
 	pop retAddress
-	mov rsi, rsp
+	mov rdi, rsp
 	call schedule
     mov rsp, rax
 	push retAddress
 	ret
 
-createContext:
+createProcessContext:
 	pop retAddress
 
     # Interrupt data
@@ -63,7 +64,8 @@ createContext:
 	push rbx    # rbx
 	push rax    # rax
 
-	mov rax, rsp
+	mov rdi, rsp
+	call createProcessPCB
 
 	push retAddress
 	ret

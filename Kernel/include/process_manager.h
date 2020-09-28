@@ -24,18 +24,18 @@ typedef struct ProcQueue {
 
 void *schedule(void *currProcRSP);
 
-// Calls scheduler and updates the RSP to the chosen process context
+// Calls schedule and updates the RSP to the chosen process context
 
-void switchProcess();
+void switchProcessContext();
 
 
-// Creates a context for a new process and returns its RSP
+// Creates a PCB for a new process and returns its PID
 
-void *createContext(int argc, char **argv, void *main);
+int createProcessPCB(void * contextRSP);
 
-// Creates a new process and returns its PID
+// Creates a context for a new process, calls createProcessPCB and returns its PID
 
-int newProcess(void * main, int argc, char **argv);
+int createProcessContext(int argc, char **argv, void *main);
 
 
 /* Kills a process and returns */

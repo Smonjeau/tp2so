@@ -126,16 +126,13 @@ void * schedule(void *currContextRSP) {
 }
 
 
-int newProcess(void *main, int argc, char **argv){
+int createProcessPCB(void *contextRSP){
 	static int pid=0;
-
-    void * contextRSP = createContext(argc, argv, main);
 
 	PCB new = malloc(sizeof(struct PCB));
 	
 	if (new == NULL)
 		return -1;
-	
 	
     new->contextRSP = contextRSP;
 	new->pid = pid++;
@@ -144,7 +141,6 @@ int newProcess(void *main, int argc, char **argv){
 	assignQuantumTime(new);
 
 	int priority = getPriorityLevel(new) - 100;
-	
 
 	if(firstProc == 0) {
 		new->procState = READY;

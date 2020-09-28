@@ -72,7 +72,20 @@ picSlaveMask:
 -------------------------------------------------------------------------------------------------------------------------------------------------- */
 
 
-irqHandlerMaster _irq00Handler 0		# Timer Tick
+_irq00Handler:			# Timer Tick
+	pushState
+
+	; mov rdi, 0
+	; call irqDispatcher
+
+	call switchProcessContext
+
+	mov al, 0x20
+	out 0x20, al
+
+	popState
+	iretq
+
 
 _irq01Handler:			# Keyboard
 	pushState
