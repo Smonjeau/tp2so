@@ -47,4 +47,8 @@ void killProcess(int pid);
 void ps(void * buffer, int * procCant);
 
 
+/* Devuelve el RSP "mas chico" */
+void * getLastContext();
+
+
 #endif 

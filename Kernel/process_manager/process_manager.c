@@ -20,6 +20,8 @@ ProcQueue queue2[40] = {{0}};
 ProcQueue * actives = queue1;
 ProcQueue * expireds = queue2;
 
+void * lastRSP = NULL;
+
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
 	pcb->remainingTicks = 10;
@@ -123,10 +125,14 @@ void * schedule(void *currContextRSP) {
 
 	if(currentPCB->procState == RUN) {
 		currentPCB->remainingTicks--;
+		if(currContextRSP < lastRSP)
+			lastRSP = currContextRSP;
 		currentPCB->contextRSP = currContextRSP; //Por si cambió
 	} else if(currentPCB->procState == READY) { //Primer proceso
 		currentPCB->procState = RUN;
 	}
+
+
 
 	
 	if(currentPCB->remainingTicks > 0)
@@ -173,6 +179,11 @@ void * schedule(void *currContextRSP) {
 int createProcessPCB(void *contextRSP){
 	_cli();	
 	static int pid=0;
+
+	if(lastRSP == NULL)
+		lastRSP = contextRSP;
+	else if(contextRSP < lastRSP)
+		lastRSP = contextRSP;
 
 	PCB new = malloc(sizeof(struct PCB));
 	
@@ -303,4 +314,8 @@ void killProcess(int pid) {
 	switchProcessContext();
 
 	
+}
+
+void * getLastContext() {
+	return lastRSP;
 }
