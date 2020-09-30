@@ -18,12 +18,18 @@
 .extern sysMemStatus 
 .extern sysFree
 .extern sysPS
-
+.extern sysStartProcess
+.extern sysKill
 .intel_syntax noprefix
 
 .section .text
 
+.include "./interruptions/macros.s"
+
+
 _syscallDispatcher:
+    pushStateNoRax
+
     cmp rax, 0
     je _read
 
@@ -63,55 +69,69 @@ _syscallDispatcher:
     cmp rax, 12
     je _ps
 
-    iretq
+    jmp endOfInt
+
+
+
+endOfInt:
+	push rax
+    mov al, 0x20
+	out 0x20, al
+    pop rax
+	popStateNoRax
+	iretq
 
 _read:
     call sysRead
-    iretq
+    jmp endOfInt
 
 _draw:
     call sysDraw
-    iretq
+    jmp endOfInt
     
 _getRes:
     call sysGetRes
-    iretq
+    jmp endOfInt
 
 _memDump:
     call sysMemDump
-    iretq
+    jmp endOfInt
 
 _getTime:
     call sysGetTime
-    iretq
+    jmp endOfInt
 
 _cpuInfo:
     call sysCpuInfo
-    iretq
+    jmp endOfInt
 
 _cpuTemp:
     call sysCPUTemp
-    iretq
+    jmp endOfInt
 
 _getRegBkp:
     call sysGetRegBkp
-    iretq
+    jmp endOfInt
 _malloc:
     call sysMalloc 
-    iretq
+    jmp endOfInt
 
 _free:
     call sysFree
-    iretq
+    jmp endOfInt
 
 _ps:
     call sysPS
-    iretq
+    jmp endOfInt
 
 _memStatus:
     call sysMemStatus 
-    iretq
+    jmp endOfInt
 
 _startProcess:
     call sysStartProcess 
-    iretq
+    jmp endOfInt
+
+_kill:
+    call sysKill
+    jmp endOfInt

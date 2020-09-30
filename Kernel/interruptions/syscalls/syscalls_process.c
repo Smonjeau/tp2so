@@ -16,6 +16,10 @@ int sysStartProcess(void *main, int argc, char **argv){
 
 }
 
-void sysPS(void * buffer) {
-	ps(buffer);
+void sysPS(void * buffer, int * procCant) {
+	ps(buffer, procCant);
+}
+
+void sysKill(int pid){
+    killProcess(pid);
 }

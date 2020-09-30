@@ -29,3 +29,6 @@ syscall free, 9
 syscall memStatus, 10
 
 syscall startProcess, 11
+
+syscall ps, 12
+syscall kill, 13

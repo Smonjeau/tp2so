@@ -42,17 +42,15 @@ void * memcpy(void * destination, const void * source, int length){
 }
 
 void print_mem_status(){
-    //char msgs [3][20] = {"Total memory: ","Available memory:","Occupied memory:"};
-    int total_mem=1;
-    int  avail_mem=1;
-    int occ_mem=1;
+    int total_mem=0;
+    int  avail_mem=0;
+    int occ_mem=0;
     memStatus(&total_mem,&avail_mem,&occ_mem);
     char buffer [30];
-    printLine(itoa(total_mem,buffer,10,-1));
-    printLine(itoa(avail_mem,buffer,10,-1));
-    printLine(itoa(occ_mem,buffer,10,-1));
+    printf("Total memory: %s KB\\n",1,itoa(total_mem,buffer,10,-1));
+    printf("Free memory: %s KB\\n",1,itoa(avail_mem,buffer,10,-1));
+    printf("Occuppied memory: %s KB\\n",1,itoa(occ_mem,buffer,10,-1));
 }
-
 /* ------------------------------------------------------------------------------------------------------------------
                                                 CHAR FUNCTIONS
  -------------------------------------------------------------------------------------------------------------------- */

@@ -14,6 +14,9 @@ MALLOC        8       int size                                                  
 FREE          9       void *ptr                                                  Frees a previously allocated segment starting at ptr.
 MEMSTATUS     10      int *memSize       int *freeSpace        int *occSpace     Provides information about the usage of memory.
 STARTPROCESS  11      void *main         int argc              char **argv       Creates a process starting at main, with specified parameters, and returns its PID.
+PS            12      void * buffer      int * cantProc                          Provides *cantProc proccesses data, using PCB
+																					struct.
+																										
 
 STRUCTURES:
 
@@ -21,3 +24,11 @@ ScreenRes { int height, int width}
 Time { int hours, int minutes, int seconds }
 CpuInfo { char * brandName, char * brandDesc }
 RegBkp { uint64_t rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15 }
+
+PCB {
+    int pid;
+    ProcState procState;
+    void * contextRSP;
+    unsigned char remainingTicks;
+    struct PCB * nextPCB;
+}

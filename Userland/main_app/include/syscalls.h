@@ -15,6 +15,11 @@ int memDump(void *src, void *dest);
 
 int startProcess(void *main, int argc, char **argv);
 
+int kill (int pid);
+
+
+void ps (void * buffer, int * procCant);
+
 
 // ------------------------------------- KEYBOARD -------------------------------------
 

@@ -29,6 +29,7 @@ void *schedule(void *currProcRSP);
 void switchProcessContext();
 
 
+
 // Creates a PCB for a new process and returns its PID
 
 int createProcessPCB(void * contextRSP);
@@ -40,11 +41,15 @@ int createProcessContext(int argc, char **argv, void *main);
 
 /* Kills a process and returns */
 
-int killProcess(int pid);
+void killProcess(int pid);
 
 
 /* PS devuelve arreglo de structs PCB existentes y numero de procesos */
-void ps(void * buffer);
+void ps(void * buffer, int * procCant);
 
 
-#endif /* PROCESS_MANAGER_H_ */
+/* Devuelve el RSP "mas chico" */
+void * getLastContext();
+
+
+#endif 

@@ -12,6 +12,19 @@
 #include <asm_lib.h>
 #include <syscalls.h>
 #include <image_lib.h>
+#include <stdint.h>
+
+
+typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
+
+
+typedef struct PCB {
+    int pid;
+    ProcState procState;
+    void * contextRSP;
+    unsigned char remainingTicks;
+    struct PCB * nextPCB;
+}  PCB;
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		WINDOW DEFINITIONS
@@ -39,9 +52,13 @@ typedef enum
 	DIVZERO,
 	INVOPCODE,
 	CLEAR,
+	PS,
+	MEM,
+	LINEA,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
-	WRONG
+	WRONG,
+	
 } command;
 
 command parseCommand(char *buffer, int length, char *string);
@@ -60,6 +77,11 @@ static void clearWindow(void);
 
 static void printWarning(int num);
 static int parseHexa(char *);
+static void psInfo();
+
+static void printProcData();
+static void printMemStatus();
+
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	WINDOW METHODS
@@ -69,9 +91,27 @@ static int parseHexa(char *);
  Defines the position and size of the window (all right half)
  and assings a color to title and body cursors
 -------------------------------------------------------------- */
+static void test3(int argc, char **argv){
+	static int x3=0;
+	static int y3 = 400;
+	int cant=0;
+	while(cant<4) {
+		x3=0;
+		for(; x3<1024; x3++)
+			draw(x3, y3, 0x0000FF);
+		y3 += 6;
+		cant++;
+		//killProcess(-1);
+		//while(1);
+	}
+	kill(-1);
+	return ;
+	
+}
 
 static void createWindow()
 {
+	
 
 	ScreenRes res;
 	getRes(&res);
@@ -224,6 +264,15 @@ void shell(){
 			case CLEAR:
 				clearWindow();
 				break;
+			case PS:
+				printProcData();
+				break;
+			case MEM:
+				printMemStatus();
+				break;
+			case LINEA:
+				startProcess(test3,0, (void*)0);
+				break;
 
 			case DISPLAY_ANON:
 				displayImage(ANONYMOUS, 20, 200);
@@ -236,6 +285,7 @@ void shell(){
 			case WRONG:
 				printWarning(WRONG);
 				break;
+
 
 			default:
 				printWarning(NOCOMMAND);
@@ -278,6 +328,8 @@ static void help(void)
 	printLine("- display anon      to show an image of Anonymous");
 	printLine("- display matrix    to show an image of Matrix");
 	printLine("- clear             to clear the screen");
+	printLine("- mem               to print heap status");
+	printLine("- ps                to print procceses data");
 
 	newLine();
 	
@@ -302,6 +354,8 @@ static void printTime(void)
 
 	printf("\\nTime now: %2d:%2d:%2d\\n", 3, t.hours, t.minutes, t.seconds);
 }
+
+
 
 /* -------------------------------------------------------------
 						INFOREG
@@ -367,6 +421,54 @@ static void printStoredReg(void)
 }
 
 /* -------------------------------------------------------------
+						PRINTPROCDATA
+---------------------------------------------------------------- */
+void printProcData(){
+	int structSize = sizeof(struct PCB);
+	int count=0;
+	//char  msgs [3][10] = {"Pid:","State:","RSP:"};
+	PCB * buffer = malloc(structSize*50);
+	PCB  pcb;
+	char str [10];
+	if(buffer==NULL)
+		return;
+	ps(buffer,&count);
+	if(count==0){
+		printLine("The are no procceses");
+		return;
+	}
+	for(int i=0;i<count;i++){
+		pcb=buffer [i];
+		print("Pid: ");
+		print(itoa(pcb.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
+		print("        State: ");
+		switch (pcb.procState)
+		{
+		case READY:
+			print("READY");
+			break;
+		case RUN:
+			print("RUNNING");
+			break;
+		case BLOCKED:
+			print("BLOCKED");
+
+			break;
+		case DEAD:
+			print("DEAD");
+
+			break;
+
+		}	
+		printf("       RSP: %x \\n", 1, (uint64_t)pcb.contextRSP);
+
+
+
+	}
+
+	free(buffer);
+}
+/* -------------------------------------------------------------
 						PRINTMEM
 ---------------------------------------------------------------- */
 
@@ -395,6 +497,13 @@ void printMemDump(char *sourceStr)
 			   src[i + 4], src[i + 5], src[i + 6], src[i + 7]);
 	}
 	
+}
+
+/* -------------------------------------------------------------
+						PRINTMEMSTATUS
+---------------------------------------------------------------- */
+void printMemStatus(){
+	print_mem_status();
 }
 
 /* -------------------------------------------------------------
@@ -629,12 +738,32 @@ static int isClearScreen(char *buffer, int length)
 	return checkEmptySpace(buffer, 5, length);
 }
 
+static int isPs(char * buffer, int length){
+	char * str = "ps";
+	if(!strncmp(str,buffer,2))
+		return 0;
+	return checkEmptySpace(buffer,2,length);
+}
+
+static int isPrintMemData(char*buffer,int length){
+	if(!strcmp("mem",buffer))
+		return 0;
+	return checkEmptySpace(buffer,3,length);
+}
+static int isLine(char * buffer, int length){
+	if(!strcmp("line",buffer))
+		return 0;
+	return checkEmptySpace(buffer,4,length);
+}
+
 static int isAllowedChar(char c)
 {
 	if (isAlpha(c) || isDigit(c) || isSpace(c) || c == 0)
 		return 1;
 	return 0;
 }
+
+
 
 command parseCommand(char *buffer, int length, char *string)
 {
@@ -680,6 +809,12 @@ command parseCommand(char *buffer, int length, char *string)
 
 	if (isClearScreen(buffer, length))
 		return CLEAR;
+	if (isPs(buffer,length))
+		return PS;
+	if (isPrintMemData(buffer,length))
+		return MEM;    
+	if(isLine(buffer,length))
+		return LINEA;
 
 	return NOCOMMAND;
 }
