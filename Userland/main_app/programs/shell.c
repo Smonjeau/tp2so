@@ -54,10 +54,11 @@ typedef enum
 	CLEAR,
 	PS,
 	MEM,
+	LINEA,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
 	WRONG,
-	PS
+	
 } command;
 
 command parseCommand(char *buffer, int length, char *string);
@@ -81,6 +82,7 @@ static void psInfo();
 static void printProcData();
 static void printMemStatus();
 
+
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	WINDOW METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
@@ -89,9 +91,27 @@ static void printMemStatus();
  Defines the position and size of the window (all right half)
  and assings a color to title and body cursors
 -------------------------------------------------------------- */
+static void test3(int argc, char **argv){
+	static int x3=0;
+	static int y3 = 400;
+	int cant=0;
+	while(cant<4) {
+		x3=0;
+		for(; x3<1024; x3++)
+			draw(x3, y3, 0x0000FF);
+		y3 += 6;
+		cant++;
+		//killProcess(-1);
+		//while(1);
+	}
+	kill(-1);
+	return ;
+	
+}
 
 static void createWindow()
 {
+	
 
 	ScreenRes res;
 	getRes(&res);
@@ -250,6 +270,9 @@ void shell(){
 			case MEM:
 				printMemStatus();
 				break;
+			case LINEA:
+				startProcess(test3,0, (void*)0);
+				break;
 
 			case DISPLAY_ANON:
 				displayImage(ANONYMOUS, 20, 200);
@@ -263,8 +286,6 @@ void shell(){
 				printWarning(WRONG);
 				break;
 
-			case PS:
-				psInfo();
 
 			default:
 				printWarning(NOCOMMAND);
@@ -334,13 +355,7 @@ static void printTime(void)
 	printf("\\nTime now: %2d:%2d:%2d\\n", 3, t.hours, t.minutes, t.seconds);
 }
 
-/* -------------------------------------------------------------
-						PS
---------------------------------------------------------------- */
-static void psInfo() {
-	//Acá hay que reservar espacio para el buffer
-	//Llamar a la syscall
-}
+
 
 /* -------------------------------------------------------------
 						INFOREG
@@ -735,6 +750,11 @@ static int isPrintMemData(char*buffer,int length){
 		return 0;
 	return checkEmptySpace(buffer,3,length);
 }
+static int isLine(char * buffer, int length){
+	if(!strcmp("line",buffer))
+		return 0;
+	return checkEmptySpace(buffer,4,length);
+}
 
 static int isAllowedChar(char c)
 {
@@ -793,6 +813,8 @@ command parseCommand(char *buffer, int length, char *string)
 		return PS;
 	if (isPrintMemData(buffer,length))
 		return MEM;    
+	if(isLine(buffer,length))
+		return LINEA;
 
 	return NOCOMMAND;
 }

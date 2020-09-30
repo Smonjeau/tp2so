@@ -6,6 +6,7 @@
 
 .global _cli
 .global _sti
+.global _hlt
 
 .intel_syntax noprefix
 

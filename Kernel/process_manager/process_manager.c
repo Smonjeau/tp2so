@@ -211,7 +211,7 @@ int createProcessPCB(void *contextRSP){
 
 
 void killProcess(int pid) {
-	_cli(); //La hacemos atomica
+	_cli(); //La hacemos no interrumpible
 
 	PCB currentPCB;
 	int priorityIdx;
@@ -308,10 +308,9 @@ void killProcess(int pid) {
 	
 
 	//free(currentPCB);
-
 	_sti();	
-
-	switchProcessContext();
+	if(currentPCB->procState==RUN) //El proceso se suicida
+		switchProcessContextBuenarda();
 
 	
 }

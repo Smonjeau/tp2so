@@ -17,7 +17,8 @@
 .extern sysMemStatus 
 .extern sysFree
 .extern sysPS
-
+.extern sysStartProcess
+.extern sysKill
 .intel_syntax noprefix
 
 .section .text
@@ -106,4 +107,8 @@ _memStatus:
 
 _startProcess:
     call sysStartProcess 
+    iretq
+
+_kill:
+    call sysKill
     iretq

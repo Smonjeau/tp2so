@@ -15,7 +15,7 @@ int memDump(void *src, void *dest);
 
 int startProcess(void *main, int argc, char **argv);
 
-void ps(void * buffer);
+int kill (int pid);
 
 
 void ps (void * buffer, int * procCant);

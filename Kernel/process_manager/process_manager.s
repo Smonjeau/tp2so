@@ -1,10 +1,30 @@
 .extern schedule
 .extern createProcessPCB
+.extern malloc
 .global switchProcessContext
+.global switchProcessContextBuenarda
 .global createProcessContext
 .intel_syntax noprefix
 
 .section .text
+.macro popState
+	pop rax
+	pop rbx
+	pop rcx
+	pop rdx
+	pop rsi
+	pop rdi
+	pop rbp
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	pop r12
+	pop r13
+	pop r14
+	pop r15
+.endm
+ 
 
 /*
 This is a test function, it sets the specified process context, skipping the scheduler
@@ -29,6 +49,11 @@ setProcess:
 	iretq
 */
 
+
+
+
+
+
 switchProcessContext:
 	pop retAddress
 	mov rdi, rsp
@@ -41,10 +66,15 @@ createProcessContext:
 	pop retAddress
 
 	# Reserve 1kb for previous process stack growth
-	sub rsp, 1024
+#	  sub rsp, 1024
+	mov rdi,1024
+	call malloc
+	mov rsp,rax  # comparar con null
+	add rsp,1024
+	mov rbp,rsp
 
     # Interrupt data
-    push 0      # SS
+    push 8   # SS
     push rbp    # RSP
     push 0x202  # RFLAGS
     push 0x8    # CS

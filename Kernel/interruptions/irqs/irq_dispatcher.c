@@ -34,7 +34,7 @@ void irqDispatcher(uint64_t irq) {
 }
 
 
-// RTC
+// TIMER TICK
 void int_20() {
 
 	 ((EntryPoint) mainApp)(IRQ_PRODUCED, 1, TIMER_TICK_IRQ);
