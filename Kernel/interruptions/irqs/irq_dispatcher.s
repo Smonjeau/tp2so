@@ -77,8 +77,11 @@ _irq00Handler:			# Timer Tick
 
 	; mov rdi, 0
 	; call irqDispatcher
+	cli
 
 	call switchProcessContext
+
+	sti
 
 	mov al, 0x20
 	out 0x20, al

@@ -93,35 +93,70 @@ void ps(void * buffer, int * procCant) {
 }
 
 void swapIfNeeded() {
-	int idx;
-	PCB auxPCB = NULL;
-	for(idx = 0; idx < 40 && auxPCB == NULL; idx++)
-		auxPCB = actives[idx].first;
+	int idx, found = 0;
+	for(idx = 0; idx < 40; idx++)
+		if(actives[idx].first != NULL)
+			found = 1;
 
-	if(auxPCB == NULL)
+	if(found == 0)
 		swapQueues();
 
 	
 }
 
-
+static int y = 50;
 void * schedule(void *currContextRSP) {
+	/*if(getNumProcTotal() == 3) {
+		int x = 0;
+		for(; x<1024; x++)
+			draw(x, 100, 0xFFFFFF);
+		//return currContextRSP;
+	}*/
+
+
+
 
 	/*Gran parte de este scheduler deberá ser alterado en próxima
 	entrega pues no se está considerando caso de proceso bloqueado.*/
 
-	PCB currentPCB;
+	PCB currentPCB = NULL;
 	int priorityIdx;
-	for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
+	for(priorityIdx = 0; priorityIdx < 40 && currentPCB == NULL; priorityIdx++)
 		currentPCB = actives[priorityIdx].first;
-		if(currentPCB != NULL)// && currentPCB->procState == RUN)
-			break; //Lo encontré
+
+	if(priorityIdx == 40) {
+		/*int x = 0;
+		if(getNumProcTotal() == 0) {
+			for(; x<1024; x++)
+				draw(x, y, 0xFFFFFF);
+		} else if(getNumProcTotal() == 1) {
+			for(; x<1024; x++)
+				draw(x, y, 0xFF0000);
+		} else if(getNumProcTotal() == 2) {
+			for(; x<1024; x++)
+				draw(x, y, 0x00FF00);
+		} else if(getNumProcTotal() == 3) {
+			for(; x<1024; x++)
+				draw(x, y, 0x0000FF);
+		} else {
+			for(; x<1024; x++)
+				draw(x, y, 0xf4ff44);
+		}
+
 		
+		
+		
+
+			
+		y += 10;*/
+		
+
+		return currContextRSP; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
 	}
 
-	if(priorityIdx == 40)
-		return currContextRSP;	// No hay ningún proceso en la cola, continuar el hilo de ejecución
+	priorityIdx--; //Compenso el ultimo ++
 
+	
 
 	if(currentPCB->procState == RUN) {
 		currentPCB->remainingTicks--;
@@ -136,7 +171,9 @@ void * schedule(void *currContextRSP) {
 
 	
 	if(currentPCB->remainingTicks > 0)
-		return currentPCB->contextRSP; //Continua el mismo proceso de antes.
+		return currentPCB->contextRSP; //Continua
+
+
 
 
 	//Se terminó el tiempo asignado del proceso.
@@ -148,26 +185,29 @@ void * schedule(void *currContextRSP) {
 
 	// Debo buscar al proximo a ejecutar. Aprovecho lo que ya recorri de las colas de activos.
 	int idx;
-	for(idx = priorityIdx; idx < 40; idx++) {
+	currentPCB = NULL;
+	for(idx = priorityIdx; idx < 40 && currentPCB == NULL && currentPCB->procState != READY; idx++)
 		currentPCB = actives[idx].first;
-		if(currentPCB != NULL && currentPCB->procState == READY)
-			break; //Lo encontré
-	}
+
+
+	
 
 	if(idx == 40) {
 		//No quedan mas procesos activos. Intercambiamos por los expirados.
 		swapQueues();
 
 		//Nuevamente recorro en busca del primer proceso listo
-		for(idx = priorityIdx; idx < 40; idx++) {
+		currentPCB = NULL;
+		for(idx = 0; idx < 40 && currentPCB == NULL && currentPCB->procState != READY; idx++)
 			currentPCB = actives[idx].first;
-			if(currentPCB != NULL && currentPCB->procState == READY)
-				break; //Lo encontré
-		}
+
+		//Y si no encuentra READY? No deberia pasar pues siempre creamos al menos 1 proceso master
+		
 		currentPCB->procState = RUN;
 		return currentPCB->contextRSP;
 
 	} else {
+		idx--; //Compenso
 		currentPCB->procState = RUN;
 		return currentPCB->contextRSP;
 	}
@@ -175,10 +215,10 @@ void * schedule(void *currContextRSP) {
 
 }
 
+static int pid=0;
 
 int createProcessPCB(void *contextRSP){
 	_cli();	
-	static int pid=0;
 
 	if(lastRSP == NULL)
 		lastRSP = contextRSP;
@@ -204,9 +244,40 @@ int createProcessPCB(void *contextRSP){
 	queueProc(actives + priority, new);
 	_sti();	
 
-	return contextRSP;
+	return new->pid;
 
 }
+int createProcessPCBFromKernel(void *contextRSP){
+	
+	if(lastRSP == NULL)
+		lastRSP = contextRSP;
+	else if(contextRSP < lastRSP)
+		lastRSP = contextRSP;
+
+	PCB new = malloc(sizeof(struct PCB));
+	
+	if (new == NULL)
+		return -1;
+	
+    new->contextRSP = contextRSP;
+	new->pid = pid++;
+	new->nextPCB = NULL;
+
+	assignQuantumTime(new);
+
+	int priority = getPriorityLevel(new) - 100;
+
+	
+	new->procState = READY;
+
+	queueProc(actives + priority, new);
+
+	return new->pid;
+
+}
+
+
+
 
 
 void killProcess(int pid) {
@@ -242,11 +313,11 @@ void killProcess(int pid) {
 		//Buscamos proceso con el mismo pid
 		//Vamos por los activos
 		int found = 0;
-		PCB prevPCB = NULL; //Lo encesitamos para el proceso de borrado en una cola
-		for(priorityIdx = 0; priorityIdx < 40 && !found; priorityIdx++) {
+		PCB prevPCB = NULL; //Lo necesitamos para el proceso de borrado en una cola
+		for(priorityIdx = 0; priorityIdx < 40 && found == 0; priorityIdx++) {
 			currentPCB = actives[priorityIdx].first;
 			
-			while(currentPCB != NULL && !found) {
+			while(currentPCB != NULL && found == 0) {
 				if(currentPCB->pid == pid) {
 					found = 1;
 				} else {
@@ -255,7 +326,7 @@ void killProcess(int pid) {
 				}
 			}			
 		}
-		if(found) {
+		if(found == 1) {
 
 			priorityIdx--; //Para comensar el ultimo ++ del for
 			if((actives[priorityIdx].first)->pid == pid) {
@@ -272,9 +343,9 @@ void killProcess(int pid) {
 
 		} else {
 			//Vamos por los expirados
-			for(priorityIdx = 0; priorityIdx < 40 && !found; priorityIdx++) {
+			for(priorityIdx = 0; priorityIdx < 40 && found == 0; priorityIdx++) {
 				currentPCB = expireds[priorityIdx].first;
-				while(currentPCB != NULL && !found) {
+				while(currentPCB != NULL && found == 0) {
 					if(currentPCB->pid == pid) {
 						found = 1;
 					} else {
@@ -284,7 +355,7 @@ void killProcess(int pid) {
 				}			
 			}
 			
-			priorityIdx--; //Para comensar el ultimo ++ del for
+			priorityIdx--; //Para compensar el ultimo ++ del for
 			if((expireds[priorityIdx].first)->pid == pid) {
 				//Es el primero
 				expireds[priorityIdx].first = currentPCB->nextPCB;
@@ -304,16 +375,39 @@ void killProcess(int pid) {
 				
 	}
 
-	
+	ProcState state = currentPCB->procState;
 
-	//free(currentPCB);
+	free(currentPCB);
 	_sti();	
-	//if(currentPCB->procState==RUN) //El proceso se suicida
-//		switchProcessContextBuenarda();
+	if(state == RUN) //El proceso se suicida
+		_hlt(); //Espero a que llegue el tick para cambiar de proceso
+
+	
 
 	
 }
 
 void * getLastContext() {
 	return lastRSP;
+}
+
+int getNumProcTotal() {
+	int counter = 0;
+	PCB pcb;
+	for(int idx = 0; idx < 40; idx++) {
+		pcb = (actives + idx)->first;
+		while(pcb != NULL) {
+			pcb = pcb->nextPCB;
+			counter++;
+		}
+	}
+
+	for(int idx = 0; idx < 40; idx++) {
+		pcb = (expireds + idx)->first;
+		while(pcb != NULL) {
+			pcb = pcb->nextPCB;
+			counter++;
+		}
+	}
+	return counter;
 }

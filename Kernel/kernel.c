@@ -48,34 +48,153 @@ void * initializeKernelBinary(){
 	return getStackBase();
 }
 
+void printError() {
+	//pinta rayitas blancas arriba
+	int xerror=0;
+	for(; xerror<1024; xerror++)
+		draw(xerror, 5, 0xFF0000);
+	xerror=0;
+	for(; xerror<1024; xerror++)
+		draw(xerror, 6, 0xFF0000);
+	xerror=0;
+	for(; xerror<1024; xerror++)
+		draw(xerror, 7, 0xFF0000);
+}
+
 
 void test2(int argc, char **argv){
-	for(int y=512; y<1024; y++)
-		for(int x=0; x<1024; x++)
-			for(double c=0; c<9999; c++)
-				draw(x, y, 0x00FF00);
-	while(1);
+	static int x2=0;
+	static int y2 = 300;
+	static long long count2 = 0;
+	while(1) {
+		if(count2++ % 9999999 == 0) {
+			x2=0;
+			for(; x2<1024; x2++)
+				draw(x2, y2, 0x00FF00);
+			y2 += 1;
+			
+		}
+		
+	}
+	
+}
+
+void test3(int argc, char **argv){
+	static int x3=0;
+	static int y3 = 400;
+	static long long count3 = 0;
+	while(1) {
+		if(count3++ % 9999999 == 0) {
+			x3=0;
+			for(; x3<1024; x3++)
+				draw(x3, y3, 0x0000FF);
+			y3 += 1;
+
+		}
+	}
+	
 }
 
 void test1(int argc, char **argv){
-	createProcessContext(0, (void*)0, test2);
+	/*static int x1=0;
+	static int y1 = 200;
+	static int count1 = 0;
+	
+	while(1) {
+		if(count1++ % 9999999 == 0) {
+			x1=0;
+			for(; x1<1024; x1++)
+				draw(x1, y1, 0xFF0000);
+			y1 += 1;
+		}
 
-	for(int y=0; y<512; y++)
-		for(int x=0; x<1024; x++)
-			for(double c=0; c<9999; c++)
-				draw(x, y, 0xFF0000);
-	while(1);
+	}*/
+	if(createProcessContext(0, (void*)0, test2) == -1)
+		printError();//Error
+	if(createProcessContext(0, (void*)0, test3) == -1)
+		printError();//Error
+
+	killProcess(-1);
+	//while(1);
+
+
 }
+
+
+
+
 
 int main(){
 
+
 	load_idt();
+	
 
-	// createProcessContext(0, (void*)0, test1);
+	//createProcessContext(0, (void*)0, mainApp);
+	if(createProcessContextFromKernel(0, (void*)0, test1) == -1)
+		printError();//Error
+	
 
-	// while(1);
+	/*void * rsp1 = schedule((void *)0);
+	void * rsp = schedule(rsp1);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
 
-	((EntryPoint) mainApp)(START_SHELL, 0);
+	void * rsp2 = schedule(rsp);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+	rsp = schedule(rsp2);
+
+	void * rsp3 = schedule(rsp);
+	rsp = schedule(rsp3);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+
+	void * rsp4 = schedule(rsp);
+	rsp = schedule(rsp4);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+	rsp = schedule(rsp);
+
+	if(rsp == rsp2) {
+		int exis = 0;
+		for(; exis<1024; exis++)
+			draw(exis, 700, 0xFFFFFF);
+	}*/
+
+
+	
+
+
+
+	
+
+	__asm__("sti\n\t");
+	while(1);
+	//((EntryPoint) mainApp)(START_SHELL, 0);
 		
 	return 0;
 

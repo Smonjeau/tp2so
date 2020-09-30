@@ -38,6 +38,13 @@ int createProcessPCB(void * contextRSP);
 
 int createProcessContext(int argc, char **argv, void *main);
 
+// Creates a context for a new process from Kernel, calls createProcessPCB and returns its PID
+//It avoids setting interrupts
+
+int createProcessContextFromKernel(int argc, char **argv, void *main);
+
+//int getNumProc();
+
 
 /* Kills a process and returns */
 

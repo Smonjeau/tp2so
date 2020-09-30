@@ -1,12 +1,16 @@
 .extern schedule
 .extern createProcessPCB
+.extern createProcessPCBFromKernel
 .extern malloc
 .global switchProcessContext
-.global switchProcessContextBuenarda
 .global createProcessContext
+.global createProcessContextFromKernel
 .intel_syntax noprefix
 
 .section .text
+
+.include "./interruptions/macros.s"
+ 
 
 /*
 This is a test function, it sets the specified process context, skipping the scheduler
@@ -36,6 +40,43 @@ switchProcessContext:
 	mov rdi, rsp
 	call schedule
     mov rsp, rax
+	push retAddress
+	ret
+
+createProcessContext:
+	pop retAddress
+
+	# Reserve 1kb for previous process stack growth
+	  sub rsp, 1024
+    
+
+    # Interrupt data
+    push 0      # SS
+    push rbp    # RSP
+    push 0x202  # RFLAGS
+    push 0x8    # CS
+    push rdx 	# RIP	rsp+15*8
+
+    # State data
+    push 0      # r15
+	push 0      # r14
+	push 0      # r13
+	push 0      # r12
+	push 0      # r11
+	push 0      # r10
+	push 0      # r9
+	push 0      # r8
+	push rbp    # rbp
+	push rdi    # rdi (argc)
+	push rsi    # rsi (argv)
+	push rdx    # rdx
+	push rcx    # rcx
+	push rbx    # rbx
+	push rax    # rax
+
+	mov rdi, rsp
+	call createProcessPCB
+
 	push retAddress
 	ret
 
