@@ -309,8 +309,8 @@ void killProcess(int pid) {
 
 	//free(currentPCB);
 	_sti();	
-	if(currentPCB->procState==RUN) //El proceso se suicida
-		switchProcessContextBuenarda();
+	//if(currentPCB->procState==RUN) //El proceso se suicida
+//		switchProcessContextBuenarda();
 
 	
 }

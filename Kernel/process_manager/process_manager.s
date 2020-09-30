@@ -53,6 +53,16 @@ setProcess:
 
 
 
+switchProcessContextBuenarda:
+	pop retAddress
+	add rsp,8
+	mov rdi, rsp
+	call schedule
+    
+	mov rsp, rax
+	popState 
+	push retAddress
+	ret
 
 switchProcessContext:
 	pop retAddress
@@ -66,15 +76,11 @@ createProcessContext:
 	pop retAddress
 
 	# Reserve 1kb for previous process stack growth
-#	  sub rsp, 1024
-	mov rdi,1024
-	call malloc
-	mov rsp,rax  # comparar con null
-	add rsp,1024
-	mov rbp,rsp
+	  sub rsp, 1024
+    
 
     # Interrupt data
-    push 8   # SS
+    push 0      # SS
     push rbp    # RSP
     push 0x202  # RFLAGS
     push 0x8    # CS
