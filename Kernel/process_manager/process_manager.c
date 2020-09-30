@@ -204,7 +204,7 @@ int createProcessPCB(void *contextRSP){
 	queueProc(actives + priority, new);
 	_sti();	
 
-	return pid;
+	return contextRSP;
 
 }
 

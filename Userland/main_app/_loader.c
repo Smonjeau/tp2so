@@ -21,9 +21,9 @@ int _start(int message, int nargs, ...) {
 
 	switch(message){
 		case START_SHELL:
-			return shell();
-			//startProcess(shell, 0, (void*) 0);
-			//__asm__("hlt;\n\r");
+			// return shell();
+			startProcess(shell, 0, (void*) 0);
+			__asm__("hlt;\n\r");
 
 		case EXCEPTION_PRODUCED:
 			return exception(valist);

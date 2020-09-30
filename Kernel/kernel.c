@@ -49,59 +49,33 @@ void * initializeKernelBinary(){
 }
 
 
-void test1(int argc, char **argv){
-	static int x1=0;
-	static int y1 = 200;
-	//while(1) {
-		x1=0;
-		for(; x1<1024; x1++)
-			draw(x1, y1, 0xFF0000);
-		y1 += 1;
-		//killProcess(-1);
-		while(1);
-
-	//}
-}
-
 void test2(int argc, char **argv){
-	static int x2=0;
-	static int y2 = 300;
-	//while(1) {
-		x2=0;
-		for(; x2<1024; x2++)
-			draw(x2, y2, 0x00FF00);
-		y2 += 1;
-		//while(1);
-		//killProcess(0);
-		
-	//}
-	
+	for(int y=512; y<1024; y++)
+		for(int x=0; x<1024; x++)
+			for(double c=0; c<9999; c++)
+				draw(x, y, 0x00FF00);
+	while(1);
 }
 
-void test3(int argc, char **argv){
-	static int x3=0;
-	static int y3 = 400;
-	//while(1) {
-		x3=0;
-		for(; x3<1024; x3++)
-			draw(x3, y3, 0x0000FF);
-		y3 += 1;
-		//killProcess(-1);
-		//while(1);
-	//}
-	
-}
+void test1(int argc, char **argv){
+	createProcessContext(0, (void*)0, test2);
 
+	for(int y=0; y<512; y++)
+		for(int x=0; x<1024; x++)
+			for(double c=0; c<9999; c++)
+				draw(x, y, 0xFF0000);
+	while(1);
+}
 
 int main(){
 
 	load_idt();
 
-	createProcessContext(0, (void*)0, test1);
+	// createProcessContext(0, (void*)0, test1);
 
-	while(1);
+	// while(1);
 
-	//((EntryPoint) mainApp)(START_SHELL, 0);
+	((EntryPoint) mainApp)(START_SHELL, 0);
 		
 	return 0;
 

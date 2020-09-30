@@ -40,11 +40,20 @@ switchProcessContext:
 	ret
 
 createProcessContext:
+	cli
+
+	# Preserve calling args
+	push rdi
+	push rsi
+	push rdx
 
 	# Reserve 1kb for process stack
-	push rdi
 	mov rdi, 1024
 	call malloc
+
+	# Restore calling args
+	pop rdx
+	pop rsi
 	pop rdi
 
 	# Calc the base of the stack
@@ -75,11 +84,13 @@ createProcessContext:
 	movq [rax-8*19], 0    	# rax
 
 	# Calc the top of the stack
-	sub rax, 8*20
+	sub rax, 8*19
 	
 	# Create the process PCB
 	mov rdi, rax
 	call createProcessPCB
+
+	sti
 	ret
 
 .section .data
