@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <screen_driver.h>
 #include <interrupts.h>
+#include <screen_driver.h>
 
 /*
 	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100,
@@ -70,7 +71,6 @@ void ps(void * buffer, int * procCant) {
 	for(int priority = 0; priority < 40; priority++) {
 		queue = actives + priority;
 		pcb = queue->first;
-		pcb->pid = 12;
 		while(pcb != NULL) {
 			memcpy(buffer + structSize * count++, pcb, structSize);
 			pcb = pcb->nextPCB;
@@ -217,7 +217,7 @@ void * schedule(void *currContextRSP) {
 
 static int pid=0;
 
-int createProcessPCB(void *contextRSP){
+int createProcessPCB(void *contextRSP, void * baseRSP){
 	_cli();	
 
 	if(lastRSP == NULL)
@@ -231,6 +231,7 @@ int createProcessPCB(void *contextRSP){
 		return -1;
 	
     new->contextRSP = contextRSP;
+	new->baseRSP=baseRSP;
 	new->pid = pid++;
 	new->nextPCB = NULL;
 
@@ -277,12 +278,11 @@ int createProcessPCBFromKernel(void *contextRSP){
 }
 
 
-
+ 
 
 
 void killProcess(int pid) {
 	_cli(); //La hacemos no interrumpible
-
 	PCB currentPCB;
 	int priorityIdx;
 	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
@@ -376,7 +376,7 @@ void killProcess(int pid) {
 	}
 
 	ProcState state = currentPCB->procState;
-
+	free(currentPCB->baseRSP);
 	free(currentPCB);
 	_sti();	
 	if(state == RUN) //El proceso se suicida

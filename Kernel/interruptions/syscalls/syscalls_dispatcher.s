@@ -69,6 +69,9 @@ _syscallDispatcher:
     cmp rax, 12
     je _ps
 
+    cmp rax,13
+    je _kill
+
     jmp endOfInt
 
 

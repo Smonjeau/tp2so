@@ -88,6 +88,11 @@ createProcessContext:
 	movq [rax-8*18], 1    	# rbx
 	movq [rax-8*19], 0    	# rax
 
+	
+	# Calc base of the stack, for future free
+	sub rax,1024
+	mov rsi, rax
+	add rax,1024
 	# Calc the top of the stack
 	sub rax, 8*19
 	

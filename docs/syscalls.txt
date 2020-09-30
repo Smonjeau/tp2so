@@ -16,7 +16,7 @@ MEMSTATUS     10      int *memSize       int *freeSpace        int *occSpace    
 STARTPROCESS  11      void *main         int argc              char **argv       Creates a process starting at main, with specified parameters, and returns its PID.
 PS            12      void * buffer      int * cantProc                          Provides *cantProc proccesses data, using PCB
 																					struct.
-																										
+KILL          13      int pid                                                    kills the proccess corresponding to the  provided pid 																										
 
 STRUCTURES:
 

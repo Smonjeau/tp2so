@@ -104,9 +104,7 @@ static void test3(int argc, char **argv){
 		//killProcess(-1);
 		//while(1);
 	}
-	kill(-1);
-	return ;
-	
+	kill(-1);	
 }
 
 static void createWindow()

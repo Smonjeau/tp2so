@@ -131,59 +131,11 @@ int main(){
 	
 
 	//createProcessContext(0, (void*)0, mainApp);
-	if(createProcessContextFromKernel(0, (void*)0, test1) == -1)
-		printError();//Error
+	//createProcessContextFromKernel(0, (void*)0, test)
+	
 	
 
-	/*void * rsp1 = schedule((void *)0);
-	void * rsp = schedule(rsp1);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
 
-	void * rsp2 = schedule(rsp);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-	rsp = schedule(rsp2);
-
-	void * rsp3 = schedule(rsp);
-	rsp = schedule(rsp3);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-
-	void * rsp4 = schedule(rsp);
-	rsp = schedule(rsp4);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-	rsp = schedule(rsp);
-
-	if(rsp == rsp2) {
-		int exis = 0;
-		for(; exis<1024; exis++)
-			draw(exis, 700, 0xFFFFFF);
-	}*/
 
 
 	
@@ -193,8 +145,9 @@ int main(){
 	
 
 	__asm__("sti\n\t");
-	while(1);
-	//((EntryPoint) mainApp)(START_SHELL, 0);
+
+	((EntryPoint) mainApp)(START_SHELL, 0);
+	_hlt();
 		
 	return 0;
 
