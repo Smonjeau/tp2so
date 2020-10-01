@@ -17,14 +17,16 @@
 
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
 
-
 typedef struct PCB {
     int pid;
     ProcState procState;
     void * contextRSP;
+    void * baseRSP;
+    char * name;
     unsigned char remainingTicks;
     struct PCB * nextPCB;
-}  PCB;
+} PCB;
+
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		WINDOW DEFINITIONS
@@ -269,7 +271,7 @@ void shell(){
 				printMemStatus();
 				break;
 			case LINEA:
-				startProcess(test3,0, (void*)0);
+				startProcess(test3,0, (void*)0,"line");
 				break;
 
 			case DISPLAY_ANON:
@@ -437,6 +439,7 @@ void printProcData(){
 	}
 	for(int i=0;i<count;i++){
 		pcb=buffer [i];
+		printf("Name: %s    ",1,pcb.name);
 		print("Pid: ");
 		print(itoa(pcb.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
 		print("        State: ");

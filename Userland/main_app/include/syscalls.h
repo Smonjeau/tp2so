@@ -13,7 +13,7 @@ int memDump(void *src, void *dest);
 
 // ------------------------------------ PROCESS MANAGEMENT ------------------------------------
 
-int startProcess(void *main, int argc, char **argv);
+int startProcess(void *main, int argc, char **argv, char * name);
 
 int kill (int pid);
 

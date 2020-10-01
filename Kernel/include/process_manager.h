@@ -9,6 +9,7 @@ typedef struct PCB {
     ProcState procState;
     void * contextRSP;
     void * baseRSP;
+    char * name;
     unsigned char remainingTicks;
     struct PCB * nextPCB;
 } * PCB;
@@ -33,11 +34,11 @@ void switchProcessContext();
 
 // Creates a PCB for a new process and returns its PID
 
-int createProcessPCB(void * contextRSP, void * baseRSP);
+int createProcessPCB(void * contextRSP, void * baseRSP, char * name);
 
 // Creates a context for a new process, calls createProcessPCB and returns its PID
 
-int createProcessContext(int argc, char **argv, void *main);
+int createProcessContext(int argc, char **argv, void *main, char * name);
 
 // Creates a context for a new process from Kernel, calls createProcessPCB and returns its PID
 //It avoids setting interrupts

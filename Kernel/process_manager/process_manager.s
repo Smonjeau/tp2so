@@ -51,12 +51,14 @@ createProcessContext:
 	push rdi
 	push rsi
 	push rdx
+	push rcx
 
 	# Reserve 1kb for process stack
 	mov rdi, 1024
 	call malloc
 
 	# Restore calling args
+	pop rcx
 	pop rdx
 	pop rsi
 	pop rdi
@@ -98,7 +100,12 @@ createProcessContext:
 	
 	# Create the process PCB
 	mov rdi, rax
+
+	# Name of the process 
+	mov rdx,rcx
+
 	call createProcessPCB
+
 
 	sti
 	ret

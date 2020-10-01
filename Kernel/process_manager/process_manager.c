@@ -217,7 +217,7 @@ void * schedule(void *currContextRSP) {
 
 static int pid=0;
 
-int createProcessPCB(void *contextRSP, void * baseRSP){
+int createProcessPCB(void *contextRSP, void * baseRSP, char * name){
 	_cli();	
 
 	if(lastRSP == NULL)
@@ -233,6 +233,7 @@ int createProcessPCB(void *contextRSP, void * baseRSP){
     new->contextRSP = contextRSP;
 	new->baseRSP=baseRSP;
 	new->pid = pid++;
+	new->name=name;
 	new->nextPCB = NULL;
 
 	assignQuantumTime(new);

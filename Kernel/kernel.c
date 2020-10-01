@@ -109,12 +109,12 @@ void test1(int argc, char **argv){
 		}
 
 	}*/
-	if(createProcessContext(0, (void*)0, test2) == -1)
-		printError();//Error
-	if(createProcessContext(0, (void*)0, test3) == -1)
-		printError();//Error
+//	if(createProcessContext(0, (void*)0, test2) == -1)
+//		printError();//Error
+//	if(createProcessContext(0, (void*)0, test3) == -1)
+//		printError();//Error
 
-	killProcess(-1);
+//	killProcess(-1);
 	//while(1);
 
 

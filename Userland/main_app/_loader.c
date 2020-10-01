@@ -22,7 +22,7 @@ int _start(int message, int nargs, ...) {
 	switch(message){
 		case START_SHELL:
 			// return shell();
-			startProcess(shell, 0, (void*) 0);
+			startProcess(shell, 0, (void*) 0,"shell");
 			__asm__("hlt;\n\r");
 
 		case EXCEPTION_PRODUCED:
