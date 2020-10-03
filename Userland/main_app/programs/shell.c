@@ -174,7 +174,7 @@ void shell(){
 	command currentCommand = WRONG;
 
 	w.activeCursor = bodyCursor;
-	printf("Hola soy la shell mi pid es %d\n",1,getPid());
+	//printf("Hola soy la shell mi pid es %d\n",1,getPid());
 
 	while (1)
 	{

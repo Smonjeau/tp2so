@@ -13,29 +13,12 @@ Utilice el siguiente comando en su terminal para compilar y ejecutar el programa
 sudo ./run.sh
 ```
 
-## Manejo del programa
-#### Cambiar de ventana
-El programa está dividido en dos pantallas. Para poder acceder a cada una debe usar la tecla:
-- **F1** para acceder a la Calculadora
-- **F2** para acceder a la Shell
-
-#### Uso de calculadora
-Al usar la calculadora se pueden utilizar los siguientes símbolos:
-
-- **{0,...,9}** todos los dígitos para armar números enteros negativos o positivos
-- para armar números con parte decimal, se puede utilizar tanto la **coma (,)** como el **punto (.)**
-- **+** y **-** para la suma y resta
-- **x** (letra minúscula) y **%** para la multiplicación y la división
-- **(** y **)** para cambiar la precedencia de los argumentos
-- **=** o **Enter** para pedir el resultado
-
-Aplican las mismas reglas que para la matemática.
-
 Se puede borrar con:
 - **Backspace** un caracter por vez
 - **Esc** la línea entera
 
-Se puede cambiar a la ventana de la Shell con **F2**
+#### Implementación actual
+Contamos con un MM manejado por bitmap, un scheduler RR sin prioridades(aunque está armado para agregarlo) y sin estado BLOQUEADO. También está implementado el kill, que recibe el pid del proceso o matar (-1 para matarse a si mismo) y el ps.
 
 #### Uso de la Shell
 Al usar la Shell se pueden utilizar los siguientes comandos
@@ -54,6 +37,10 @@ registros guardados en cierto momento
 - **display anon** para imprimir una imagen sorpresa
 - **display matrix** para imprimir una imagen sorpresa
 - **clear** para limpiar la pantalla
+- **mem** para consultar el estado del heap
+- **line** para dibujar unas líneas en la pantalla
+- **ps** para obtener info de los procesos
+
 
 También se pueden utilizar:
 - **F2** para volver a la Calculadora
