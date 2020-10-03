@@ -57,6 +57,7 @@ typedef enum
 	PS,
 	MEM,
 	LINEA,
+	KILL,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
 	WRONG,
@@ -83,6 +84,7 @@ static void psInfo();
 
 static void printProcData();
 static void printMemStatus();
+static void killCommand(char * buffer);
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
@@ -93,7 +95,10 @@ static void printMemStatus();
  Defines the position and size of the window (all right half)
  and assings a color to title and body cursors
 -------------------------------------------------------------- */
-static void test3(int argc, char **argv){
+static void drawLine(int argc, char **argv){
+	printf("Hola soy el proceso q dibuja una linea, mi pid es %d \\n",1,getPid());
+	int i;
+	//for(int i=0;i< 0xffffffff;i++);
 	static int x3=0;
 	static int y3 = 400;
 	int cant=0;
@@ -103,10 +108,9 @@ static void test3(int argc, char **argv){
 			draw(x3, y3, 0x0000FF);
 		y3 += 6;
 		cant++;
-		//killProcess(-1);
-		//while(1);
+
 	}
-	kill(-1);	
+	//kill(-1);	
 }
 
 static void createWindow()
@@ -163,7 +167,6 @@ void shell(){
 	printLine("Shell");
 
 	drawIndicator(indicatorColor);
-
 	char bufferw2[W2_BUFFER_LEN + 1];
 	cleanBuffer(bufferw2, W2_BUFFER_LEN);
 
@@ -171,6 +174,7 @@ void shell(){
 	command currentCommand = WRONG;
 
 	w.activeCursor = bodyCursor;
+	printf("Hola soy la shell mi pid es %d\n",1,getPid());
 
 	while (1)
 	{
@@ -271,9 +275,11 @@ void shell(){
 				printMemStatus();
 				break;
 			case LINEA:
-				startProcess(test3,0, (void*)0,"line");
+				startProcess(drawLine,0, (void*)0,"line");
 				break;
-
+			case KILL:
+				killCommand(parameter);
+				break;
 			case DISPLAY_ANON:
 				displayImage(ANONYMOUS, 20, 200);
 				break;
@@ -474,6 +480,16 @@ void printProcData(){
 ---------------------------------------------------------------- */
 
 const int bufferMem = 33;
+
+void killCommand(char * pid){
+	int _pid= strToNum(pid);
+	if(_pid==-1){
+		printLine("Argument must be a pid. Use ps to see processes");
+		return;
+	}
+	kill(_pid);
+	return;
+}
 
 void printMemDump(char *sourceStr)
 {
@@ -757,6 +773,12 @@ static int isLine(char * buffer, int length){
 	return checkEmptySpace(buffer,4,length);
 }
 
+static int isCommandKill(char * buffer, int length, char * pid){
+	if(!strcmp("kill",buffer))
+		return 0;
+	return checkEmptySpace(buffer,4,length);
+}
+
 static int isAllowedChar(char c)
 {
 	if (isAlpha(c) || isDigit(c) || isSpace(c) || c == 0)
@@ -816,6 +838,8 @@ command parseCommand(char *buffer, int length, char *string)
 		return MEM;    
 	if(isLine(buffer,length))
 		return LINEA;
+	if(isCommandKill(buffer,length,string))
+		return KILL;
 
 	return NOCOMMAND;
 }

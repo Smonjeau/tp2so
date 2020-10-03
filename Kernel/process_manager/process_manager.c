@@ -23,6 +23,7 @@ ProcQueue * expireds = queue2;
 
 void * lastRSP = NULL;
 
+PCB runningProc=NULL;
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
 	pcb->remainingTicks = 10;
@@ -170,10 +171,11 @@ void * schedule(void *currContextRSP) {
 
 
 	
-	if(currentPCB->remainingTicks > 0)
+	if(currentPCB->remainingTicks > 0){
+		runningProc=currentPCB;
 		return currentPCB->contextRSP; //Continua
 
-
+	}
 
 
 	//Se terminó el tiempo asignado del proceso.
@@ -204,11 +206,13 @@ void * schedule(void *currContextRSP) {
 		//Y si no encuentra READY? No deberia pasar pues siempre creamos al menos 1 proceso master
 		
 		currentPCB->procState = RUN;
+		runningProc=currentPCB;
 		return currentPCB->contextRSP;
 
 	} else {
 		idx--; //Compenso
 		currentPCB->procState = RUN;
+		runningProc=currentPCB;
 		return currentPCB->contextRSP;
 	}
 

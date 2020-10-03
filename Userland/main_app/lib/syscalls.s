@@ -32,3 +32,5 @@ syscall startProcess, 11
 
 syscall ps, 12
 syscall kill, 13
+
+syscall getPid,14

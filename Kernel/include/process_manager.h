@@ -1,7 +1,7 @@
 #ifndef PROCESS_MANAGER_H_
 #define PROCESS_MANAGER_H_
 
-
+#define NULL (void*)0
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
 
 typedef struct PCB {
@@ -13,6 +13,8 @@ typedef struct PCB {
     unsigned char remainingTicks;
     struct PCB * nextPCB;
 } * PCB;
+
+
 
 
 typedef struct ProcQueue {

@@ -20,6 +20,7 @@ int kill (int pid);
 
 void ps (void * buffer, int * procCant);
 
+int getPid ();
 
 // ------------------------------------- KEYBOARD -------------------------------------
 
