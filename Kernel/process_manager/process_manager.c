@@ -105,7 +105,41 @@ void swapIfNeeded() {
 	
 }
 
-static int y = 50;
+//static int y = 50;
+void blockProcess(int pid) {
+	if(pid == 0)
+		return;
+
+	/* Debe ser atómica */
+	_cli();
+	int found = 0;
+	PCB currentPCB = NULL;
+
+	//Busco en actives
+	for(int idx = 0; idx < 40 && found == 0; idx++) {
+		currentPCB = actives[idx].first;
+
+		while(currentPCB != NULL && currentPCB->pid != pid)
+			currentPCB = currentPCB->nextPCB; 
+
+		if(currentPCB != NULL && currentPCB->pid == pid)
+			found = 1;	
+		
+	}
+
+	if(found == 1) {
+		if(currentPCB->procState == READY)
+			currentPCB->procState = BLOCKED;
+		else if(currentPCB->procState == BLOCKED)
+			currentPCB->procState = READY;
+	}
+
+
+
+	_sti();
+}
+
+
 void * schedule(void *currContextRSP) {
 
 

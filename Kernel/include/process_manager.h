@@ -54,6 +54,11 @@ int createProcessContextFromKernel(int argc, char **argv, void *main);
 void killProcess(int pid);
 
 
+/* Alternate BLOCKED/READY */
+
+void blockProcess(int pid);
+
+
 /* PS devuelve arreglo de structs PCB existentes y numero de procesos */
 void ps(void * buffer, int * procCant);
 
