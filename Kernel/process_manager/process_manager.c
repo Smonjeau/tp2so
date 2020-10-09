@@ -126,6 +126,19 @@ void blockProcess(int pid) {
 			found = 1;	
 		
 	}
+	if(found == 0) {
+		//Busco en expireds
+		for(int idx = 0; idx < 40 && found == 0; idx++) {
+			currentPCB = expireds[idx].first;
+
+			while(currentPCB != NULL && currentPCB->pid != pid)
+				currentPCB = currentPCB->nextPCB; 
+
+			if(currentPCB != NULL && currentPCB->pid == pid)
+				found = 1;	
+			
+		}
+	}
 
 	if(found == 1) {
 		if(currentPCB->procState == READY)
