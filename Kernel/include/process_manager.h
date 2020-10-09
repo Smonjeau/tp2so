@@ -47,7 +47,6 @@ int createProcessContext(int argc, char **argv, void *main, char * name);
 
 int createProcessContextFromKernel(int argc, char **argv, void *main);
 
-//int getNumProc();
 
 
 /* Kills a process and returns */

@@ -47,10 +47,10 @@ void queueProc(ProcQueue * queue, PCB pcb) {
 	pcb->nextPCB = NULL;
 }
 
-void sendToExpired(PCB pcb) {
+void sendToExpired(PCB pcb, ProcState newState) {
 	assignQuantumTime(pcb); //Le reseteamos su quantum time
 	int priority = getPriorityLevel(pcb) - 100; //Recalculamos su priority
-	pcb->procState = READY;
+	pcb->procState = newState;
 	//queueProc(expireds[priority], pcb);
 	queueProc(expireds + priority, pcb);
 }
@@ -107,12 +107,6 @@ void swapIfNeeded() {
 
 static int y = 50;
 void * schedule(void *currContextRSP) {
-	/*if(getNumProcTotal() == 3) {
-		int x = 0;
-		for(; x<1024; x++)
-			draw(x, 100, 0xFFFFFF);
-		//return currContextRSP;
-	}*/
 
 
 
@@ -121,39 +115,36 @@ void * schedule(void *currContextRSP) {
 	entrega pues no se está considerando caso de proceso bloqueado.*/
 
 	PCB currentPCB = NULL;
-	int priorityIdx;
-	for(priorityIdx = 0; priorityIdx < 40 && currentPCB == NULL; priorityIdx++)
+	int priorityIdx = 0;
+	do {
 		currentPCB = actives[priorityIdx].first;
 
-	if(priorityIdx == 40) {
-		/*int x = 0;
-		if(getNumProcTotal() == 0) {
-			for(; x<1024; x++)
-				draw(x, y, 0xFFFFFF);
-		} else if(getNumProcTotal() == 1) {
-			for(; x<1024; x++)
-				draw(x, y, 0xFF0000);
-		} else if(getNumProcTotal() == 2) {
-			for(; x<1024; x++)
-				draw(x, y, 0x00FF00);
-		} else if(getNumProcTotal() == 3) {
-			for(; x<1024; x++)
-				draw(x, y, 0x0000FF);
-		} else {
-			for(; x<1024; x++)
-				draw(x, y, 0xf4ff44);
-		}
-
-		
-		
-		
-
+		//Debemos considerar que sucede si el currentPCB está bloqueado
+		while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
+			//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
+			//Primero lo sacamos de esta cola
+			actives[priorityIdx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
+			if(actives[priorityIdx].first == NULL)
+				actives[priorityIdx].last = NULL; //Era el unico proceso
 			
-		y += 10;*/
-		
 
+			sendToExpired(currentPCB, BLOCKED);
+
+
+			currentPCB = currentPCB->nextPCB; //Paso al siguiente en la cola, en busca de un proceso READY
+
+		}
+		
+		priorityIdx++;
+
+	} while(priorityIdx < 40 && currentPCB == NULL);
+
+
+	/*for(priorityIdx = 0; priorityIdx < 40 && currentPCB == NULL; priorityIdx++) //Esto era cuando no habia bloqueados
+		currentPCB = actives[priorityIdx].first;*/
+
+	if(priorityIdx == 40)
 		return currContextRSP; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
-	}
 
 	priorityIdx--; //Compenso el ultimo ++
 
@@ -172,7 +163,7 @@ void * schedule(void *currContextRSP) {
 
 	
 	if(currentPCB->remainingTicks > 0){
-		runningProc=currentPCB;
+		runningProc = currentPCB;
 		return currentPCB->contextRSP; //Continua
 
 	}
@@ -182,7 +173,7 @@ void * schedule(void *currContextRSP) {
 	actives[priorityIdx].first = currentPCB->nextPCB;
 	if(actives[priorityIdx].first == NULL)
 		actives[priorityIdx].last = NULL;
-	sendToExpired(currentPCB);
+	sendToExpired(currentPCB, READY);
 
 
 	// Debo buscar al proximo a ejecutar. Aprovecho lo que ya recorri de las colas de activos.
@@ -394,25 +385,4 @@ void killProcess(int pid) {
 
 void * getLastContext() {
 	return lastRSP;
-}
-
-int getNumProcTotal() {
-	int counter = 0;
-	PCB pcb;
-	for(int idx = 0; idx < 40; idx++) {
-		pcb = (actives + idx)->first;
-		while(pcb != NULL) {
-			pcb = pcb->nextPCB;
-			counter++;
-		}
-	}
-
-	for(int idx = 0; idx < 40; idx++) {
-		pcb = (expireds + idx)->first;
-		while(pcb != NULL) {
-			pcb = pcb->nextPCB;
-			counter++;
-		}
-	}
-	return counter;
 }
