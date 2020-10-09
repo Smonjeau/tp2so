@@ -59,6 +59,11 @@ void killProcess(int pid);
 void blockProcess(int pid);
 
 
+/* Change process priority (100 - 139) */
+
+void niceProcess(int pid, int priority);
+
+
 /* PS devuelve arreglo de structs PCB existentes y numero de procesos */
 void ps(void * buffer, int * procCant);
 

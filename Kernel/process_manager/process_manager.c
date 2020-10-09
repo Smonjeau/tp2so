@@ -7,8 +7,8 @@
 #include <screen_driver.h>
 
 /*
-	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100,
-	se asigna un quantum de tiempo fijo y no se consideran procesos bloqueados.
+	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100 y
+	se asigna un quantum de tiempo fijo..
 	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
 */
 
@@ -47,11 +47,33 @@ void queueProc(ProcQueue * queue, PCB pcb) {
 	pcb->nextPCB = NULL;
 }
 
-void sendToExpired(PCB pcb, ProcState newState) {
+//Quita proceso de una cola particular
+void removeFromQueue(ProcQueue * queue, int pid) {
+	//Debe ser llamada desde otra funcion que sea atómica SI O SI
+	PCB prev = NULL;
+	PCB curr = queue->first;
+	while(curr != NULL && curr->pid != pid) {
+		prev = curr;
+		curr = curr->nextPCB;
+	}
+	if(curr != NULL) {
+		if(prev == NULL) {
+			queue->first = curr->nextPCB;
+			if(queue->first == NULL)
+				queue->last = NULL;
+		} else {
+			prev->nextPCB = curr->nextPCB;
+			if(prev->nextPCB == NULL)
+				queue->last = prev;
+		}
+	}
+}
+
+void sendToExpired(PCB pcb, ProcState newState, int priority) { 
+	//Recibe priority como parametro por si dinamicamente se decide cambiarle la prioridad
 	assignQuantumTime(pcb); //Le reseteamos su quantum time
-	int priority = getPriorityLevel(pcb) - 100; //Recalculamos su priority
+	//Mantenemos el priority que tenia previamente //getPriorityLevel(pcb) - 100; //Recalculamos su priority
 	pcb->procState = newState;
-	//queueProc(expireds[priority], pcb);
 	queueProc(expireds + priority, pcb);
 }
 
@@ -105,7 +127,68 @@ void swapIfNeeded() {
 	
 }
 
-//static int y = 50;
+void niceProcess(int pid, int priority) {
+	if(priority < 100 || priority > 139)
+		return;
+
+	/* Debe ser atómica */
+	_cli();
+	int found = 0, inActives = 1, idxPriority;
+	PCB currentPCB = NULL;
+
+	//Busco en actives
+	for(idxPriority = 0; idxPriority < 40 && found == 0; idxPriority++) {
+		currentPCB = actives[idxPriority].first;
+
+		while(currentPCB != NULL && currentPCB->pid != pid)
+			currentPCB = currentPCB->nextPCB; 
+
+		if(currentPCB != NULL && currentPCB->pid == pid)
+			found = 1;	
+		
+	}
+	if(found == 0) {
+		inActives = 0;
+		//Busco en expireds
+		for(idxPriority = 0; idxPriority < 40 && found == 0; idxPriority++) {
+			currentPCB = expireds[idxPriority].first;
+
+			while(currentPCB != NULL && currentPCB->pid != pid)
+				currentPCB = currentPCB->nextPCB; 
+
+			if(currentPCB != NULL && currentPCB->pid == pid)
+				found = 1;	
+			
+		}
+	}
+
+	if(found == 1) {
+		idxPriority--; //Compenso el ultimo ++
+		if(idxPriority != priority) {
+			//Primero lo quitamos de esta cola
+			if(inActives)
+				removeFromQueue(actives + idxPriority, pid);
+			else
+				removeFromQueue(expireds + idxPriority, pid);
+
+			priority -= 100;
+
+			//Ahora lo añadimos a la nueva cola
+			if(inActives)
+				queueProc(actives + priority, currentPCB);
+			else
+				queueProc(expireds + priority, currentPCB);
+		}
+		
+	}
+
+
+
+	_sti();
+
+
+}
+
 void blockProcess(int pid) {
 	if(pid == 0)
 		return;
@@ -157,10 +240,6 @@ void * schedule(void *currContextRSP) {
 
 
 
-
-	/*Gran parte de este scheduler deberá ser alterado en próxima
-	entrega pues no se está considerando caso de proceso bloqueado.*/
-
 	PCB currentPCB = NULL;
 	int priorityIdx = 0;
 	do {
@@ -175,7 +254,7 @@ void * schedule(void *currContextRSP) {
 				actives[priorityIdx].last = NULL; //Era el unico proceso
 			
 
-			sendToExpired(currentPCB, BLOCKED);
+			sendToExpired(currentPCB, BLOCKED, priorityIdx);
 
 
 			currentPCB = currentPCB->nextPCB; //Paso al siguiente en la cola, en busca de un proceso READY
@@ -186,9 +265,6 @@ void * schedule(void *currContextRSP) {
 
 	} while(priorityIdx < 40 && currentPCB == NULL);
 
-
-	/*for(priorityIdx = 0; priorityIdx < 40 && currentPCB == NULL; priorityIdx++) //Esto era cuando no habia bloqueados
-		currentPCB = actives[priorityIdx].first;*/
 
 	if(priorityIdx == 40)
 		return currContextRSP; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
@@ -220,7 +296,7 @@ void * schedule(void *currContextRSP) {
 	actives[priorityIdx].first = currentPCB->nextPCB;
 	if(actives[priorityIdx].first == NULL)
 		actives[priorityIdx].last = NULL;
-	sendToExpired(currentPCB, READY);
+	sendToExpired(currentPCB, READY, priorityIdx);
 
 
 	// Debo buscar al proximo a ejecutar. Aprovecho lo que ya recorri de las colas de activos.
