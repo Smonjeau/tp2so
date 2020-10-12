@@ -152,57 +152,101 @@ void mem_status(int * memory_size, int * free_space, int * occupied_space){
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     BUDDY SYSTEM IMPLEMENTATION
 --------------------------------------------------------------------------------------------------------------------------- */
-
-#define TOTAL_NODES (MEM_SIZE -1) //Este cálculo viene de hacer la fórmula para la cantidad de nodos de un arbol binario completo
+/*La implementación está pensada con un BT. La raiz arranca con un valor del total de la memoria disponible
+y se va dividiendo recursivamente de a mitades, el valor mínimo es 2. Si mi memoria es de 16B(2^4), voy a tener
+como máximo 2^4 -1 nodos y 4-1 niveles
+Para alocar voy recorriendo siempre por la izquierda. Si no se puede colocar a la izquierda voy por el nodo
+de la derecha, que tiene el offset apropiado para no ir pisando la memoria*/
+#define TOTAL_NODES (MEM_SIZE -1) 
+#define TREE_HEIGHT 23 - 1  //El tamaño de la mem es 8MB = 2^23 B
 #define TRUE 1
 #define FALSE 0
 
-typedef  struct Node
+
+typedef  struct node
 {
-    struct node* left;
-    struct  node* right;
+    struct node * left;
+    struct node * right;
+     struct node * ascendant;
     int size;
     char free;
-    char leaf;
-}Node;
-
-Node buddy_tree [TOTAL_NODES];
-
+ 
+}node;
+node buddy_tree [TOTAL_NODES];
 int nodes_counter =0;
-//root node
-Node root;
-root.left=NULL;
-root.right=NULL;
-root.size=MEM_SIZE;
-root.free=TRUE;
-root.leaf=FALSE;
-node buddy_tree [nodes_counter++] = root;
+_int node_size = sizeof(struct node);
+
+node * create_tree_node_rec (int size, node * ascendant, int levels_remaining){
+    //Creo todo el arbol, tengo TREE_HEIGHT niveles que crear
+    if(!levels_remaining)
+        return NULL;
+    //Como no hay memoria dinámica, reservamos un array estático para ir pidiendo memoria para los nodos
+    node * node = buddy_tree + (nodes_counter++);
+    node->ascendant=ascendant;
+    node->free=TRUE;
+    node->size=size;
+   
+
+    //creo todo el arbol recursivamente
+    node->right= create_tree_node_rec(size / 2, node, levels_remaining - 1);
+
+    node->left= create_tree_node_rec(size/2,node,levels_remaining-1);
+
+    return node;
 
 
 
-void *  recursive_malloc (int size, Node * node,int offset){
+
+}
+
+void *  recursive_malloc (int size, node * node, int offset){
+    if(node->free==FALSE)
+        return NULL;
     if((node->size)/2 < size){
+        node->free=FALSE;
         return FIRST_HEAP_ADRESS + offset;
     }
-    if(node->leaf){
-        buddy_tree[nodes_counter++] = (Node){NULL,NULL,node->size / 2, TRUE,TRUE};
-        buddy_tree[nodes_counter++] = (Node) {NULL,NULL,node->size / 2, TRUE,TRUE};
-        node->left = buddy_tree[nodes_counter-2];
-        node->right = buddy_tree[nodes_counter-1];
-        node->leaf=FALSE;
-        recursive_malloc(size,node->left,0);
+    if(node->left->free==TRUE){
+        void * aux = recursive_malloc(size,node->left, offset);
+        if (aux){
+            return aux;
+        }
+
     }
+    if(node->right->free){
+        void * aux = recursive_malloc(size,node->right, offset + (node->size)/2);
+        if(aux)
+            return aux;
+
+    }
+    return NULL;
+
 
 
 }
 
 void * malloc (int size){
-    return recursive_malloc(size,buddy_tree[0],0);
+    if(!nodes_counter)
+        create_tree_node_rec(MEM_SIZE,NULL,ROOT,TREE_HEIGHT+1);
+    return recursive_malloc(size,buddy_tree,0);
+
 }
 
+int free_rec (void * adress, node * node, int offset){
 
+    if(FIRST_HEAP_ADRESS+offset == adress && node->free==FALSE){
+        node->free=TRUE;
+        return TRUE; //lo libero
+    }
+    if(node->left == NULL || node->right==NULL)
+        return FALSE;
+    if(!free_rec(adress,node->left,offset))
+        free_rec(adress,node->right,offset + (node->size / 2));
+}
 
-
+void free(void* adress){
+    free_rec(adress, buddy_tree, 0);
+}
 
 
 

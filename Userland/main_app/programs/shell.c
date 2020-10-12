@@ -58,6 +58,7 @@ typedef enum
 	MEM,
 	LINEA,
 	KILL,
+	LOOP,
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
 	WRONG,
@@ -85,6 +86,8 @@ static void psInfo();
 static void printProcData();
 static void printMemStatus();
 static void killCommand(char * buffer);
+
+extern void loop();
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
@@ -275,7 +278,10 @@ void shell(){
 				printMemStatus();
 				break;
 			case LINEA:
-				startProcess(drawLine,0, (void*)0,"line");
+				startProcess(drawLine,0,NULL,"line");
+				break;
+			case LOOP:
+				startProcess(loop,0,NULL,"loop");
 				break;
 			case KILL:
 				killCommand(parameter);
@@ -772,6 +778,11 @@ static int isLine(char * buffer, int length){
 		return 0;
 	return checkEmptySpace(buffer,4,length);
 }
+static int isLoop(char * buffer, int length){
+	if(!strcmp("loop",buffer))
+		return 0;
+	return checkEmptySpace(buffer,4,length);
+}
 
 static int isCommandKill(char * buffer, int length, char * pid){
 	if(!strcmp("kill",buffer))
@@ -838,6 +849,8 @@ command parseCommand(char *buffer, int length, char *string)
 		return MEM;    
 	if(isLine(buffer,length))
 		return LINEA;
+	if(isLoop(buffer,length))
+		return LOOP;
 	if(isCommandKill(buffer,length,string))
 		return KILL;
 
