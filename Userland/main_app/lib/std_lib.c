@@ -9,6 +9,7 @@
 #include <std_lib.h>
 #include <syscalls.h>
 #include <stdint.h>
+#include <asm_lib.h>
 
 
 /* ------------------------------------------------------------------------------------------------------------------
@@ -407,7 +408,7 @@ int strncmp(char *s1, char *s2, int n){
         if (u1 == '\0')
             return 0;
     }
-    
+
     return 0;
 }
 
@@ -417,4 +418,13 @@ void strcpy(char *src, char *dest)
     for (i = 0; src[i] != 0; i++)
         dest[i] = src[i];
     dest[i] = 0;
+}
+
+
+void acquire(int *lock){
+    while(xchg(lock, 1) != 0);
+}
+
+void release(int *lock){
+    xchg(lock, 0);
 }

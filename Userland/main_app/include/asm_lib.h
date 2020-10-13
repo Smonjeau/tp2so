@@ -9,3 +9,5 @@ void regDump(RegDump *dump);
 void halt();
 
 void sti();
+
+int xchg();

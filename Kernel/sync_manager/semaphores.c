@@ -1,5 +1,6 @@
 #include <mem_manager.h>
 #include <process_manager.h>
+#include <std_lib.h>
 #include <lib.h>
 
 #define MAX_BLOCKED_PIDS 20
@@ -9,6 +10,7 @@ typedef struct Semaphore{
     int value;
     int blockedPIDs[MAX_BLOCKED_PIDS];
     int blockedPIDsSize;
+    int lock;
     struct Semaphore * next;
 } Semaphore;
 
@@ -24,6 +26,7 @@ int createSemaphore(int id, int initValue){
     newSem->id = id;
     newSem->value = initValue;
     newSem->blockedPIDsSize = 0;
+    newSem->lock = 0;
     newSem->next = NULL;
 
     Semaphore *lastSem = semaphores;
@@ -60,15 +63,24 @@ int waitSemaphore(int id){
     Semaphore *semaphore = findSemaphore(id, 0);
     if(semaphore == NULL)
         return -1;
+    
+    acquire(semaphore->lock);
 
     if(semaphore->value > 0){
         semaphore->value -= 1;
-        return 0;
+    }else{
+        release(semaphore->lock);
+
+        int currPid = getPID();
+        blockProcess(currPid);
+        semaphore->blockedPIDs[semaphore->blockedPIDsSize++] = currPid;
+        
+        acquire(semaphore->lock);
+
+        semaphore->value -= 1;
     }
 
-    int currPid = getPID();
-    blockProcess(currPid);
-    semaphore->blockedPIDs[semaphore->blockedPIDsSize++] = currPid;
+    release(semaphore->lock);
 
     return 0;
 
@@ -81,13 +93,15 @@ int postSemaphore(int id){
     if(semaphore == NULL)
         return -1;
 
-    if(semaphore->value == 0){
-        for(int i=0; i<semaphore->blockedPIDsSize; i++)
-            blockProcess(semaphore->blockedPIDs[i]);
-        semaphore->blockedPIDsSize = 0;
-    }
+    acquire(semaphore->lock);
 
     semaphore->value += 1;
+
+    for(int i=0; i<semaphore->blockedPIDsSize; i++)
+        blockProcess(semaphore->blockedPIDs[i]);
+    semaphore->blockedPIDsSize = 0;
+
+    release(semaphore->lock);
 
     return 0;
 

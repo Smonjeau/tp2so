@@ -62,6 +62,8 @@ void consumer(int argc, char **argv){
 	for(; x<x+100; x++)
 			draw(x, 100, 0xFF0000);
 
+	kill(-1);
+
 	// while(1){
 	// 	waitSem(0);
 	// 	for(; x<x+100; x++)
