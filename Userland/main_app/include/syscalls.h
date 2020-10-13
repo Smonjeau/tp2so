@@ -17,6 +17,7 @@ int startProcess(void *main, int argc, char **argv, char * name);
 
 int kill (int pid);
 
+int block (int pid);
 
 void ps (void * buffer, int * procCant);
 

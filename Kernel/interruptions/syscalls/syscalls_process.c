@@ -29,3 +29,11 @@ void sysKill(int pid){
 int sysGetPid(){
     return runningProc->pid;
 }
+
+void sysBlock(int pid) {
+	blockProcess(pid);
+}
+
+void sysNice(int pid, int priority) {
+	niceProcess(pid, priority);
+}
