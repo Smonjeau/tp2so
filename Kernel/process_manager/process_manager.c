@@ -191,7 +191,7 @@ void niceProcess(int pid, int priority) {
 
 
 
-PCB getPCB(int pid) {
+void blockProcess(int pid) {
 	if(pid == 0)
 		return;
 
@@ -200,54 +200,39 @@ PCB getPCB(int pid) {
 	int found = 0;
 	PCB currentPCB = NULL;
 
-	for(int idx=0; idx < 40 && found == 0; idx++) {
+	//Busco en actives
+	for(int idx = 0; idx < 40 && found == 0; idx++) {
 		currentPCB = actives[idx].first;
 
 		while(currentPCB != NULL && currentPCB->pid != pid)
 			currentPCB = currentPCB->nextPCB; 
 
 		if(currentPCB != NULL && currentPCB->pid == pid)
-			found = 1;		
+			found = 1;	
+		
+	}
+	if(found == 0) {
+		//Busco en expireds
+		for(int idx = 0; idx < 40 && found == 0; idx++) {
+			currentPCB = expireds[idx].first;
+
+			while(currentPCB != NULL && currentPCB->pid != pid)
+				currentPCB = currentPCB->nextPCB; 
+
+			if(currentPCB != NULL && currentPCB->pid == pid)
+				found = 1;	
+			
+		}
 	}
 
-	if(found)
-		return currentPCB;
-
-	for(int idx = 0; idx < 40 && found == 0; idx++) {
-		currentPCB = expireds[idx].first;
-
-		while(currentPCB != NULL && currentPCB->pid != pid)
-			currentPCB = currentPCB->nextPCB; 
-
-		if(currentPCB != NULL && currentPCB->pid == pid)
-			found = 1;		
+	if(found == 1) {
+		if(currentPCB->procState == READY)
+			currentPCB->procState = BLOCKED;
+		else if(currentPCB->procState == BLOCKED)
+			currentPCB->procState = READY;
 	}
-
-	return currentPCB;
 
 	_sti();
-}
-
-
-int blockProcess(int pid){
-
-	PCB pcb = getPCB(pid);
-	if(pcb == NULL)
-		return -1;
-
-	pcb->procState = BLOCKED;
-
-}
-
-
-int unblockProcess(int pid){
-
-	PCB pcb = getPCB(pid);
-	if(pcb == NULL || pcb->procState != BLOCKED)
-		return -1;
-
-	pcb->procState = READY;
-
 }
 
 
