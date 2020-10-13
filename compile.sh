@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /home
 make clean -s
-make all -s
+make MM=$1 -s

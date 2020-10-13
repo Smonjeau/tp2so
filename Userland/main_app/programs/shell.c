@@ -100,7 +100,7 @@ extern void loop();
 -------------------------------------------------------------- */
 static void drawLine(int argc, char **argv){
 	printf("Hola soy el proceso q dibuja una linea, mi pid es %d \\n",1,getPid());
-	int i;
+	//int i;
 	//for(int i=0;i< 0xffffffff;i++);
 	static int x3=0;
 	static int y3 = 400;

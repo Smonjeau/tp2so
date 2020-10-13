@@ -3,7 +3,7 @@
 #define NULL ((void*)0)
 #define FIRST_HEAP_ADRESS ((char*) 0x800000)
 #define MEM_SIZE (8*1024*1024)
-#if buddy ==0
+#ifdef MM_BITMAP
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                 BITMAP IMPLEMENTATION
@@ -147,7 +147,7 @@ void mem_status(int * memory_size, int * free_space, int * occupied_space){
 
 }
 
-#elif buddy == 1
+#else
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     BUDDY SYSTEM IMPLEMENTATION
@@ -174,7 +174,7 @@ typedef  struct node
 }node;
 node buddy_tree [TOTAL_NODES];
 int nodes_counter =0;
-_int node_size = sizeof(struct node);
+int node_size = sizeof(struct node);
 
 node * create_tree_node_rec (int size, node * ascendant, int levels_remaining){
     //Creo todo el arbol, tengo TREE_HEIGHT niveles que crear

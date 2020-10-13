@@ -1,7 +1,13 @@
 #!/bin/bash
-docker run -v `pwd`:/home --security-opt seccomp:unconfined -ti agodio/itba-so:1.0 /home/compile.sh
+if [ "$1" = "buddy" ]
+then
+    docker run -v `pwd`:/home --security-opt seccomp:unconfined -ti agodio/itba-so:1.0 /home/compile.sh BUDDY
+else
+    docker run -v `pwd`:/home --security-opt seccomp:unconfined -ti agodio/itba-so:1.0 /home/compile.sh BITMAP
+fi
 
-if [[ "$1" = "gdb" ]]; then
+if [ "$1" = "gdb" -o "$2" = "gdb" ]
+then
     qemu-system-x86_64 -hda Image/x64BareBonesImage.qcow2 -m 512 -s -S -d int
 else
     qemu-system-x86_64 -hda Image/x64BareBonesImage.qcow2 -m 4096

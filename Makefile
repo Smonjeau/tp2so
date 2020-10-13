@@ -1,12 +1,8 @@
-
-buddy:  bootloader kernelBuddy userland image 
 all:  bootloader kernel userland image
 
 bootloader:
 	cd Bootloader; make all
 
-kernelBuddy:
-	cd Kernel;make CFLAGS=-Dbuddy=1 all
 kernel:
 	cd Kernel; make all
 
