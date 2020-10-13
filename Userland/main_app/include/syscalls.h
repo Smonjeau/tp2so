@@ -19,9 +19,22 @@ int kill (int pid);
 
 int block (int pid);
 
+int getPid ();
+
 void ps (void * buffer, int * procCant);
 
-int getPid ();
+typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
+
+typedef struct PCB {
+    int pid;
+    ProcState procState;
+    void * contextRSP;
+    void * baseRSP;
+    char * name;
+    unsigned char remainingTicks;
+    struct PCB * nextPCB;
+} PCB;
+
 
 // ------------------------------------- KEYBOARD -------------------------------------
 

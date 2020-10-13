@@ -6,27 +6,12 @@
 | Press F1 to switch to calculator program.															|
 ---------------------------------------------------------------------------------------------------*/
 
+#include <shell_builtins.h>
+#include <syscalls.h>
 #include <windows_lib.h>
+#include <image_lib.h>
 #include <keyboard_lib.h>
 #include <std_lib.h>
-#include <asm_lib.h>
-#include <syscalls.h>
-#include <image_lib.h>
-#include <stdint.h>
-
-
-typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
-
-typedef struct PCB {
-    int pid;
-    ProcState procState;
-    void * contextRSP;
-    void * baseRSP;
-    char * name;
-    unsigned char remainingTicks;
-    struct PCB * nextPCB;
-} PCB;
-
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		WINDOW DEFINITIONS
@@ -34,61 +19,20 @@ typedef struct PCB {
 
 static Window w;
 
-#define W2_BUFFER_LEN 250
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		SHELL DEFINITIONS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-typedef enum
-{
-	NOCOMMAND,
+#define MAX_TOKENS 10
+#define MAX_TOKEN_LEN 20
+#define MAX_CMD_LEN MAX_TOKENS*MAX_TOKEN_LEN
 
-	HELP,
-	TIME,
-	INFOREG,
-	STOREDREG,
-	PRINTMEM,
-	CPUTEMP,
-	CPUINFO,
-	DIVZERO,
-	INVOPCODE,
-	CLEAR,
-	PS,
-	MEM,
-	LINEA,
-	KILL,
-	LOOP,
-	DISPLAY_ANON,
-	DISPLAY_MATRIX,
-	WRONG,
-	BLOCK
-	
-} command;
+void parseCommand(char *cmdBuff);
 
-command parseCommand(char *buffer, int length, char *string);
-
-static void help(void);
-
-static void printTime(void);
-static void printInfoReg(void);
-static void printStoredReg(void);
-static void printMemDump(char *start);
-static void printCPUTemp(void);
-static void printCPUInfo(void);
-static void divZeroException(void);
-static void invOpcodeException(void);
 static void clearWindow(void);
 
-static void printWarning(int num);
 static int parseHexa(char *);
-static void psInfo();
-
-static void printProcData();
-static void printMemStatus();
-static void killCommand(char * buffer);
-static void blockProcess(char * buffer);
-
 
 extern void loop();
 
@@ -119,45 +63,22 @@ static void drawLine(int argc, char **argv){
 	//kill(-1);	
 }
 
-static void createWindow()
-{
+static void createWindow(){
 	
-
 	ScreenRes res;
 	getRes(&res);
 
-	w.xi = 0;
-	w.xf = res.width;
-	w.yi = 0;
-	w.yf = res.height;
+	w.xi = 0; w.xf = res.width;
+	w.yi = 0; w.yf = res.height;
 	
 	w.textBackground = 0;
 
-	w.cursors[titleCursor].x = titleX;
-	w.cursors[titleCursor].y = titleY;
-	w.cursors[titleCursor].fontColor = titleColor;
-	w.cursors[titleCursor].fontSize = titleSize;
-
-	w.cursors[bodyCursor].x = 0;
-	w.cursors[bodyCursor].y = bodyY;
+	w.cursors[bodyCursor].x = 0; w.cursors[bodyCursor].y = 0;
 	w.cursors[bodyCursor].fontColor = bodyColor;
 	w.cursors[bodyCursor].fontSize = bodySize;
 	w.cursors[bodyCursor].withIndicator = 1;
 
 }
-
-/* -----------------------------------------------------------
- Draws a line below the title to indicate that this windows
- is currently selected
--------------------------------------------------------------- */
-
-static void drawIndicator(int color)
-{
-
-	for (int x = indicatorX; x < indicatorWidth; x++)
-		drawPoint(x, indicatorY, indicatorHeight, color);
-}
-
 
 /* -------------------------------------------------------------
  Method that activates when this window becomes selected
@@ -169,151 +90,42 @@ void shell(){
 	createWindow();
 	setWindow(&w);
 
-	w.activeCursor = titleCursor;
-	printLine("Shell");
-
-	drawIndicator(indicatorColor);
-	char bufferw2[W2_BUFFER_LEN + 1];
-	cleanBuffer(bufferw2, W2_BUFFER_LEN);
-
-	int bIter = 0;
-	command currentCommand = WRONG;
+	char cmdBuff[MAX_CMD_LEN] = {0};
+	int buffPos = 0;
 
 	w.activeCursor = bodyCursor;
-	//printf("Hola soy la shell mi pid es %d\n",1,getPid());
 
-	while (1)
-	{
+	char c;
+	while ((c = getChar())){
 
-		char c = getChar();
+		// Handle the chars that are not CR
 
 		if(c == f3Code)
-		{
 			scrollUp(8);
-		}
 
-		if (c == '\b')
-		{
-
-			// Backspace pressed, backward the buffer
-
-			if (bIter != 0)
-			{
-				bIter--;
-				bufferw2[bIter] = 0;
-			}
-		}
-		else if (isPrintableChar(c) && bIter < W2_BUFFER_LEN)
-		{
-
-			// Put the char into buffer
-
-			bufferw2[bIter++] = c;
-			if (bIter == W2_BUFFER_LEN)
-				bIter++;
-		}
+		if (c == '\b' && buffPos > 0)
+			cmdBuff[--buffPos] = 0;
+		
+		if (isPrintableChar(c) && buffPos < MAX_CMD_LEN)
+			cmdBuff[buffPos++] = c;
 
 		printChar(c);
 
-		// Enter pressed, parse and execute command
-		if (c == '\r')
-		{
-			if(bIter==0){
+		// Handle the CR char, parse command
+
+		if (c == '\r'){
+
+			if(buffPos==0){
 				newLine();
 				continue;
 			}
 
-			// String for storing command parameter if present
-			char parameter[W2_BUFFER_LEN];
-
-			if (bIter > W2_BUFFER_LEN)
-				currentCommand = WRONG;
-			else
-			{
-				currentCommand = parseCommand(bufferw2, bIter, parameter);
-			}
-
-			switch (currentCommand)
-			{
-			case HELP:
-				help();
-				break;
-
-			case TIME:
-				printTime();
-				break;
-
-			case INFOREG:
-				printInfoReg();
-				break;
-
-			case STOREDREG:
-				printStoredReg();
-				break;
-
-			case PRINTMEM:
-				printMemDump(parameter);
-				break;
-
-			case CPUTEMP:
-				printCPUTemp();
-				break;
-
-			case CPUINFO:
-				printCPUInfo();
-				break;
-
-			case DIVZERO:
-				divZeroException();
-				break;
-
-			case INVOPCODE:
-				invOpcodeException();
-				break;
-
-			case CLEAR:
-				clearWindow();
-				break;
-			case PS:
-				printProcData();
-				break;
-			case MEM:
-				printMemStatus();
-				break;
-			case LINEA:
-				startProcess(drawLine,0,NULL,"line");
-				break;
-			case LOOP:
-				startProcess(loop,0,NULL,"loop");
-				break;
-			case KILL:
-				killCommand(parameter);
-				break;
-			case BLOCK:
-				blockProcess(parameter);
-				break;
-			case DISPLAY_ANON:
-				displayImage(ANONYMOUS, 20, 200);
-				break;
-
-			case DISPLAY_MATRIX:
-				displayImage(MATRIX, 20, 200);
-				break;
-
-			case WRONG:
-				printWarning(WRONG);
-				break;
-
-
-			default:
-				printWarning(NOCOMMAND);
-			}
+			cmdBuff[buffPos] = 0;
+			parseCommand(cmdBuff);
 
 			newLine();
 
-			cleanBuffer(bufferw2, W2_BUFFER_LEN);
-			bIter = 0;
-			continue;
+			buffPos = 0;
 		}
 	}
 }
@@ -322,299 +134,7 @@ void shell(){
                                         SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------
-						HELP
----------------------------------------------------------------- */
-
-static void help(void)
-{
-	newLine();
-	printLine("---------------------------------------------------");
-	printLine("On this Terminal you can try the following commands:");
-	
-	newLine();
-
-	printLine("- cputemp           to get the CPU Temp");
-	printLine("- help              to go to the Help Manual");
-	printLine("- printmem n        to print memory starting at n");
-	printLine("- cpuinfo           to get the CPU Brand Data");
-	printLine("- inforeg           to get the Register's Values");
-	printLine("- storedreg         to get the Stored Register's Values");
-	printLine("- time              to get the Time");
-	printLine("- divzero           to execute a Div by Zero");
-	printLine("- invopcode         to exectue an invalid opcode");
-	printLine("- display anon      to show an image of Anonymous");
-	printLine("- display matrix    to show an image of Matrix");
-	printLine("- clear             to clear the screen");
-	printLine("- mem               to print heap status");
-	printLine("- ps                to print procceses data");
-
-	newLine();
-	
-	printLine("To go to calculator window, press F1");
-	printLine("To scroll the window up, press F3");
-	printLine("To store registers value, press TAB");
-	
-	newLine();
-	
-	printLine("---------------------------------------------------");
-	newLine();
-}
-
-/* -------------------------------------------------------------
-						TIME
----------------------------------------------------------------- */
-
-static void printTime(void)
-{
-	Time t;
-	getTime(&t);
-
-	printf("\\nTime now: %2d:%2d:%2d\\n", 3, t.hours, t.minutes, t.seconds);
-}
-
-
-
-/* -------------------------------------------------------------
-						INFOREG
----------------------------------------------------------------- */
-
-static void printInfoReg(void)
-{
-	RegDump reg;
-	regDump(&reg);
-
-	printLine("Register's values:");
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
-	printf("\\n - rax - %x", 1, reg.rax);
-	printf("\\n - rbx - %x", 1, reg.rbx);
-	printf("\\n - rcx - %x", 1, reg.rcx);
-	printf("\\n - rdx - %x", 1, reg.rdx);
-	printf("\\n - rsi - %x", 1, reg.rsi);
-	printf("\\n - rdi - %x", 1, reg.rdi);
-	printf("\\n - rbp - %x", 1, reg.rbp);
-	printf("\\n - rsp - %x", 1, reg.rsp);
-
-	printf("\\n - r8 - %x", 1, reg.r8);
-	printf("\\n - r9 - %x", 1, reg.r9);
-	printf("\\n - r10 - %x", 1, reg.r10);
-	printf("\\n - r11 - %x", 1, reg.r11);
-	printf("\\n - r12 - %x", 1, reg.r12);
-	printf("\\n - r13 - %x", 1, reg.r13);
-	printf("\\n - r14 - %x", 1, reg.r14);
-	printf("\\n - r15 - %x\\n", 1, reg.r15);
-
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
-}
-
-/* -------------------------------------------------------------
-						STOREDREG
----------------------------------------------------------------- */
-
-static void printStoredReg(void)
-{
-	RegBkp reg;
-	getRegBkp(&reg);
-
-	printLine("Stored register's values:");
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
-	printf("\\n - rax - %x", 1, reg.rax);
-	printf("\\n - rbx - %x", 1, reg.rbx);
-	printf("\\n - rcx - %x", 1, reg.rcx);
-	printf("\\n - rdx - %x", 1, reg.rdx);
-	printf("\\n - rsi - %x", 1, reg.rsi);
-	printf("\\n - rdi - %x", 1, reg.rdi);
-	printf("\\n - rbp - %x", 1, reg.rbp);
-
-	printf("\\n - r8 - %x", 1, reg.r8);
-	printf("\\n - r9 - %x", 1, reg.r9);
-	printf("\\n - r10 - %x", 1, reg.r10);
-	printf("\\n - r11 - %x", 1, reg.r11);
-	printf("\\n - r12 - %x", 1, reg.r12);
-	printf("\\n - r13 - %x", 1, reg.r13);
-	printf("\\n - r14 - %x", 1, reg.r14);
-	printf("\\n - r15 - %x\\n", 1, reg.r15);
-
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
-}
-
-/* -------------------------------------------------------------
-						PRINTPROCDATA
----------------------------------------------------------------- */
-void printProcData(){
-	int structSize = sizeof(struct PCB);
-	int count=0;
-	//char  msgs [3][10] = {"Pid:","State:","RSP:"};
-	PCB * buffer = malloc(structSize*50);
-	PCB  pcb;
-	char str [10];
-	if(buffer==NULL)
-		return;
-	ps(buffer,&count);
-	if(count==0){
-		printLine("The are no procceses");
-		return;
-	}
-	for(int i=0;i<count;i++){
-		pcb=buffer [i];
-		printf("Name: %s    ",1,pcb.name);
-		print("Pid: ");
-		print(itoa(pcb.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
-		print("        State: ");
-		switch (pcb.procState)
-		{
-		case READY:
-			print("READY");
-			break;
-		case RUN:
-			print("RUNNING");
-			break;
-		case BLOCKED:
-			print("BLOCKED");
-
-			break;
-		case DEAD:
-			print("DEAD");
-
-			break;
-
-		}	
-		printf("       RSP: %x \\n", 1, (uint64_t)pcb.contextRSP);
-
-
-
-	}
-
-	free(buffer);
-}
-/* -------------------------------------------------------------
-						PRINTMEM
----------------------------------------------------------------- */
-
-const int bufferMem = 33;
-
-void killCommand(char * pid){
-	int _pid= strToNum(pid);
-	if(_pid==-1){
-		printLine("Argument must be a pid. Use ps to see processes");
-		return;
-	}
-	kill(_pid);
-	return;
-}
-
-void blockProcess(char * pid){
-	int _pid= strToNum(pid);
-	if(_pid==-1){
-		printLine("Argument must be a pid. Use ps to see processes");
-		return;
-	}
-	block(_pid);
-	return;
-}
-
-void printMemDump(char *sourceStr)
-{
-
-	uint64_t sourceHex = parseHexa(sourceStr);
-	if (sourceHex < 0)
-	{
-		printLine("Parameter not allowed");
-		return;
-	}
-
-	char *src = NULL;
-	src = (char *)sourceHex;
-	char *dst = src + 32;
-
-	memDump((void *)src, (void *)dst);
-
-	newLine();
-	for (int i = 0; i < bufferMem; i += 8)
-	{
-		printf("%2x: %2x %2x %2x %2x %2x %2x %2x %2x\\n", 9, src + i, src[i], src[i + 1], src[i + 2], src[i + 3],
-			   src[i + 4], src[i + 5], src[i + 6], src[i + 7]);
-	}
-	
-}
-
-/* -------------------------------------------------------------
-						PRINTMEMSTATUS
----------------------------------------------------------------- */
-void printMemStatus(){
-	print_mem_status();
-}
-
-/* -------------------------------------------------------------
-						CPUTEMP
----------------------------------------------------------------- */
-
-static void printCPUTemp(void)
-{
-	int temp = cpuTemp();
-	printf("\\n Computer's Temperature: %d\\n", 1, temp);
-}
-
-/* -------------------------------------------------------------
-						CPUINFO
----------------------------------------------------------------- */
-
-static void printCPUInfo(void)
-{
-	CPUInfo info;
-
-	char brandName[50], brandDesc[70];
-	info.brandName = (char *)&brandName;
-	info.brandDesc = (char *)&brandDesc;
-
-	cpuInfo(&info);
-
-	printf("\\nBrand name: %s", 1, info.brandName);
-	printf("\\nBrand description: %s\\n", 1, info.brandDesc);
-}
-
-/* -------------------------------------------------------------
-						DIVZERO
----------------------------------------------------------------- */
-
-static void divZeroException(void)
-{
-	int a;
-	a = 2 / 0;
-}
-
-/* -------------------------------------------------------------
-						INVOPCODE
----------------------------------------------------------------- */
-
-void invalidOpcode();
-
-static void invOpcodeException(void)
-{
-	invalidOpcode();
-}
-
-/* -------------------------------------------------------------
-						WARNING
----------------------------------------------------------------- */
-
-static void printWarning(int num)
-{
-	printf("\\n >> Error: ", 0);
-	switch (num)
-	{
-	case 0:
-		printLine("Command not found");
-		printLine("If you want to see the command manual type 'help'.");
-		break;
-	default:
-		print("Something went wrong. ");
-	}
-	printf("Please, try again.\\n", 0);
-}
-
-static void clearWindow()
-{
+static void clearWindow(){
 	for (int x = 0; x < w.xf; x++)
 	{
 		for (int y = bodyY; y < w.yf; y++)
@@ -632,275 +152,89 @@ static void clearWindow()
                                 COMMAND-CHECK METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-static int checkEmptySpace(char *buffer, int start, int length)
-{
+void parseCommand(char *cmdBuff){
 
-	for (int i = start; i <= length && buffer[i]; i++)
-	{
-		if (!isSpace(buffer[i]))
-			return 0;
+	// Separate on tokens
+
+	char *tokens[MAX_TOKENS] = {0};
+	tokens[0] = cmdBuff;
+
+	for (int i=0, j=1; cmdBuff[i]; i++){
+		if(isSpace(cmdBuff[i])){
+			cmdBuff[i] = 0;
+			tokens[j++] = cmdBuff+i+1;
+		}
 	}
 
-	return 1;
-}
+	// Miscellaneous
 
-static int isCommandHelp(char *buffer, int length)
-{
-	char *str = "help";
-	if (!strncmp(str, buffer, 4))
-		return 0;
+	if(strncmp(tokens[0], "help", 5))
+		printHelp();
 
-	return checkEmptySpace(buffer, 4, length);
-}
+	else if(strncmp(tokens[0], "divzero", 8))
+		divZeroException();
 
-static int isCommandTime(char *buffer, int length)
-{
-	char *str = "time";
-	if (!strncmp(str, buffer, 4))
-		return 0;
+	else if(strncmp(tokens[0], "invopcode", 10))
+		invOpcodeException();
 
-	return checkEmptySpace(buffer, 4, length);
-}
+	else if(strncmp(tokens[0], "time", 5))
+		printTime();
 
-static int isCommandInfoReg(char *buffer, int length)
-{
-	char *str = "inforeg";
-	if (!strncmp(str, buffer, 7))
-		return 0;
-
-	return checkEmptySpace(buffer, 7, length);
-}
-
-static int isCommandStoredReg(char *buffer, int length)
-{
-	char *str = "storedreg";
-	if (!strncmp(str, buffer, 9))
-		return 0;
-
-	return checkEmptySpace(buffer, 9, length);
-}
-
-static int isCommandPrintmem(char *buffer, int length, char *start)
-{
-	if (!strncmp("printmem", buffer, 8))
-		return 0;
-
-	start[0] = '0';
-	start[1] = 'x';
-	if (checkEmptySpace(buffer, 8, length))
-	{
-		start[2] = '0';
-		start[3] = 0;
-		return 1;
-	}
-
-	char *aux2 = " 0x";
-	if (!strncmp(aux2, buffer + 8, 3))
-	{
-		return 0;
-	}
-
-	int aux3 = 11;
-	int i = 2;
-	while (isHexa(*(buffer + aux3)) && aux3 < length && aux3 < (11 + 16))
-	{
-		start[i++] = buffer[aux3++];
-	}
-	start[i] = 0;
-
-	return checkEmptySpace(buffer, aux3, length);
-}
-
-static int isCommandCPUTemp(char *buffer, int length)
-{
-	char *str = "cputemp";
-
-	if (!strncmp(str, buffer, 7))
-		return 0;
-
-	return checkEmptySpace(buffer, 7, length);
-}
-
-static int isCommandCPUInfo(char *buffer, int length)
-{
-	char *str = "cpuinfo";
-	if (!strncmp(str, buffer, 7))
-		return 0;
-
-	return checkEmptySpace(buffer, 7, length);
-}
-
-static int isCommandDivZero(char *buffer, int length)
-{
-	char *str = "divzero";
-	if (!strncmp(str, buffer, 7))
-		return 0;
-
-	return checkEmptySpace(buffer, 7, length);
-}
+	else if(strncmp(tokens[0], "display", 8))
+		displayImage(tokens[1], 20, 200);
+	
+	else if(strncmp(tokens[0], "clear", 6))
+		clearWindow();
 
 
-static int isCommandDisplayAnon(char *buffer, int length)
-{
-	char *str = "display anon";
-	if (!strncmp(str, buffer, 12))
-		return 0;
+	// CPU management
 
-	return checkEmptySpace(buffer, 12, length);
-}
+	else if(strncmp(tokens[0], "cputemp", 8))
+		printCPUTemp();
 
+	else if(strncmp(tokens[0], "cpuinfo", 8))
+		printCPUInfo();
 
-static int isCommandDisplayMatrix(char *buffer, int length)
-{
-	char *str = "display matrix";
-	if (!strncmp(str, buffer, 14))
-		return 0;
+	else if(strncmp(tokens[0], "inforeg", 8))
+		printInfoReg();
 
-	return checkEmptySpace(buffer, 14, length);
-}
+	else if(strncmp(tokens[0], "storedreg", 10))
+		printStoredReg();
+	
 
-static int isCommandInvOpcode(char *buffer, int length)
-{
-	char *str = "invopcode";
-	if (!strncmp(str, buffer, 9))
-		return 0;
+	// Memory management
 
-	return checkEmptySpace(buffer, 9, length);
-}
+	else if(strncmp(tokens[0], "printmem", 9))
+		printMemDump(tokens[1]);
+	
+	else if(strncmp(tokens[0], "mem", 4))
+		printMemStatus();
 
-static int isClearScreen(char *buffer, int length)
-{
-	char *str = "clear";
-	if (!strncmp(str, buffer, 5))
-		return 0;
+	
+	// Process management
+	
+	else if(strncmp(tokens[0], "ps", 3))
+		printProcData();
 
-	return checkEmptySpace(buffer, 5, length);
-}
+	else if(strncmp(tokens[0], "kill", 5))
+		killCommand(tokens[1]);
 
-static int isPs(char * buffer, int length){
-	char * str = "ps";
-	if(!strncmp(str,buffer,2))
-		return 0;
-	return checkEmptySpace(buffer,2,length);
-}
+	else if(strncmp(tokens[0], "block", 6))
+		blockProcess(tokens[1]);
+	
 
-static int isPrintMemData(char*buffer,int length){
-	if(!strcmp("mem",buffer))
-		return 0;
-	return checkEmptySpace(buffer,3,length);
-}
-static int isLine(char * buffer, int length){
-	if(!strcmp("line",buffer))
-		return 0;
-	return checkEmptySpace(buffer,4,length);
-}
-static int isLoop(char * buffer, int length){
-	if(!strcmp("loop",buffer))
-		return 0;
-	return checkEmptySpace(buffer,4,length);
-}
+	// New processes
 
-static int isCommandKill(char * buffer, int length, char * pid){
-	if(!strcmp("kill",buffer))
-		return 0;
-	return checkEmptySpace(buffer,4,length);
-}
+	else if(strncmp(tokens[0], "line", 5))	
+		startProcess(drawLine, 0, NULL, "line");
 
-static int isCommandBlock(char * buffer, int length, char * pid){
-	if(!strcmp("block",buffer))
-		return 0;
-	return checkEmptySpace(buffer,5,length);
-}
-
-static int isAllowedChar(char c)
-{
-	if (isAlpha(c) || isDigit(c) || isSpace(c) || c == 0)
-		return 1;
-	return 0;
-}
+	else if(strncmp(tokens[0], "loop", 5))
+		startProcess(loop, 0, NULL, "loop");
 
 
+	// Command not found
 
-command parseCommand(char *buffer, int length, char *string)
-{
-
-	for (int i = 0; i < W2_BUFFER_LEN; i++)
-	{
-		if (!isAllowedChar(buffer[i]))
-			return NOCOMMAND;
-	}
-
-	if (isCommandHelp(buffer, length) == 1)
-		return HELP;
-
-	if (isCommandTime(buffer, length))
-		return TIME;
-
-	if (isCommandInfoReg(buffer, length))
-		return INFOREG;
-
-	if (isCommandStoredReg(buffer, length))
-		return STOREDREG;
-
-	if (isCommandPrintmem(buffer, length, string))
-		return PRINTMEM;
-
-	if (isCommandCPUTemp(buffer, length))
-		return CPUTEMP;
-
-	if (isCommandCPUInfo(buffer, length))
-		return CPUINFO;
-
-	if (isCommandDivZero(buffer, length))
-		return DIVZERO;
-
-	if (isCommandDisplayAnon(buffer, length))
-		return DISPLAY_ANON;
-
-	if (isCommandDisplayMatrix(buffer, length))
-		return DISPLAY_MATRIX;
-
-	if (isCommandInvOpcode(buffer, length))
-		return INVOPCODE;
-
-	if (isClearScreen(buffer, length))
-		return CLEAR;
-	if (isPs(buffer,length))
-		return PS;
-	if (isPrintMemData(buffer,length))
-		return MEM;    
-	if(isLine(buffer,length))
-		return LINEA;
-	if(isLoop(buffer,length))
-		return LOOP;
-	if(isCommandKill(buffer,length,string))
-		return KILL;
-	if(isCommandBlock(buffer, length, string))
-		return BLOCK;
-
-	return NOCOMMAND;
-}
-
-static int parseHexa(char *start)
-{
-	int res = 0;
-	if (start[0] != '0' || start[1] != 'x')
-	{
-		return -1;
-	}
-
-	for (int i = 2; start[i]; i++)
-	{
-		char c = '0';
-
-		if (isDigit(start[i]))
-			c = '0';
-		else if (isLower(start[i]))
-			c = 'a';
-		else
-			c = 'A';
-		res = res * 16 + start[i] - c;
-	}
-
-	return res;
+	else
+		printWarning();
+	
 }

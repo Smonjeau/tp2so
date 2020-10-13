@@ -1,3 +1,1 @@
-typedef enum Image{ ANONYMOUS, MATRIX } Image;
-
-void displayImage(Image image, int x, int y);
+void displayImage(char *imageName, int x, int y);
