@@ -12,31 +12,38 @@
 void printHelp(void){
 	newLine();
 	printLine("---------------------------------------------------");
-	printLine("On this Terminal you can try the following commands:");
+	newLine();
+
+	printLine("- help              to go to the Help Manual");
+	printLine("- clear             to clear the screen");
+	newLine();
 	
+	printLine("- time              to get the system time");
+	printLine("- divzero           to execute a Div by Zero");
+	printLine("- invopcode         to exectue an invalid opcode");
+	newLine();
+	
+	printLine("- display anon      to show an image of Anonymous");
+	printLine("- display matrix    to show an image of Matrix");
 	newLine();
 
 	printLine("- cputemp           to get the CPU Temp");
-	printLine("- help              to go to the Help Manual");
-	printLine("- printmem n        to print memory starting at n");
 	printLine("- cpuinfo           to get the CPU Brand Data");
 	printLine("- inforeg           to get the Register's Values");
 	printLine("- storedreg         to get the Stored Register's Values");
-	printLine("- time              to get the Time");
-	printLine("- divzero           to execute a Div by Zero");
-	printLine("- invopcode         to exectue an invalid opcode");
-	printLine("- display anon      to show an image of Anonymous");
-	printLine("- display matrix    to show an image of Matrix");
-	printLine("- clear             to clear the screen");
-	printLine("- mem               to print heap status");
-	printLine("- ps                to print procceses data");
-
 	newLine();
 	
-	printLine("To go to calculator window, press F1");
+	printLine("- memdump n         to print memory starting at n");
+	printLine("- heapstat          to print heap status");
+	newLine();
+
+	printLine("- ps                to list active processes");
+	printLine("- kill pid          to kill a process");
+	printLine("- block pid         to block a process");
+	newLine();
+	
 	printLine("To scroll the window up, press F3");
 	printLine("To store registers value, press TAB");
-	
 	newLine();
 	
 	printLine("---------------------------------------------------");

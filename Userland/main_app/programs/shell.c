@@ -14,13 +14,6 @@
 #include <std_lib.h>
 
 /* --------------------------------------------------------------------------------------------------------------------------
-                                        		WINDOW DEFINITIONS
-------------------------------------------------------------------------------------------------------------------------- */
-
-static Window w;
-
-
-/* --------------------------------------------------------------------------------------------------------------------------
                                         		SHELL DEFINITIONS
 ------------------------------------------------------------------------------------------------------------------------- */
 
@@ -30,38 +23,18 @@ static Window w;
 
 void parseCommand(char *cmdBuff);
 
-static void clearWindow(void);
+void clearWindow(void);
 
-static int parseHexa(char *);
+void drawLine(int argc, char **argv);
 
 extern void loop();
 
+static Window w;
+
 
 /* --------------------------------------------------------------------------------------------------------------------------
-                                        	WINDOW METHODS
+                                        	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
-
-/* -----------------------------------------------------------
- Defines the position and size of the window (all right half)
- and assings a color to title and body cursors
--------------------------------------------------------------- */
-static void drawLine(int argc, char **argv){
-	printf("Hola soy el proceso q dibuja una linea, mi pid es %d \\n",1,getPid());
-	//int i;
-	//for(int i=0;i< 0xffffffff;i++);
-	static int x3=0;
-	static int y3 = 400;
-	int cant=0;
-	while(cant<4) {
-		x3=0;
-		for(; x3<1024; x3++)
-			draw(x3, y3, 0x0000FF);
-		y3 += 6;
-		cant++;
-
-	}
-	//kill(-1);	
-}
 
 static void createWindow(){
 	
@@ -80,10 +53,6 @@ static void createWindow(){
 
 }
 
-/* -------------------------------------------------------------
- Method that activates when this window becomes selected
- it waits for a key press constantly and handles it appropiately
----------------------------------------------------------------- */
 
 void shell(){
 
@@ -130,23 +99,6 @@ void shell(){
 	}
 }
 
-/* --------------------------------------------------------------------------------------------------------------------------
-                                        SHELL METHODS
-------------------------------------------------------------------------------------------------------------------------- */
-
-static void clearWindow(){
-	for (int x = 0; x < w.xf; x++)
-	{
-		for (int y = bodyY; y < w.yf; y++)
-		{
-			//draw(x, y, 0);
-			drawPoint(x, y, 1, 0);
-		}
-	}
-
-	w.cursors[bodyCursor].x = 0;
-	w.cursors[bodyCursor].y = bodyY;
-}
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                 COMMAND-CHECK METHODS
@@ -204,10 +156,10 @@ void parseCommand(char *cmdBuff){
 
 	// Memory management
 
-	else if(strncmp(tokens[0], "printmem", 9))
+	else if(strncmp(tokens[0], "memdump", 8))
 		printMemDump(tokens[1]);
 	
-	else if(strncmp(tokens[0], "mem", 4))
+	else if(strncmp(tokens[0], "heapstat", 9))
 		printMemStatus();
 
 	
@@ -237,4 +189,41 @@ void parseCommand(char *cmdBuff){
 	else
 		printWarning();
 	
+}
+
+
+/* --------------------------------------------------------------------------------------------------------------------------
+                                        	OTHER METHODS
+------------------------------------------------------------------------------------------------------------------------- */
+
+void clearWindow(){
+	for (int x = 0; x < w.xf; x++)
+	{
+		for (int y = bodyY; y < w.yf; y++)
+		{
+			//draw(x, y, 0);
+			drawPoint(x, y, 1, 0);
+		}
+	}
+
+	w.cursors[bodyCursor].x = 0;
+	w.cursors[bodyCursor].y = bodyY;
+}
+
+
+void drawLine(int argc, char **argv){
+	printf("Hola soy el proceso q dibuja una linea, mi pid es %d \\n",1,getPid());
+	
+	static int x3=0;
+	static int y3 = 400;
+	int cant=0;
+	while(cant<4) {
+		x3=0;
+		for(; x3<1024; x3++)
+			draw(x3, y3, 0x0000FF);
+		y3 += 6;
+		cant++;
+	}
+
+	//kill(-1);	
 }
