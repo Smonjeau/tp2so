@@ -63,8 +63,6 @@ void shell(){
 
 	w.activeCursor = bodyCursor;
 
-	startProcess(drawLine, 0, NULL, "line");
-	block(1);
 
 	char c;
 	while ((c = getChar())){

@@ -27,7 +27,7 @@ typedef struct ProcQueue {
 
 // Updates de RSP of the running process and returns the RSP of the next process
 
-void *schedule(void *currProcRSP);
+void * schedule(void *currProcRSP);
 
 // Calls schedule and updates the RSP to the chosen process context
 
@@ -55,13 +55,10 @@ int createProcessContextFromKernel(int argc, char **argv, void *main);
 void killProcess(int pid);
 
 
-/* Switch process state from any to BLOCKED. Returns 0 on success, -1 on failure*/
+/* Switch process state READY/BLOCKED.*/
 
-int blockProcess(int pid);
+void blockProcess(int pid);
 
-/* Switch process state from BLOCKED to READY. Returns 0 on success, -1 on failure */
-
-int unblockProcess(int pid);
 
 
 /* Change process priority (100 - 139) */

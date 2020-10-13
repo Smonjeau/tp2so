@@ -36,6 +36,7 @@ int getPriorityLevel(PCB pcb) {
 
 // Añade proceso a una cola particular.
 void queueProc(ProcQueue * queue, PCB pcb) {
+	pcb->nextPCB = NULL;
 	if(queue->last == NULL) {
 		//Empty queue
 		queue->first = pcb;
@@ -44,7 +45,7 @@ void queueProc(ProcQueue * queue, PCB pcb) {
 		(queue->last)->nextPCB = pcb;
 		queue->last = pcb;
 	}
-	pcb->nextPCB = NULL;
+	
 }
 
 //Quita proceso de una cola particular
@@ -192,16 +193,16 @@ void niceProcess(int pid, int priority) {
 
 
 void blockProcess(int pid) {
-	if(pid == 0)
+	if(pid == 0) 
 		return;
 
 	/* Debe ser atómica */
 	_cli();
-	int found = 0;
+	int found = 0, idx;
 	PCB currentPCB = NULL;
 
 	//Busco en actives
-	for(int idx = 0; idx < 40 && found == 0; idx++) {
+	for(idx = 0; idx < 40 && found == 0; idx++) {
 		currentPCB = actives[idx].first;
 
 		while(currentPCB != NULL && currentPCB->pid != pid)
@@ -213,7 +214,7 @@ void blockProcess(int pid) {
 	}
 	if(found == 0) {
 		//Busco en expireds
-		for(int idx = 0; idx < 40 && found == 0; idx++) {
+		for(idx = 0; idx < 40 && found == 0; idx++) {
 			currentPCB = expireds[idx].first;
 
 			while(currentPCB != NULL && currentPCB->pid != pid)
@@ -226,15 +227,36 @@ void blockProcess(int pid) {
 	}
 
 	if(found == 1) {
-		if(currentPCB->procState == READY)
+		/*idx--;*/
+		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;
-		else if(currentPCB->procState == BLOCKED)
+		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
+		} else if(currentPCB->procState == RUN) {
+			currentPCB->procState = BLOCKED;
+			// Renuncia al CPU
+			_sti();
+			//TODO
+			_hlt();
+		}
+
+			
+
+		
+	} else {
+		_sti();
 	}
 
-	_sti();
+	
 }
+void drawLine(){
+	static int c=0;
+	c+=1;
 
+		for(int x=0; x<1024; x++)
+			draw(x,c*80,0xFFFFFF);
+
+}
 
 void * schedule(void *currContextRSP) {
 
@@ -257,7 +279,7 @@ void * schedule(void *currContextRSP) {
 			sendToExpired(currentPCB, BLOCKED, priorityIdx);
 
 
-			currentPCB = currentPCB->nextPCB; //Paso al siguiente en la cola, en busca de un proceso READY
+			currentPCB = actives[priorityIdx].first; //Paso al siguiente en la cola, en busca de un proceso READY
 
 		}
 		
@@ -302,8 +324,30 @@ void * schedule(void *currContextRSP) {
 	// Debo buscar al proximo a ejecutar. Aprovecho lo que ya recorri de las colas de activos.
 	int idx;
 	currentPCB = NULL;
-	for(idx = priorityIdx; idx < 40 && currentPCB == NULL && currentPCB->procState != READY; idx++)
+
+	idx = priorityIdx;
+	do {
 		currentPCB = actives[idx].first;
+
+		//Debemos considerar que sucede si el currentPCB está bloqueado
+		while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
+			//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
+			//Primero lo sacamos de esta cola
+			actives[idx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
+			if(actives[idx].first == NULL)
+				actives[idx].last = NULL; //Era el unico proceso
+			
+
+			sendToExpired(currentPCB, BLOCKED, idx);
+
+
+			currentPCB = actives[idx].first; //Paso al siguiente en la cola, en busca de un proceso READY
+
+		}
+		
+		idx++;
+
+	} while(idx < 40 && currentPCB == NULL);
 
 
 	
@@ -314,8 +358,30 @@ void * schedule(void *currContextRSP) {
 
 		//Nuevamente recorro en busca del primer proceso listo
 		currentPCB = NULL;
-		for(idx = 0; idx < 40 && currentPCB == NULL && currentPCB->procState != READY; idx++)
+		idx = 0;
+		do {
 			currentPCB = actives[idx].first;
+
+			//Debemos considerar que sucede si el currentPCB está bloqueado
+			while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
+				//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
+				//Primero lo sacamos de esta cola
+				actives[idx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
+				if(actives[idx].first == NULL)
+					actives[idx].last = NULL; //Era el unico proceso
+				
+
+				sendToExpired(currentPCB, BLOCKED, idx);
+
+
+				currentPCB = actives[idx].first; //Paso al siguiente en la cola, en busca de un proceso READY
+
+			}
+			
+			idx++;
+
+		} while(idx < 40 && currentPCB == NULL);
+
 
 		//Y si no encuentra READY? No deberia pasar pues siempre creamos al menos 1 proceso master
 		
@@ -324,7 +390,7 @@ void * schedule(void *currContextRSP) {
 		return currentPCB->contextRSP;
 
 	} else {
-		idx--; //Compenso
+		//idx--; //Compenso
 		currentPCB->procState = RUN;
 		runningProc=currentPCB;
 		return currentPCB->contextRSP;
