@@ -1,12 +1,15 @@
-- Bitmap memory manager     🗸
-- Buddy memory manager      !
+- Bitmap memory manager     ✓
+- Buddy memory manager      ✓
 - Pass memory tests         X
 
-- Process switching         🗸
-- Create process            🗸
-- List processes            🗸
-- Block process             !
-- Unblock process           X
+- Process switching         ✓
+- Create process            ✓
+- List processes            ✓
+- Block process             ✓
+- Unblock process           ✓
 - Change process priority   X
-- Kill process              🗸
+- Kill process              ✓
 - Pass processes tests      X
+
+- Implement semaphores      !
+- Implement pipes           X
