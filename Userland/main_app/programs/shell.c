@@ -89,11 +89,11 @@ void shell(){
 
 	w.activeCursor = bodyCursor;
 
-	if(createSem(0, 0) == -1){
-		printf("Failed to create semaphore\n", 0);
-	}
+	// if(createSem(0, 0) == -1){
+	// 	printf("Failed to create semaphore\n", 0);
+	// }
 
-	// startProcess(consumer, 0, NULL, "consumer");
+	startProcess(consumer, 0, NULL, "consumer");
 	// startProcess(producer, 0, NULL, "producer");
 
 

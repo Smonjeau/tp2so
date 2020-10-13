@@ -12,6 +12,14 @@
 	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
 */
 
+void drawLine(){
+	static int c=0;
+	c+=1;
+
+		for(int x=0; x<1024; x++)
+			draw(x,c*80,0xFFFFFF);
+
+}
 
 
 ProcQueue queue1[40] = {{0}};
@@ -227,16 +235,29 @@ void blockProcess(int pid) {
 	}
 
 	if(found == 1) {
-		/*idx--;*/
+
+		idx--;
 		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;
+			_sti();
+			
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
-		} else if(currentPCB->procState == RUN) {
-			currentPCB->procState = BLOCKED;
-			// Renuncia al CPU
 			_sti();
-			//TODO
+			
+		} else if(currentPCB->procState == RUN) {
+			/*actives[idx].first = currentPCB->nextPCB;
+			if(actives[idx].first == NULL)
+				actives[idx].last = NULL;*/
+			
+			if(currentPCB->pid == 1 && currentPCB->procState == RUN)
+				drawLine();
+			currentPCB->procState = BLOCKED;
+			//sendToExpired(currentPCB, BLOCKED, idx);
+			// Renuncia al CPU
+			//Solo en este caso bloqueamos y enviamos a expirados en vez de que lo haga el scheduler
+
+			_sti();
 			_hlt();
 		}
 
@@ -249,47 +270,48 @@ void blockProcess(int pid) {
 
 	
 }
-void drawLine(){
-	static int c=0;
-	c+=1;
 
-		for(int x=0; x<1024; x++)
-			draw(x,c*80,0xFFFFFF);
-
-}
 
 void * schedule(void *currContextRSP) {
 
 
 
 	PCB currentPCB = NULL;
-	int priorityIdx = 0;
+	int priorityIdx;
 	do {
-		currentPCB = actives[priorityIdx].first;
+		priorityIdx = 0;
+		do {
+			currentPCB = actives[priorityIdx].first;
 
-		//Debemos considerar que sucede si el currentPCB está bloqueado
-		while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
-			//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
-			//Primero lo sacamos de esta cola
-			actives[priorityIdx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
-			if(actives[priorityIdx].first == NULL)
-				actives[priorityIdx].last = NULL; //Era el unico proceso
+			//Debemos considerar que sucede si el currentPCB está bloqueado
+			while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
+				//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
+				//Primero lo sacamos de esta cola
+				actives[priorityIdx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
+				if(actives[priorityIdx].first == NULL)
+					actives[priorityIdx].last = NULL; //Era el unico proceso
+				
+
+				sendToExpired(currentPCB, BLOCKED, priorityIdx);
+
+
+				currentPCB = actives[priorityIdx].first; //Paso al siguiente en la cola, en busca de un proceso READY
+
+			}
 			
+			priorityIdx++;
 
-			sendToExpired(currentPCB, BLOCKED, priorityIdx);
-
-
-			currentPCB = actives[priorityIdx].first; //Paso al siguiente en la cola, en busca de un proceso READY
-
+		} while(priorityIdx < 40 && currentPCB == NULL);
+		if(priorityIdx == 40) {
+			//drawLine();
+			swapQueues(); //Es necesario cuando un proceso se autobloquea y no quedan activos en estado READY
 		}
-		
-		priorityIdx++;
-
-	} while(priorityIdx < 40 && currentPCB == NULL);
+	} while(priorityIdx == 40);
 
 
-	if(priorityIdx == 40)
+	/*if(priorityIdx == 40)
 		return currContextRSP; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
+	*/
 
 	priorityIdx--; //Compenso el ultimo ++
 
@@ -392,7 +414,7 @@ void * schedule(void *currContextRSP) {
 	} else {
 		//idx--; //Compenso
 		currentPCB->procState = RUN;
-		runningProc=currentPCB;
+		runningProc = currentPCB;
 		return currentPCB->contextRSP;
 	}
 
