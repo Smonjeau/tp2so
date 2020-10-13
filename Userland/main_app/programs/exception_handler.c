@@ -8,8 +8,8 @@
 #include <programs.h>
 #include <windows_lib.h>
 #include <std_lib.h>
+#include <std_io.h>
 #include <syscalls.h>
-#include <keyboard_lib.h>
 #include <kernel_messages.h>
 
 /* --------------------------------------------------------------------------------------------------------------------------

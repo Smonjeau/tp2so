@@ -4,7 +4,6 @@
 | This libary implements a bare version of C stdlib, providing functions such as prinf, itoa, etc.  |
 ---------------------------------------------------------------------------------------------------*/
 
-#include <keyboard_lib.h>
 #include <windows_lib.h>
 #include <stdarg.h>
 #include <std_lib.h>

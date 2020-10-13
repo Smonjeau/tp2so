@@ -16,19 +16,29 @@
 .endm
 
 syscall read, 0
-syscall draw, 1
-syscall getRes, 2
-syscall memDump, 3
+syscall write, 1
+
+syscall draw, 2
+syscall getRes, 3
 syscall getTime, 4
+
 syscall cpuInfo, 5
 syscall cpuTemp, 6
 syscall getRegBkp, 7
-syscall malloc, 8
-syscall free, 9
-syscall memStatus, 10
-syscall startProcess, 11
-syscall ps, 12
-syscall kill, 13
-syscall getPid,14
+
+syscall memDump, 8
+syscall memStatus, 9
+syscall malloc, 10
+syscall free, 11
+
+syscall startProcess, 12
+syscall getPid, 13
+syscall ps, 14
 syscall block, 15
 syscall nice, 16
+syscall kill, 17
+
+syscall createSem, 18
+syscall waitSem, 19
+syscall postSem, 20
+syscall deleteSem, 21

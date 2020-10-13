@@ -55,13 +55,9 @@ int createProcessContextFromKernel(int argc, char **argv, void *main);
 void killProcess(int pid);
 
 
-/* Switch process state from any to BLOCKED. Returns 0 on success, -1 on failure*/
+/* Switch process state from READY to BLOCKED and viceversa */
 
-int blockProcess(int pid);
-
-/* Switch process state from BLOCKED to READY. Returns 0 on success, -1 on failure */
-
-int unblockProcess(int pid);
+void blockProcess(int pid);
 
 
 /* Change process priority (100 - 139) */

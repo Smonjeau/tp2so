@@ -2,21 +2,36 @@ Syscalls follow the System V AMD64 ABI calling convention/
 A function that returns 0/-1 on success/failure will be refered as "s/f".
 
 NAME          RAX     RDI                RSI                   RDX               DESCRIPTION
-READ          0                                                                  Returns a keycode from buffer, or -1 if empty
-DRAW          1       uint8_t xcord      uint8_t ycord         uint8 rgb         Draws a pixel at (x,y) with rgb color (in hex), returns -2/-1 on invalid color/coordinate, 0 if ok
-GETRES        2       ScreenRes * res                                            Load screen resolution into res, returns void.
-MEMDUMP       3       void * src         void * dest                             Loads 32 bytes of memory from src to dest, returns s/f.
-GETTIME       4       Time * time                                                Loads system time into time, returns void.
+READ          0       int fd                                                     Returns a char from buffer identified by fd, if empty, halts.
+WRITE         1       char c             int fd                                  Write the char c into buffer identified by fd, returns s/f.
+
+DRAW          2       uint8_t xcord      uint8_t ycord         uint8 rgb         Draws a pixel at (x,y) with rgb color (in hex), returns -2/-1 on invalid color/coordinate, 0 if ok.
+GETRES        3       ScreenRes * res                                            Load screen resolution into res.
+GETTIME       4       Time * time                                                Loads system time into time.
+
 CPUINFO       5       CpuInfo * name                                             Loads processor brand name, and description, with a max length of 50 and 70 bytes each.
 CPUTEMP       6                                                                  Returns the temperature of the CPU in Celsius.
 GETREGBKP     7       RegBkp *RegBkp                                             Loads the status of the registers from the last time TAB was pressed or an exception was produced.
-MALLOC        8       int size                                                   Allocates a segment of size bytes and returns a pointer to the beggining of it, or NULL on error.
-FREE          9       void *ptr                                                  Frees a previously allocated segment starting at ptr.
-MEMSTATUS     10      int *memSize       int *freeSpace        int *occSpace     Provides information about the usage of memory.
-STARTPROCESS  11      void *main         int argc              char **argv       Creates a process starting at main, with specified parameters, and returns its PID.
-PS            12      void * buffer      int * cantProc                          Provides *cantProc proccesses data, using PCB
-																					struct.
-KILL          13      int pid                                                    kills the proccess corresponding to the  provided pid 																										
+
+MEMDUMP       8       void * src         void * dest                             Loads 32 bytes of memory from src to dest, returns s/f.
+MEMSTATUS     9       int *memSize       int *freeSpace        int *occSpace     Provides information about the usage of memory.
+MALLOC        10       int size                                                   Allocates a segment of size bytes and returns a pointer to the beggining of it, or NULL on error.
+FREE          11      void *ptr                                                  Frees a previously allocated segment starting at ptr.
+
+STARTPROCESS  12      void *main         int argc              char **argv       Creates a process starting at main, with specified parameters, and returns its PID.
+GETPID        13                                                                 Returns the PID of the running process, or -1 if none.
+PS            14      void * buffer      int * cantProc                          Provides *cantProc proccesses data, using PCB struct.
+BLOCK         15      int pid                                                    Kills the proccess corresponding to the provided pid, or -1 if unexistent.																								
+NICE          16      int pid            int newPrio                             Switches the block state of the proccess corresponding to the provided pid, or -1 if unexistent.																								
+KILL          17      int pid                                                    Changes the priority of the proccess corresponding to the provided pid, or -1 if unexistent.																								
+
+CREATESEM     18      int id             int initValue                           Creates a semaphore with the specified id and initial value. Returns s/f.
+WAITSEM       19      int id                                                     Blocks the caller until the specified semaphore has a value>0, then decreases it. Returns s/f.
+POSTSEM       20      int id                                                     Increases the value of the specified semaphore. Returns s/f.
+DELETESEM     21      int id                                                     Deletes the specified semaphore if no processes are wating for it. Returns s/f.
+
+
+TODO: Returns of KILL, BLOCK, NICE
 
 STRUCTURES:
 

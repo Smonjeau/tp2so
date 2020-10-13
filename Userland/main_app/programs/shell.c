@@ -9,8 +9,8 @@
 #include <syscalls.h>
 #include <windows_lib.h>
 #include <image_lib.h>
-#include <keyboard_lib.h>
 #include <std_lib.h>
+#include <std_io.h>
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		SHELL DEFINITIONS
@@ -63,15 +63,15 @@ void shell(){
 
 	w.activeCursor = bodyCursor;
 
-	startProcess(drawLine, 0, NULL, "line");
-	block(1);
+	// startProcess(drawLine, 0, NULL, "line");
+	// block(1);
 
 	char c;
 	while ((c = getChar())){
 
 		// Handle the chars that are not CR
 
-		if(c == f3Code)
+		if(c == F3)
 			scrollUp(8);
 
 		if (c == '\b' && buffPos > 0)
@@ -210,6 +210,24 @@ void clearWindow(){
 
 	w.cursors[bodyCursor].x = 0;
 	w.cursors[bodyCursor].y = bodyY;
+}
+
+
+void consumer(int argc, char **argv){
+	static int x=0;
+
+	while(1){
+		waitSem(0);
+		for(; x<x+100; x++)
+			draw(x, 100, 0xFF0000);
+	}
+}
+
+void producer(int argc, char **argv){
+	while(1){
+		for(int i=0; i<9999; i++);
+		postSem(0);
+	}
 }
 
 

@@ -1,5 +1,3 @@
-int read();
-
 void handleKeyStroke();
 
-int getKey();
+char getChar();

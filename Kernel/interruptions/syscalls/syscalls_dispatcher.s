@@ -7,22 +7,33 @@
 .globl _syscallDispatcher
 
 .extern sysRead
+.extern sysWrite
+
 .extern sysDraw
 .extern sysGetRes
-.extern sysMemDump
 .extern sysGetTime
+
 .extern sysCpuInfo
 .extern sysCPUTemp
 .extern sysGetRegBkp
+
+.extern sysMemDump
+.extern sysMemStatus
 .extern sysMalloc 
-.extern sysMemStatus 
 .extern sysFree
-.extern sysPS
+
 .extern sysStartProcess
-.extern sysKill
-.extern sysNice
 .extern sysGetPid
+.extern sysPS
 .extern sysBlock
+.extern sysNice
+.extern sysKill
+
+.extern sysCreateSemaphore
+.extern sysWaitSemaphore
+.extern sysPostSemaphore
+.extern sysDeleteSemaphore
+
 .intel_syntax noprefix
 
 .section .text
@@ -37,13 +48,13 @@ _syscallDispatcher:
     je _read
 
     cmp rax, 1
-    je _draw
+    je _write
 
     cmp rax, 2
-    je _getRes
+    je _draw
 
     cmp rax, 3
-    je _memDump
+    je _getRes
 
     cmp rax, 4
     je _getTime
@@ -58,25 +69,25 @@ _syscallDispatcher:
     je _getRegBkp
 
     cmp rax, 8
-    je _malloc
+    je _memDump
 
-    cmp rax,9
-    je _free 
-
-    cmp rax,10 
+    cmp rax, 9
     je _memStatus
 
-    cmp rax,11
-    je _startProcess
+    cmp rax, 10
+    je _malloc
+
+    cmp rax, 11
+    je _free 
 
     cmp rax, 12
-    je _ps
+    je _startProcess
 
-    cmp rax,13
-    je _kill
-
-    cmp rax,14
+    cmp rax, 13
     je _get_pid
+
+    cmp rax, 14
+    je _ps
 
     cmp rax, 15
     je _block
@@ -84,8 +95,22 @@ _syscallDispatcher:
     cmp rax, 16
     je _nice
 
-    jmp endOfInt
+    cmp rax, 17
+    je _kill
 
+    cmp rax, 18
+    je _createSemaphore
+
+    cmp rax, 19
+    je _waitSemaphore
+
+    cmp rax, 20
+    je _postSemaphore
+
+    cmp rax, 21
+    je _deleteSemaphore
+
+    jmp endOfInt
 
 
 endOfInt:
@@ -96,9 +121,15 @@ endOfInt:
 	popStateNoRax
 	iretq
 
+
 _read:
     call sysRead
     jmp endOfInt
+
+_write:
+    call sysWrite
+    jmp endOfInt
+
 
 _draw:
     call sysDraw
@@ -108,13 +139,10 @@ _getRes:
     call sysGetRes
     jmp endOfInt
 
-_memDump:
-    call sysMemDump
-    jmp endOfInt
-
 _getTime:
     call sysGetTime
     jmp endOfInt
+
 
 _cpuInfo:
     call sysCpuInfo
@@ -127,6 +155,16 @@ _cpuTemp:
 _getRegBkp:
     call sysGetRegBkp
     jmp endOfInt
+
+
+_memDump:
+    call sysMemDump
+    jmp endOfInt
+
+_memStatus:
+    call sysMemStatus 
+    jmp endOfInt
+
 _malloc:
     call sysMalloc 
     jmp endOfInt
@@ -135,24 +173,17 @@ _free:
     call sysFree
     jmp endOfInt
 
-_ps:
-    call sysPS
-    jmp endOfInt
-
-_memStatus:
-    call sysMemStatus 
-    jmp endOfInt
 
 _startProcess:
     call sysStartProcess 
     jmp endOfInt
 
-_kill:
-    call sysKill
-    jmp endOfInt
-
 _get_pid:
     call sysGetPid
+    jmp endOfInt
+
+_ps:
+    call sysPS
     jmp endOfInt
 
 _block:
@@ -163,4 +194,23 @@ _nice:
     call sysNice
     jmp endOfInt
 
-    
+_kill:
+    call sysKill
+    jmp endOfInt
+
+
+_createSemaphore:
+    call sysCreateSemaphore
+    jmp endOfInt
+
+_waitSemaphore:
+    call sysWaitSemaphore
+    jmp endOfInt
+
+_postSemaphore:
+    call sysPostSemaphore
+    jmp endOfInt
+
+_deleteSemaphore:
+    call sysDeleteSemaphore
+    jmp endOfInt

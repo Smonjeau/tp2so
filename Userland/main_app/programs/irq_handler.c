@@ -6,7 +6,6 @@
 
 #include <programs.h>
 #include <windows_lib.h>
-#include <keyboard_lib.h>
 #include <kernel_messages.h>
 
 int interruption(va_list valist){
