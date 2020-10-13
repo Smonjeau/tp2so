@@ -33,3 +33,7 @@ int sysGetPid(){
 void sysBlock(int pid) {
 	blockProcess(pid);
 }
+
+void sysNice(int pid, int priority) {
+	niceProcess(pid, priority);
+}

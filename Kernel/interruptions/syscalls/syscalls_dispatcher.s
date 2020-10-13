@@ -20,6 +20,7 @@
 .extern sysPS
 .extern sysStartProcess
 .extern sysKill
+.extern sysNice
 .extern sysGetPid
 .extern sysBlock
 .intel_syntax noprefix
@@ -79,6 +80,9 @@ _syscallDispatcher:
 
     cmp rax, 15
     je _block
+
+    cmp rax, 16
+    je _nice
 
     jmp endOfInt
 
@@ -153,6 +157,10 @@ _get_pid:
 
 _block:
     call sysBlock
+    jmp endOfInt
+
+_nice:
+    call sysNice
     jmp endOfInt
 
     
