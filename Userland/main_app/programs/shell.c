@@ -64,6 +64,10 @@ void shell(){
 
 	w.activeCursor = bodyCursor;
 
+	// startProcess(drawLine, 0, NULL, "line");
+	// startProcess(drawLine, 0, NULL, "line");
+	// kill(2);
+
 	char c;
 	while ((c = getChar())){
 
@@ -168,8 +172,9 @@ void parseCommand(char *cmdBuff){
 	else if(strncmp(tokens[0], "ps", 3))
 		printProcData();
 
-	else if(strncmp(tokens[0], "kill", 5))
-		killCommand(tokens[1]);
+	else if(strncmp(tokens[0], "kill", 5)){
+		killProcess(tokens[1]);
+	}
 
 	else if(strncmp(tokens[0], "block", 6))
 		blockProcess(tokens[1]);
@@ -212,18 +217,13 @@ void clearWindow(){
 
 
 void drawLine(int argc, char **argv){
-	printf("Hola soy el proceso q dibuja una linea, mi pid es %d \\n",1,getPid());
-	
-	static int x3=0;
-	static int y3 = 400;
-	int cant=0;
-	while(cant<4) {
-		x3=0;
-		for(; x3<1024; x3++)
-			draw(x3, y3, 0x0000FF);
-		y3 += 6;
-		cant++;
-	}
+	static int c=0;
+	c+=1;
 
-	//kill(-1);	
+	for(int y=200*c; y<200*(c+1); y++)
+		for(int x=0; x<1024; x++)
+			for(int i=0; i<999; i++)
+				draw(x,y,0xFF0000);
+
+	kill(-1);	
 }

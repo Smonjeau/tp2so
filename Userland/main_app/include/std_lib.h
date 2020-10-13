@@ -46,7 +46,7 @@ int isPrintableChar(char c);
 
 void reverseStr(char str[], int length);
 
-int strToNum (char * str);
+int atoi (char * str);
 
 char *itoa(int num, char *str, int base, int fixLen);
 

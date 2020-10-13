@@ -9,9 +9,9 @@ void printCPUInfo(void);
 void printInfoReg(void);
 void printStoredReg(void);
 
-void printMemDump(char *start);
+void printMemDump(char * start);
 void printMemStatus(void);
 
 void printProcData();
-void killCommand(char * pid);
+void killProcess(char * pid);
 void blockProcess(char * pid);

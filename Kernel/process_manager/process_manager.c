@@ -26,7 +26,7 @@ void * lastRSP = NULL;
 PCB runningProc=NULL;
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
-	pcb->remainingTicks = 10;
+	pcb->remainingTicks = 2;
 }
 
 // Decide el nivel de prioridad del proceso.

@@ -1,0 +1,12 @@
+- Bitmap memory manager     🗸
+- Buddy memory manager      !
+- Pass memory tests         X
+
+- Process switching         🗸
+- Create process            🗸
+- List processes            !
+- Block process
+- Unblock process           X
+- Change process priority   X
+- Kill process              🗸
+- Pass processes tests      X

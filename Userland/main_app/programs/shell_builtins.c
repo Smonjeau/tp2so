@@ -256,8 +256,8 @@ void printProcData(){
 }
 
 
-void killCommand(char * pid){
-	int _pid= strToNum(pid);
+void killProcess(char * pid){
+	int _pid = atoi(pid);
 
 	if(_pid==-1){
 		printLine("Argument must be a pid. Use ps to see processes");
@@ -269,7 +269,7 @@ void killCommand(char * pid){
 
 
 void blockProcess(char * pid){
-	int _pid= strToNum(pid);
+	int _pid= atoi(pid);
 
 	if(_pid==-1){
 		printLine("Argument must be a pid. Use ps to see processes");

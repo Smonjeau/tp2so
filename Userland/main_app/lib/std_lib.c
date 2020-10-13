@@ -166,19 +166,32 @@ void reverseStr(char *str, int length)
 
 
 /* -----------------------------------------------------------
- Function to convert an string to integer. It only accepts positive integers in string format
+ Function to convert an string to integer.
 ----------------------------------------------------------- */
-int strToNum (char * str){
-    int res = 0;
-    int i =0;
-    while(str[i]){
-        if(!isDigit(str[i]))
-            return -1;
-        res *= 10;
-        res += str[i++] + '0';
-    }
-    return res;
-}
+
+int atoi(char* str){ 
+    if (*str == '\0') 
+        return 0; 
+  
+    int res = 0; 
+    int sign = 1; 
+    int i = 0; 
+  
+    if (str[0] == '-') { 
+        sign = -1; 
+        i++; 
+    } 
+  
+    for (; str[i] != '\0'; ++i) { 
+        if (!isDigit(str[i])) 
+            return -1;   
+        res = res * 10 + str[i] - '0'; 
+    } 
+  
+    return sign * res; 
+} 
+
+
 /* -----------------------------------------------------------
  Function to convert an integer to a string
 ----------------------------------------------------------- */
