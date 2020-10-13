@@ -36,11 +36,13 @@ setProcess:
 */
 
 switchProcessContext:
+	/*cli*/
 	pop retAddress
 	mov rdi, rsp
 	call schedule
     mov rsp, rax
 	push retAddress
+	/*sti*/
 	ret
 
 
