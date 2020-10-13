@@ -4,8 +4,8 @@
 
 - Process switching         🗸
 - Create process            🗸
-- List processes            !
-- Block process
+- List processes            🗸
+- Block process             !
 - Unblock process           X
 - Change process priority   X
 - Kill process              🗸

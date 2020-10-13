@@ -6,8 +6,6 @@
 
 #include <process_manager.h>
 
-extern PCB runningProc;
-
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     START_PROCESS
 --------------------------------------------------------------------------------------------------------------------------- */
@@ -27,7 +25,7 @@ void sysKill(int pid){
 }
 
 int sysGetPid(){
-    return runningProc->pid;
+    return getPID();
 }
 
 void sysBlock(int pid) {

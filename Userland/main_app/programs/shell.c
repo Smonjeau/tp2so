@@ -1,9 +1,8 @@
 /*---------------------------------------------------------------------------------------------------
-|   WINDOW_2.C    |                                                                             	|
+|   SHELL.C    |                                                                             	    |
 |----------------------                                                                             |
 | This windows will display the shell program.														|
 | Press ENTER to execute a command.																	|
-| Press F1 to switch to calculator program.															|
 ---------------------------------------------------------------------------------------------------*/
 
 #include <shell_builtins.h>
@@ -64,9 +63,8 @@ void shell(){
 
 	w.activeCursor = bodyCursor;
 
-	// startProcess(drawLine, 0, NULL, "line");
-	// startProcess(drawLine, 0, NULL, "line");
-	// kill(2);
+	startProcess(drawLine, 0, NULL, "line");
+	block(1);
 
 	char c;
 	while ((c = getChar())){
@@ -172,9 +170,8 @@ void parseCommand(char *cmdBuff){
 	else if(strncmp(tokens[0], "ps", 3))
 		printProcData();
 
-	else if(strncmp(tokens[0], "kill", 5)){
+	else if(strncmp(tokens[0], "kill", 5))
 		killProcess(tokens[1]);
-	}
 
 	else if(strncmp(tokens[0], "block", 6))
 		blockProcess(tokens[1]);

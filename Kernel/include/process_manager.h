@@ -14,6 +14,7 @@ typedef struct PCB {
     struct PCB * nextPCB;
 } * PCB;
 
+// x/8xb runningProc
 
 
 
@@ -54,9 +55,13 @@ int createProcessContextFromKernel(int argc, char **argv, void *main);
 void killProcess(int pid);
 
 
-/* Alternate BLOCKED/READY */
+/* Switch process state from any to BLOCKED. Returns 0 on success, -1 on failure*/
 
-void blockProcess(int pid);
+int blockProcess(int pid);
+
+/* Switch process state from BLOCKED to READY. Returns 0 on success, -1 on failure */
+
+int unblockProcess(int pid);
 
 
 /* Change process priority (100 - 139) */
@@ -68,8 +73,9 @@ void niceProcess(int pid, int priority);
 void ps(void * buffer, int * procCant);
 
 
-/* Devuelve el RSP "mas chico" */
-void * getLastContext();
+/* Returns the PID of the running process, or -1 if none */
+
+int getPID();
 
 
-#endif 
+#endif

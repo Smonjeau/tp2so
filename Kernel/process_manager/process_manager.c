@@ -189,7 +189,9 @@ void niceProcess(int pid, int priority) {
 
 }
 
-void blockProcess(int pid) {
+
+
+PCB getPCB(int pid) {
 	if(pid == 0)
 		return;
 
@@ -198,41 +200,54 @@ void blockProcess(int pid) {
 	int found = 0;
 	PCB currentPCB = NULL;
 
-	//Busco en actives
-	for(int idx = 0; idx < 40 && found == 0; idx++) {
+	for(int idx=0; idx < 40 && found == 0; idx++) {
 		currentPCB = actives[idx].first;
 
 		while(currentPCB != NULL && currentPCB->pid != pid)
 			currentPCB = currentPCB->nextPCB; 
 
 		if(currentPCB != NULL && currentPCB->pid == pid)
-			found = 1;	
-		
-	}
-	if(found == 0) {
-		//Busco en expireds
-		for(int idx = 0; idx < 40 && found == 0; idx++) {
-			currentPCB = expireds[idx].first;
-
-			while(currentPCB != NULL && currentPCB->pid != pid)
-				currentPCB = currentPCB->nextPCB; 
-
-			if(currentPCB != NULL && currentPCB->pid == pid)
-				found = 1;	
-			
-		}
+			found = 1;		
 	}
 
-	if(found == 1) {
-		if(currentPCB->procState == READY)
-			currentPCB->procState = BLOCKED;
-		else if(currentPCB->procState == BLOCKED)
-			currentPCB->procState = READY;
+	if(found)
+		return currentPCB;
+
+	for(int idx = 0; idx < 40 && found == 0; idx++) {
+		currentPCB = expireds[idx].first;
+
+		while(currentPCB != NULL && currentPCB->pid != pid)
+			currentPCB = currentPCB->nextPCB; 
+
+		if(currentPCB != NULL && currentPCB->pid == pid)
+			found = 1;		
 	}
 
-
+	return currentPCB;
 
 	_sti();
+}
+
+
+int blockProcess(int pid){
+
+	PCB pcb = getPCB(pid);
+	if(pcb == NULL)
+		return -1;
+
+	pcb->procState = BLOCKED;
+
+}
+
+
+int unblockProcess(int pid){
+
+	PCB pcb = getPCB(pid);
+	if(pcb == NULL || pcb->procState != BLOCKED)
+		return -1;
+
+	pcb->procState = READY;
+
 }
 
 
@@ -367,6 +382,7 @@ int createProcessPCB(void *contextRSP, void * baseRSP, char * name){
 	return new->pid;
 
 }
+
 int createProcessPCBFromKernel(void *contextRSP){
 	
 	if(lastRSP == NULL)
@@ -397,7 +413,11 @@ int createProcessPCBFromKernel(void *contextRSP){
 }
 
 
- 
+int getPID(){
+
+	return runningProc!=NULL ? runningProc->pid : -1;
+
+}
 
 
 void killProcess(int pid) {
@@ -504,8 +524,4 @@ void killProcess(int pid) {
 	
 
 	
-}
-
-void * getLastContext() {
-	return lastRSP;
 }
