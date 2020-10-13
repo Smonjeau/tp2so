@@ -7,6 +7,7 @@
 .global _cli
 .global _sti
 .global _hlt
+.global _xchg
 
 .intel_syntax noprefix
 
@@ -25,3 +26,8 @@ _cli:
 _sti:
 	sti
 	ret
+
+_xchg:
+    mov rax, rsi
+    xchg [rdi], eax
+    ret

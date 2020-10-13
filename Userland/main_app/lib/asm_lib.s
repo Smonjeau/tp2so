@@ -45,9 +45,3 @@ halt:
 sti:
     sti
     ret
-
-
-xchg:
-    mov rax, rsi
-    xchg [rdi], eax
-    ret

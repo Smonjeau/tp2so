@@ -419,12 +419,3 @@ void strcpy(char *src, char *dest)
         dest[i] = src[i];
     dest[i] = 0;
 }
-
-
-void acquire(int *lock){
-    while(xchg(lock, 1) != 0);
-}
-
-void release(int *lock){
-    xchg(lock, 0);
-}

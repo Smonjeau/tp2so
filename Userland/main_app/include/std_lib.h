@@ -59,9 +59,3 @@ int strcmp(char *str1, char *str2);
 int strncmp(char *s1, char *s2, int length);
 
 void strcpy(char *src, char *dest);
-
-// SYNCHRONIZATION METHODS
-
-void acquire(int *lock);
-
-void release(int *lock);

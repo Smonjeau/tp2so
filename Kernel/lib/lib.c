@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <lib.h>
 
 void * memset(void * destination, int32_t c, uint64_t length){
 	uint8_t chr = (uint8_t)c;
@@ -40,4 +41,12 @@ int div_ceil(int dividend, int divisor){
         return  dividend / divisor;
     else
         return (dividend / divisor) +1;
+}
+
+void acquire(int *lock){
+    while(_xchg(lock, 1) != 0);
+}
+
+void release(int *lock){
+    _xchg(lock, 0);
 }

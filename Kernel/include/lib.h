@@ -9,4 +9,12 @@ char *cpuVendor(char *result);
 
 int div_ceil(int dividend, int divisor);
 
+// SYNCHRONIZATION METHODS
+
+void acquire(int *lock);
+
+void release(int *lock);
+
+int _xchg();
+
 #endif
