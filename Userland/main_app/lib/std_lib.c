@@ -396,20 +396,19 @@ int strcmp(char *str1, char *str2)
  if they are equal or 0 otherwise
 -------------------------------------------------------------- */
 
-int strncmp(char *str1, char *str2, int length)
-{
-    int i;
+int strncmp(char *s1, char *s2, int n){
+    unsigned char u1, u2;
 
-    for (i = 0; i < length && str1[i] && str2[i]; i++)
-    {
-        if (str1[i] != str2[i])
+    while (n-- > 0){
+        u1 = (unsigned char) *s1++;
+        u2 = (unsigned char) *s2++;
+        if (u1 != u2)
+            return u1 - u2;
+        if (u1 == '\0')
             return 0;
     }
-
-    if (str1[i] != 0 && str2[i])
-        return 0;
-
-    return 1;
+    
+    return 0;
 }
 
 void strcpy(char *src, char *dest)

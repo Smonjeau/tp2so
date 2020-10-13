@@ -28,7 +28,7 @@ int createSemaphore(int id, int initValue){
 
     Semaphore *lastSem = semaphores;
     if(lastSem == NULL){
-        lastSem = newSem;
+        semaphores = lastSem = newSem;
     }else{
         while(lastSem->next != NULL)
             lastSem = lastSem->next;

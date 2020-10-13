@@ -17,7 +17,7 @@ char getChar(){
         halt();
     }
 
-    return ;
+    return c;
 
 }
 
