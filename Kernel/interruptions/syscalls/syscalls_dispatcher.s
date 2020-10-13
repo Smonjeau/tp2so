@@ -21,6 +21,7 @@
 .extern sysStartProcess
 .extern sysKill
 .extern sysGetPid
+.extern sysBlock
 .intel_syntax noprefix
 
 .section .text
@@ -75,6 +76,9 @@ _syscallDispatcher:
 
     cmp rax,14
     je _get_pid
+
+    cmp rax, 15
+    je _block
 
     jmp endOfInt
 
@@ -145,6 +149,10 @@ _kill:
 
 _get_pid:
     call sysGetPid
+    jmp endOfInt
+
+_block:
+    call sysBlock
     jmp endOfInt
 
     

@@ -62,6 +62,7 @@ typedef enum
 	DISPLAY_ANON,
 	DISPLAY_MATRIX,
 	WRONG,
+	BLOCK
 	
 } command;
 
@@ -86,6 +87,8 @@ static void psInfo();
 static void printProcData();
 static void printMemStatus();
 static void killCommand(char * buffer);
+static void blockProcess(char * buffer);
+
 
 extern void loop();
 
@@ -285,6 +288,9 @@ void shell(){
 				break;
 			case KILL:
 				killCommand(parameter);
+				break;
+			case BLOCK:
+				blockProcess(parameter);
 				break;
 			case DISPLAY_ANON:
 				displayImage(ANONYMOUS, 20, 200);
@@ -494,6 +500,16 @@ void killCommand(char * pid){
 		return;
 	}
 	kill(_pid);
+	return;
+}
+
+void blockProcess(char * pid){
+	int _pid= strToNum(pid);
+	if(_pid==-1){
+		printLine("Argument must be a pid. Use ps to see processes");
+		return;
+	}
+	block(_pid);
 	return;
 }
 
@@ -790,6 +806,12 @@ static int isCommandKill(char * buffer, int length, char * pid){
 	return checkEmptySpace(buffer,4,length);
 }
 
+static int isCommandBlock(char * buffer, int length, char * pid){
+	if(!strcmp("block",buffer))
+		return 0;
+	return checkEmptySpace(buffer,5,length);
+}
+
 static int isAllowedChar(char c)
 {
 	if (isAlpha(c) || isDigit(c) || isSpace(c) || c == 0)
@@ -853,6 +875,8 @@ command parseCommand(char *buffer, int length, char *string)
 		return LOOP;
 	if(isCommandKill(buffer,length,string))
 		return KILL;
+	if(isCommandBlock(buffer, length, string))
+		return BLOCK;
 
 	return NOCOMMAND;
 }
