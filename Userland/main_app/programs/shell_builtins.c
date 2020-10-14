@@ -207,7 +207,7 @@ void printMemStatus(){
 
 void printProcData(){
 
-	PCB * buffer = malloc(50 * sizeof(struct PCB));
+	ProcessInfo * buffer = malloc(50 * sizeof(ProcessInfo));
     if(buffer == (void *) 0)
 		return;
 
@@ -218,19 +218,19 @@ void printProcData(){
 		return;
 	}
 
-	PCB  pcb;
+	ProcessInfo pdata;
 	char str [10];
 	
 	for(int i=0; i<count; i++){
-		pcb=buffer[i];
+		pdata=buffer[i];
 
-		printf("Name: %s    ",1,pcb.name);
+		printf("Name: %s    ",1,pdata.name);
 
 		print("Pid: ");
-		print(itoa(pcb.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
+		print(itoa(pdata.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
 		
         print("        State: ");
-		switch (pcb.procState){
+		switch (pdata.procState){
             case READY:
                 print("READY");
                 break;
@@ -248,7 +248,8 @@ void printProcData(){
                 break;
 		}	
 
-		printf("       RSP: %x \\n", 1, (uint64_t)pcb.contextRSP);
+		printf("       Context RSP: %x", 1, (uint64_t)pdata.contextRSP);
+		printf("       Base RSP: %x\\n",1,(uint_fast64_t)pdata.baseRSP);
 	}
 
 	free(buffer);

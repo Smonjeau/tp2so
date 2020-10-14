@@ -1,7 +1,9 @@
 #ifndef PROCESS_MANAGER_H_
 #define PROCESS_MANAGER_H_
-
+#include <pipe_manager.h>
 #define NULL (void*)0
+
+#define MAX_PIPES 10
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
 
 typedef struct PCB {
@@ -11,6 +13,7 @@ typedef struct PCB {
     void * baseRSP;
     char * name;
     unsigned char remainingTicks;
+    pipe pipes [MAX_PIPES];
     struct PCB * nextPCB;
 } * PCB;
 
@@ -72,6 +75,10 @@ void ps(void * buffer, int * procCant);
 /* Returns the PID of the running process, or -1 if none */
 
 int getPID();
+
+/*Busca dos fds libres en el pcb del proceso y los asigna*/
+
+int assign_pipe_to_pcb(int * fds,pipe pipe);
 
 
 #endif

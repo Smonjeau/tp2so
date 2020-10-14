@@ -11,6 +11,7 @@
 #include <std_lib.h>
 #include <syscalls.h>
 #include <asm_lib.h>
+#include <test_util.h>
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		DEFINITIONS
@@ -33,6 +34,7 @@ static void testGetRegBkp();
 
 static void testInvalidOpcode();
 static int testDivByZero(int n);
+
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
@@ -227,3 +229,4 @@ static int testDivByZero(int n){
     return 2/n;
 
 }
+

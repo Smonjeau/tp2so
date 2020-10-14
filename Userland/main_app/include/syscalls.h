@@ -69,15 +69,13 @@ int kill (int pid);
 
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
 
-typedef struct PCB {
+typedef struct ProcessInfo {
     int pid;
+    char * name;
     ProcState procState;
     void * contextRSP;
     void * baseRSP;
-    char * name;
-    unsigned char remainingTicks;
-    struct PCB * nextPCB;
-} PCB;
+} ProcessInfo;
 
 
 // ------------------------------------ SYNCHRONIZATION ------------------------------------

@@ -112,3 +112,21 @@ char getChar(){
     return buffer[--pos];
 
 }
+
+int readStdin (char * buff, int dim){
+//BLOQUEO??    
+
+    unsigned int i;
+    for(i = 0; i < dim && i < pos; i++)
+        buff[i] = buffer[i];
+  //Ahora muevo el buffer a la izquierda "i" veces
+    if(i > 0)
+    for(int j = 0; j < pos-i; j++)
+        buffer[j] = buffer[j+i];
+    
+    pos -= i;
+
+    return i;
+
+
+}

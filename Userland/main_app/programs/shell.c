@@ -95,9 +95,8 @@ void shell(){
 	// 	printf("Failed to create semaphore\n", 0);
 	// }
 
-	startProcess(consumer, 0, NULL, "consumer");
+	//startProcess(consumer, 0, NULL, "consumer");
 	// startProcess(producer, 0, NULL, "producer");
-
 
 	char c;
 	while ((c = getChar())){
@@ -221,7 +220,7 @@ void parseCommand(char *cmdBuff){
 
 
 	//Testing
-	else if(strncmp(tokens[0],"testmm",7))
+	else if(strncmp(tokens[0],"testmm",7) == 0)
 		startProcess(test_mm,0,NULL,"testmm");
 
 

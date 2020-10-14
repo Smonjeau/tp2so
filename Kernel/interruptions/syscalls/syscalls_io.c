@@ -13,11 +13,11 @@
                                                     READ
 --------------------------------------------------------------------------------------------------------------------------- */
 
-char sysRead(int fd){
+char sysRead(int fd,char * buffer, int n){
 
     if(fd == STDIN)
-        return getChar();
-
+        //return readStdin(buffer, n);
+    	return getChar();
     return 0;
 
 }
@@ -27,7 +27,7 @@ char sysRead(int fd){
 --------------------------------------------------------------------------------------------------------------------------- */
 
 
-int sysWrite(char c, int fd){
+int sysWrite(int fd,char * buffer,int n){
     
     return 0;
 

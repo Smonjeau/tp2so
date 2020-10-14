@@ -55,7 +55,7 @@ createProcessContext:
 	push rdx
 	push rcx
 
-	# Reserve 1kb for process stack
+	# Reserve 4kb for process stack
 	mov rdi, 4096
 	call malloc
 	cmp rax,0
@@ -68,7 +68,7 @@ createProcessContext:
 	pop rdi
 
 	# Calc the base of the stack
-	add rax, 1024
+	add rax, 4096
 
     # Interrupt data
     movq [rax-8*0], 0     	# SS
@@ -96,9 +96,9 @@ createProcessContext:
 
 	
 	# Calc base of the stack, for future free
-	sub rax,1024
+	sub rax,4096
 	mov rsi, rax
-	add rax,1024
+	add rax,4096
 	# Calc the top of the stack
 	sub rax, 8*19
 	

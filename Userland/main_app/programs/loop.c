@@ -15,7 +15,7 @@ void loop(){
     else  
       printf("Hola!! Soy el proceso %d. Saludos, en un rato vuelvo!\\n",1,pid);
     aux++;
-    nap(100000000);
+    nap(10000000);
 
   }
 }

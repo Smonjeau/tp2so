@@ -93,6 +93,32 @@ void swapQueues() {
 	actives = aux;
 }
 
+void memcpy_ps(void * buffer, PCB pcb, int count){
+	//Vamos a copiar solo info relevante para mostrar
+/* 	memcpy(buffer + offset,&(pcb->pid),sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer+ offset,&(pcb->name),sizeof(char*));
+	offset += sizeof(char*);
+	memcpy(buffer+ offset,&(pcb->procState),sizeof(ProcState));
+	offset += sizeof(ProcState);
+	memcpy(buffer+offset,&(pcb->contextRSP),sizeof(void*));
+	offset += sizeof(void*);
+	memcpy(buffer+offset,&(pcb->baseRSP),sizeof(void*));
+	 */
+	typedef struct ProcessData
+	{
+		int pid;
+    	char * name;
+    	ProcState procState;
+    	void * contextRSP;
+    	void * baseRSP;
+	}Pdata;
+	Pdata proc_info = {pcb->pid,pcb->name,pcb->procState,pcb->contextRSP,pcb->baseRSP};
+	memcpy(buffer + sizeof(Pdata)* count,&proc_info, sizeof(Pdata));
+
+	
+}
+
 void ps(void * buffer, int * procCant) {
 	int structSize = sizeof(struct PCB);
 	int count = 0;
@@ -104,7 +130,9 @@ void ps(void * buffer, int * procCant) {
 		queue = actives + priority;
 		pcb = queue->first;
 		while(pcb != NULL) {
-			memcpy(buffer + structSize * count++, pcb, structSize);
+			//memcpy(buffer + structSize * count++, pcb, structSize);
+			memcpy_ps(buffer,pcb,count++);
+
 			pcb = pcb->nextPCB;
 		}
 	}
@@ -114,7 +142,9 @@ void ps(void * buffer, int * procCant) {
 		queue = expireds + priority;
 		pcb = queue->first;
 		while(pcb != NULL) {
-			memcpy(buffer + structSize * count++, pcb, structSize);
+			//memcpy(buffer + structSize * count++, pcb, structSize);
+			memcpy_ps(buffer,pcb,count++);
+			count++;
 			pcb = pcb->nextPCB;
 		}
 	}
@@ -198,7 +228,17 @@ void niceProcess(int pid, int priority) {
 
 }
 
-
+void copyFileDescriptorsFromParent(PCB pcb){
+	
+	//Heredamos los fds del ascendente 
+	if (runningProc){
+		for(int i=0; i<PIPE_SIZE;i++){
+			pcb->pipes[i] = runningProc->pipes[i];
+			if(pcb->pipes[i])
+				pcb->pipes[i]->proc_qty++;
+		}
+	}
+}
 
 void blockProcess(int pid) {
 	if(pid == 0) 
@@ -444,6 +484,9 @@ int createProcessPCB(void *contextRSP, void * baseRSP, char * name){
 
 	assignQuantumTime(new);
 
+	copyFileDescriptorsFromParent(new);
+
+
 	int priority = getPriorityLevel(new) - 100;
 
 	
@@ -473,6 +516,8 @@ int createProcessPCBFromKernel(void *contextRSP){
 	new->nextPCB = NULL;
 
 	assignQuantumTime(new);
+	copyFileDescriptorsFromParent(new);
+
 
 	int priority = getPriorityLevel(new) - 100;
 
@@ -597,4 +642,28 @@ void killProcess(int pid) {
 	
 
 	
+}
+int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign){
+	int i=0;
+	int j=0;
+	pipe * aux = runningProc->pipes;
+	while(i<2 && j<PIPE_SIZE){
+		if(aux[j]==NULL){
+			fds[i] = j;
+			i++;
+			aux[j]=pipe_to_assign;
+
+		}
+		j++;
+	}
+	if(i<2)
+		return -1;
+	return 0;
+}
+
+pipe close_fd (int fd){
+	pipe aux = runningProc->pipes[fd];
+	runningProc->pipes[fd]=NULL;
+	
+
 }
