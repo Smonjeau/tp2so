@@ -153,44 +153,48 @@ void mem_status(int * memory_size, int * free_space, int * occupied_space){
                                                     BUDDY SYSTEM IMPLEMENTATION
 --------------------------------------------------------------------------------------------------------------------------- */
 /*La implementación está pensada con un BT. La raiz arranca con un valor del total de la memoria disponible
-y se va dividiendo recursivamente de a mitades, el valor mínimo es 2. Si mi memoria es de 16B(2^4), voy a tener
+y se va dividiendo recursivamente de a mitades, el valor mínimo es 4KB. Si mi memoria es de 16B(2^4), voy a tener
 como máximo 2^4 -1 nodos y 4-1 niveles
 Para alocar voy recorriendo siempre por la izquierda. Si no se puede colocar a la izquierda voy por el nodo
 de la derecha, que tiene el offset apropiado para no ir pisando la memoria*/
-#define TOTAL_NODES (MEM_SIZE -1) 
-#define TREE_HEIGHT 23 - 1  //El tamaño de la mem es 8MB = 2^23 B
+#define TOTAL_NODES  32767//63
+#define TREE_HEIGHT 14  //El tamaño de la mem es 8MB = 2^23 B . Nodo mínimo es 512B
 #define TRUE 1
 #define FALSE 0
+#define LEFT 1
+#define RIGHT 2
 
 
 typedef  struct node
 {
     struct node * left;
     struct node * right;
-     struct node * ascendant;
+    struct node * ascendant;
     int size;
+    int l_subtree_occuppied;
+    int r_subtree_occuppied;
     char free;
  
 }node;
-node buddy_tree [TOTAL_NODES];
+node buddy_tree [TOTAL_NODES] = {{0}};
 int nodes_counter =0;
-int node_size = sizeof(struct node);
+int bytes_occupied=0;
 
-node * create_tree_node_rec (int size, node * ascendant, int levels_remaining){
-    //Creo todo el arbol, tengo TREE_HEIGHT niveles que crear
+node * create_tree_node_rec (int size,node * ascendant, int levels_remaining){
+    //Creo todo el arbol, tengo TREE_HEIGHT  niveles que crear
     if(!levels_remaining)
         return NULL;
     //Como no hay memoria dinámica, reservamos un array estático para ir pidiendo memoria para los nodos
     node * node = buddy_tree + (nodes_counter++);
-    node->ascendant=ascendant;
     node->free=TRUE;
+    node->ascendant=ascendant;
     node->size=size;
-   
-
+    node->l_subtree_occuppied=FALSE;
+    node->r_subtree_occuppied=FALSE;
     //creo todo el arbol recursivamente
-    node->right= create_tree_node_rec(size / 2, node, levels_remaining - 1);
-
     node->left= create_tree_node_rec(size/2,node,levels_remaining-1);
+    node->right= create_tree_node_rec(size / 2,node, levels_remaining - 1);
+
 
     return node;
 
@@ -200,25 +204,44 @@ node * create_tree_node_rec (int size, node * ascendant, int levels_remaining){
 }
 
 void *  recursive_malloc (int size, node * node, int offset){
-    if(node->free==FALSE)
+    if(size>node->size || node->free==FALSE )
         return NULL;
-    if((node->size)/2 < size){
+    if((size <= (node->size) /2)) {
+        //Si es hoja no puedo seguir recorriendo el arbol en busca de un nodo mas chico
+        if (node->right==NULL && node->left==NULL) {
+            node->free = FALSE;
+            bytes_occupied += node->size;
+            return FIRST_HEAP_ADRESS + offset;
+        }
+        //Voy buscando por nodos más chicos
+
+        if (node->left->free == TRUE) {
+            void *aux = recursive_malloc(size, node->left, offset);
+            if (aux) {
+                node->l_subtree_occuppied=TRUE;
+                return aux;
+            }
+
+        }
+        if (node->right->free) {
+            void *aux = recursive_malloc(size, node->right, offset + (node->size) / 2);
+            if (aux) {
+                node->r_subtree_occuppied=TRUE;
+                return aux;
+
+            }
+
+        }
+        return NULL;
+
+    }
+    //ahora me tengo q fijar que no este ocupado ningun subarbol
+    if(node->l_subtree_occuppied==FALSE && node->r_subtree_occuppied==FALSE){
         node->free=FALSE;
+        bytes_occupied += node->size;
         return FIRST_HEAP_ADRESS + offset;
     }
-    if(node->left->free==TRUE){
-        void * aux = recursive_malloc(size,node->left, offset);
-        if (aux){
-            return aux;
-        }
 
-    }
-    if(node->right->free){
-        void * aux = recursive_malloc(size,node->right, offset + (node->size)/2);
-        if(aux)
-            return aux;
-
-    }
     return NULL;
 
 
@@ -227,28 +250,49 @@ void *  recursive_malloc (int size, node * node, int offset){
 
 void * malloc (int size){
     if(!nodes_counter)
-        create_tree_node_rec(MEM_SIZE,NULL,ROOT,TREE_HEIGHT+1);
+        create_tree_node_rec(MEM_SIZE,NULL,TREE_HEIGHT+1);
     return recursive_malloc(size,buddy_tree,0);
 
 }
 
-int free_rec (void * adress, node * node, int offset){
 
+
+int free_rec (void * adress, node * node, int offset, int type){
+    if(node==NULL || (node->free==FALSE && node->l_subtree_occuppied==FALSE && node->r_subtree_occuppied==TRUE))
+        return FALSE;
     if(FIRST_HEAP_ADRESS+offset == adress && node->free==FALSE){
         node->free=TRUE;
+        bytes_occupied -= node->size;
+        if(type==LEFT)
+            node->ascendant->l_subtree_occuppied=FALSE;
+        else if(type==RIGHT)
+            node->ascendant->r_subtree_occuppied=FALSE;
         return TRUE; //lo libero
     }
-    if(node->left == NULL || node->right==NULL)
-        return FALSE;
-    if(!free_rec(adress,node->left,offset))
-        free_rec(adress,node->right,offset + (node->size / 2));
+
+    if(!free_rec(adress,node->left,offset,LEFT))
+        if(free_rec(adress,node->right,offset + (node->size / 2),RIGHT))
+            node->ascendant->r_subtree_occuppied=FALSE;
+                    
+
+    return FALSE;
+}
+void free (void * adress){
+    free_rec(adress,buddy_tree,0,LEFT);
 }
 
-void free(void* adress){
-    free_rec(adress, buddy_tree, 0);
+void mem_status(int * memory_size, int * free_space, int * occupied_space){
+    
+    *memory_size =  MEM_SIZE / 1024; //en KB
+    *free_space = (MEM_SIZE - bytes_occupied) /1024; //en kb . 
+    int aux = div_ceil(bytes_occupied,1024);
+    if(aux <= 0)
+        aux=1;
+     
+    *occupied_space = aux; // en KB
+
+
 }
-
-
 
 
 

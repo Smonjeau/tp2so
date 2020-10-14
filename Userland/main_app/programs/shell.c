@@ -28,6 +28,8 @@ void drawLine(int argc, char **argv);
 
 extern void loop();
 
+extern void test_mm();
+
 static Window w;
 
 
@@ -216,6 +218,11 @@ void parseCommand(char *cmdBuff){
 
 	else if(strncmp(tokens[0], "loop", 5) == 0)
 		startProcess(loop, 0, NULL, "loop");
+
+
+	//Testing
+	else if(strncmp(tokens[0],"testmm",7))
+		startProcess(test_mm,0,NULL,"testmm");
 
 
 	// Command not found

@@ -40,16 +40,24 @@ void * memcpy(void * destination, const void * source, int length){
 
 	return destination;
 }
+void * memset(void * destination, int32_t c, uint64_t length){
+	uint8_t chr = (uint8_t)c;
+	char * dst = (char*)destination;
+
+	while(length--)
+		dst[length] = chr;
+
+	return destination;
+}
 
 void print_mem_status(){
     int total_mem=0;
     int  avail_mem=0;
     int occ_mem=0;
     memStatus(&total_mem,&avail_mem,&occ_mem);
-    char buffer [30];
-    printf("Total memory: %s KB\\n",1,itoa(total_mem,buffer,10,-1));
-    printf("Free memory: %s KB\\n",1,itoa(avail_mem,buffer,10,-1));
-    printf("Occuppied memory: %s KB\\n",1,itoa(occ_mem,buffer,10,-1));
+    printf("Total memory: %d KB\\n",1,total_mem);
+    printf("Free memory: %d KB\\n",1,avail_mem);
+    printf("Occupied memory: %d KB\\n",1,occ_mem);
 }
 /* ------------------------------------------------------------------------------------------------------------------
                                                 CHAR FUNCTIONS

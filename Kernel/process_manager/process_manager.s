@@ -56,8 +56,10 @@ createProcessContext:
 	push rcx
 
 	# Reserve 1kb for process stack
-	mov rdi, 1024
+	mov rdi, 4096
 	call malloc
+	cmp rax,0
+	je no_space
 
 	# Restore calling args
 	pop rcx
@@ -123,8 +125,10 @@ createProcessContextFromKernel:
 	push rdx
 
 	# Reserve 1kb for process stack
-	mov rdi, 1024
+	mov rdi, 2048
 	call malloc
+	cmp rax,0
+	je no_space
 
 	# Restore calling args
 	pop rdx
@@ -167,6 +171,10 @@ createProcessContextFromKernel:
 
 	ret
 
+no_space:
+	ret
+
 .section .data
 	retAddress: .skip 8
 	firstArg: .skip 8
+
