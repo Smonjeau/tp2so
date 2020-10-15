@@ -194,7 +194,7 @@ void parseCommand(char *cmdBuff){
 	else if(strncmp(tokens[0], "memdump", 8) == 0 && j==2)
 		printMemDump(tokens[1]);
 	
-	else if(strncmp(tokens[0], "heapstat", 9) == 0)
+	else if(strncmp(tokens[0], "mem", 4) == 0)
 		printMemStatus();
 
 	
@@ -255,7 +255,7 @@ void drawLine(int argc, char **argv){
 	static int c=0;
 	c+=1;
 
-	for(int y=200*c; y<200*(c+1); y++)
+	for(int y=50*c; y<50*(c+1); y++)
 		for(int x=0; x<1024; x++)
 			for(int i=0; i<999; i++)
 				draw(x,y,0xFF0000);

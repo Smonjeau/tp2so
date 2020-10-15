@@ -264,6 +264,10 @@ void killProcess(char * pid){
 		printLine("Argument must be a pid. Use ps to see processes");
 		return;
 	}
+	if(_pid==0){
+		printLine("Can not kill Shell process");
+		return;
+	}
 
 	kill(_pid);
 }

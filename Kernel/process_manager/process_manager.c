@@ -94,17 +94,6 @@ void swapQueues() {
 }
 
 void memcpy_ps(void * buffer, PCB pcb, int count){
-	//Vamos a copiar solo info relevante para mostrar
-/* 	memcpy(buffer + offset,&(pcb->pid),sizeof(int));
-	offset += sizeof(int);
-	memcpy(buffer+ offset,&(pcb->name),sizeof(char*));
-	offset += sizeof(char*);
-	memcpy(buffer+ offset,&(pcb->procState),sizeof(ProcState));
-	offset += sizeof(ProcState);
-	memcpy(buffer+offset,&(pcb->contextRSP),sizeof(void*));
-	offset += sizeof(void*);
-	memcpy(buffer+offset,&(pcb->baseRSP),sizeof(void*));
-	 */
 	typedef struct ProcessData
 	{
 		int pid;
@@ -235,7 +224,7 @@ void copyFileDescriptorsFromParent(PCB pcb){
 		for(int i=0; i<PIPE_SIZE;i++){
 			pcb->pipes[i] = runningProc->pipes[i];
 			if(pcb->pipes[i])
-				pcb->pipes[i]->proc_qty++;
+				pcb->pipes[i]->open_ports++;
 		}
 	}
 }
@@ -484,7 +473,7 @@ int createProcessPCB(void *contextRSP, void * baseRSP, char * name){
 
 	assignQuantumTime(new);
 
-	copyFileDescriptorsFromParent(new);
+	//copyFileDescriptorsFromParent(new);
 
 
 	int priority = getPriorityLevel(new) - 100;
@@ -661,9 +650,11 @@ int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign){
 	return 0;
 }
 
-pipe close_fd (int fd){
+void close_fd (int fd){
 	pipe aux = runningProc->pipes[fd];
 	runningProc->pipes[fd]=NULL;
-	
+	aux->open_ports--;
+	free_pipe_if_empty(aux);
 
+	
 }

@@ -81,4 +81,9 @@ int getPID();
 int assign_pipe_to_pcb(int * fds,pipe pipe);
 
 
+
+void close_fd(int fd);
+
+
+
 #endif

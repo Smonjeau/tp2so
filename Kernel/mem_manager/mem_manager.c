@@ -153,7 +153,7 @@ void mem_status(int * memory_size, int * free_space, int * occupied_space){
                                                     BUDDY SYSTEM IMPLEMENTATION
 --------------------------------------------------------------------------------------------------------------------------- */
 /*La implementación está pensada con un BT. La raiz arranca con un valor del total de la memoria disponible
-y se va dividiendo recursivamente de a mitades, el valor mínimo es 4KB. Si mi memoria es de 16B(2^4), voy a tener
+y se va dividiendo recursivamente de a mitades, el valor mínimo es 512B. Si mi memoria es de 16B(2^4), voy a tener
 como máximo 2^4 -1 nodos y 4-1 niveles
 Para alocar voy recorriendo siempre por la izquierda. Si no se puede colocar a la izquierda voy por el nodo
 de la derecha, que tiene el offset apropiado para no ir pisando la memoria*/
@@ -256,7 +256,6 @@ void * malloc (int size){
 }
 
 
-
 int free_rec (void * adress, node * node, int offset, int type){
     if(node==NULL || (node->free==FALSE && node->l_subtree_occuppied==FALSE && node->r_subtree_occuppied==TRUE))
         return FALSE;
@@ -270,13 +269,12 @@ int free_rec (void * adress, node * node, int offset, int type){
         return TRUE; //lo libero
     }
 
-    if(!free_rec(adress,node->left,offset,LEFT))
-        if(free_rec(adress,node->right,offset + (node->size / 2),RIGHT))
-            node->ascendant->r_subtree_occuppied=FALSE;
-                    
+    if(((FIRST_HEAP_ADRESS+offset+node->size) >= adress) && !free_rec(adress,node->left,offset,LEFT))
+        free_rec(adress,node->right,offset + (node->size / 2),RIGHT);
 
     return FALSE;
 }
+
 void free (void * adress){
     free_rec(adress,buddy_tree,0,LEFT);
 }
