@@ -15,3 +15,4 @@ void printMemStatus(void);
 void printProcData();
 void killProcess(char * pid);
 void blockProcess(char * pid);
+void niceProcess(char * pid, char * priority);

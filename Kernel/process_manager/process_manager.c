@@ -128,7 +128,7 @@ void close_fd(int fd) {
 }
 
 
-void copyPSInfoToBuffer(char * buffer, PCB pcb) {
+void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	strcat("Name: ", buffer);
 	strcat(pcb->name, buffer);
 	strcat("     Pid: ", buffer);
@@ -151,6 +151,8 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb) {
             strcat("DEAD", buffer);
             break;
 	}
+	strcat("     Priority: ", buffer);
+	itoa(priority, buffer + strlen(buffer), 10, -1);
 	strcat("     Context RSP: ", buffer);
 	strcat("0x", buffer);
 	itoa((uint64_t)pcb->contextRSP, buffer + strlen(buffer), 16, -1);
@@ -173,7 +175,7 @@ void ps(char * buffer) {
 		queue = actives + priority;
 		pcb = queue->first;
 		while(pcb != NULL) {
-			copyPSInfoToBuffer(buffer, pcb);		
+			copyPSInfoToBuffer(buffer, pcb, priority+100);		
 			pcb = pcb->nextPCB;
 		}
 	}
@@ -183,7 +185,7 @@ void ps(char * buffer) {
 		queue = expireds + priority;
 		pcb = queue->first;
 		while(pcb != NULL) {
-			copyPSInfoToBuffer(buffer, pcb);
+			copyPSInfoToBuffer(buffer, pcb, priority+100);
 			pcb = pcb->nextPCB;
 		}
 	}

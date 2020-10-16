@@ -40,6 +40,7 @@ void printHelp(void){
 	printLine("- ps                to list active processes");
 	printLine("- kill pid          to kill a process");
 	printLine("- block pid         to block a process");
+	printLine("- nice pid priority to change priority (100 - 139)");
     printLine("- line              to draw a line (for testing)");
     printLine("- loop              to start loop (for testing)");
 	newLine();
@@ -246,4 +247,16 @@ void blockProcess(char * pid){
 	}
 
 	block(_pid);
+}
+
+void niceProcess(char * pid, char * priority) {
+	int _pid = atoi(pid);
+	int _prio = atoi(priority);
+
+	if(_pid==-1){
+		printLine("Argument must be a pid. Use ps to see processes");
+		return;
+	}
+
+	nice(_pid, _prio);
 }

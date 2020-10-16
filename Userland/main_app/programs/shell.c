@@ -211,6 +211,9 @@ void parseCommand(char *cmdBuff){
 
 	else if(strncmp(tokens[0], "block", 6) == 0 && j==2)
 		blockProcess(tokens[1]);
+
+	else if(strncmp(tokens[0], "nice", 5) == 0 && j==3)
+		niceProcess(tokens[1], tokens[2]);
 	
 
 	// New processes
