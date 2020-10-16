@@ -88,7 +88,7 @@ int waitSemaphore(int id){
 
 int postSemaphore(int id){
 
-    Semaphore *semaphore = findSemaphore(id, 0);
+    Semaphore * semaphore = findSemaphore(id, 0);
     if(semaphore == NULL)
         return -1;
 
@@ -99,7 +99,7 @@ int postSemaphore(int id){
     for(int i=0; i<semaphore->blockedPIDsSize; i++)
         blockProcess(semaphore->blockedPIDs[i]);
     semaphore->blockedPIDsSize = 0;
-
+    //watch semaphore + 88
     release(&(semaphore->lock));
 
     return 0;

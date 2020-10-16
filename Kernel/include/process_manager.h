@@ -83,4 +83,9 @@ int assign_pipe_to_pcb(int * fds, pipe pipe);
 void close_fd(int fd);
 
 
+/* Busca el pipe al cual esta coenctado el fd indicado */
+
+pipe findPipe(int fd);
+
+
 #endif

@@ -5,6 +5,7 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <semaphores.h>
+#include <pipe_manager.h>
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     CREATE_SEM
@@ -24,4 +25,19 @@ int sysPostSemaphore(int id){
 
 int sysDeleteSemaphore(int id){
     return deleteSemaphore(id);
+}
+
+int sysPipe(int * fds) {
+	return create_pipe(fds);
+}
+
+void sysClosefd(int fd) {
+	close_port(fd);
+}
+int sysPipeWrite(int fd, char * buffer, int bytes) {
+    return pipe_write(fd,buffer, bytes);
+}
+
+int sysPipeRead (int fd, char * buffer, int bytes) {
+    return pipe_read (fd,buffer, bytes);
 }

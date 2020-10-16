@@ -1,3 +1,5 @@
+#ifndef SPECIAL_KEYS_H
+#define SPECIAL_KEYS_H
 // The following keys are represented with non used ASCII codes
 
 #define NA 0        // NA = Not Ascii (unmapped keys, error codes)
@@ -7,3 +9,4 @@
 #define F3 3
 
 #define ESC 4
+#endif
