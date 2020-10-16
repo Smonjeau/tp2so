@@ -64,12 +64,16 @@ int exception(va_list args){
             printf("Possible causes: \\n", 0);
             printf(" - You didn't finish elementary school\\n", 0);
             break;
+
         case INV_OPCODE_EXCEPTION:
             printf("Invalid opcode detected!\\n", 0);
             printf("Possible causes: \\n", 0);
             printf(" - You received an EMP attack\\n", 0);
             printf(" - You tried to destroy the machine\\n", 0);
             break;
+
+        default:
+            printf("Exception code: %d\\n", 1, id);
     }
 
     RegBkp bkp;

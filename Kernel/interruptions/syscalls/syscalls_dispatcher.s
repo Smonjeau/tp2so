@@ -42,6 +42,7 @@
 
 
 _syscallDispatcher:
+    cli
     pushStateNoRax
 
     cmp rax, 0
@@ -118,6 +119,8 @@ endOfInt:
     mov al, 0x20
 	out 0x20, al
     pop rax
+
+    sti
 	popStateNoRax
 	iretq
 
@@ -183,9 +186,7 @@ _get_pid:
     jmp endOfInt
 
 _ps:
-    cli
     call sysPS
-    sti
     jmp endOfInt
 
 _block:

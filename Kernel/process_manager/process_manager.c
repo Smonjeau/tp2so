@@ -3,7 +3,6 @@
 #include <mem_manager.h>
 #include <stddef.h>
 #include <screen_driver.h>
-#include <interrupts.h>
 #include <screen_driver.h>
 
 /*
@@ -159,11 +158,16 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 
 	strcat("     Base RSP: ", buffer);
 	strcat("0x", buffer);
-	itoa((uint_fast64_t)pcb->baseRSP, buffer + strlen(buffer), 16, -1);
+	itoa((uint_fast64_t)pcb->segmentAddress, buffer + strlen(buffer), 16, -1);
 	strcat("\\n", buffer);
 }
 
 void ps(char * buffer) {
+
+	if(NULL){
+		drawLine();
+		return -1;
+	}
 
 	ProcQueue * queue;
 	PCB pcb;
@@ -208,8 +212,7 @@ void niceProcess(int pid, int priority) {
 	if(priority < 100 || priority > 139)
 		return;
 
-	/* Debe ser atómica */
-	_cli();
+
 	int found = 0, inActives = 1, idxPriority;
 	PCB currentPCB = NULL;
 
@@ -259,11 +262,6 @@ void niceProcess(int pid, int priority) {
 		
 	}
 
-
-
-	_sti();
-
-
 }
 
 
@@ -272,8 +270,6 @@ void blockProcess(int pid) {
 	if(pid == 0) 
 		return;
 
-	/* Debe ser atómica */
-	_cli();
 	int found = 0, idx;
 	PCB currentPCB = NULL;
 
@@ -306,13 +302,9 @@ void blockProcess(int pid) {
 
 		idx--;
 		if(currentPCB->procState == READY) {
-			currentPCB->procState = BLOCKED;
-			_sti();
-			
+			currentPCB->procState = BLOCKED;			
 		} else if(currentPCB->procState == BLOCKED) {
-			currentPCB->procState = READY;
-			_sti();
-			
+			currentPCB->procState = READY;			
 		} else if(currentPCB->procState == RUN) {
 
 			currentPCB->procState = BLOCKED;
@@ -320,14 +312,8 @@ void blockProcess(int pid) {
 			//Solo en este caso bloqueamos y enviamos a expirados en vez de que lo haga el scheduler
 			_timer_tick();
 		}
-
-			
-
 		
-	} else {
-		_sti();
 	}
-
 	
 }
 
@@ -490,7 +476,7 @@ void * schedule(void * currContextRSP) {
 
 static int pid=0;
 
-int createProcessPCB(void * contextRSP, void * baseRSP, char * name){
+int createProcessPCB(void * contextRSP, void * segmentAddress, char * name){
 	
 
 	if(lastRSP == NULL)
@@ -504,7 +490,7 @@ int createProcessPCB(void * contextRSP, void * baseRSP, char * name){
 		return -1;
 	
     new->contextRSP = contextRSP;
-	new->baseRSP=baseRSP;
+	new->segmentAddress=segmentAddress;
 	new->pid = pid++;
 	new->name=name;
 	new->nextPCB = NULL;
@@ -533,7 +519,7 @@ int getPID(){
 
 
 void killProcess(int pid) {
-	_cli(); //La hacemos no interrumpible
+
 	PCB currentPCB;
 	int priorityIdx;
 	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
@@ -627,9 +613,9 @@ void killProcess(int pid) {
 	}
 
 	ProcState state = currentPCB->procState;
-	free(currentPCB->baseRSP);
+	free(currentPCB->segmentAddress);
 	free(currentPCB);
-	_sti();	
+
 	if(state == RUN) //El proceso se suicida
 		_hlt(); //Espero a que llegue el tick para cambiar de proceso
 

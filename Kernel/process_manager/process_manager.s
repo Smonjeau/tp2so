@@ -9,7 +9,6 @@
 .section .text
 
 .include "./interruptions/macros.s"
- 
 
 /*
 This is a test function, it sets the specified process context, skipping the scheduler
@@ -64,9 +63,10 @@ createProcessContext:
 	pop rsi
 	pop rdi
 
-	#Ante dudas sobre por qué restamos 4088 consultar
+	# Ante dudas sobre por qué restamos 4088 consultar
+	
 	# Calc the base of the stack
-	add rax, 4088
+	add rax, 4096
 
     # Interrupt data
     movq [rax-8*0], 0     	# SS
@@ -92,22 +92,22 @@ createProcessContext:
 	movq [rax-8*18], 1    	# rbx
 	movq [rax-8*19], 0    	# rax
 
-	
-	# Calc base of the stack, for future free
-	sub rax, 4088
+	# RAX = segmentAddress
+	# RAX-8*19 = contextRSP
+
+	# Calc the segment address for future free
 	mov rsi, rax
-	add rax, 4088
-	# Calc the top of the stack
-	sub rax, 8*19
-	
-	# Create the process PCB
+	sub rsi, 4096
+
+	# Calc the contextRSP
 	mov rdi, rax
+	sub rdi, 8*19
 
 	# Name of the process 
 	mov rdx,rcx
 
+	# Create the process PCB
 	call createProcessPCB
-
 
 	sti
 	ret

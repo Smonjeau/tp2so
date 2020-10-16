@@ -8,7 +8,7 @@ typedef struct PCB {
     int pid;
     ProcState procState;
     void * contextRSP;
-    void * baseRSP;
+    void * segmentAddress;
     char * name;
     unsigned char remainingTicks;
     pipe pipes [MAX_PIPES];
