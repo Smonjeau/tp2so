@@ -626,7 +626,7 @@ void killProcess(int pid) {
 	free(currentPCB);
 
 	if(state == RUN) //El proceso se suicida
-		_hlt(); //Espero a que llegue el tick para cambiar de proceso
+		_timer_tick();
 
 	
 
