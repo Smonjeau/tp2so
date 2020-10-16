@@ -256,6 +256,7 @@ void * malloc (int size){
 }
 
 
+
 int free_rec (void * adress, node * node, int offset, int type){
     if(node==NULL || (node->free==FALSE && node->l_subtree_occuppied==FALSE && node->r_subtree_occuppied==TRUE))
         return FALSE;
@@ -269,12 +270,15 @@ int free_rec (void * adress, node * node, int offset, int type){
         return TRUE; //lo libero
     }
 
-    if(((FIRST_HEAP_ADRESS+offset+node->size) >= adress) && !free_rec(adress,node->left,offset,LEFT))
-        free_rec(adress,node->right,offset + (node->size / 2),RIGHT);
+    /*if(!free_rec(adress,node->left,offset,LEFT))
+        if(free_rec(adress,node->right,offset + (node->size / 2),RIGHT))
+            node->ascendant->r_subtree_occuppied=FALSE;*/
+    if(((FIRST_HEAP_ADRESS+offset+node->size) >= adress) && !free_rec(adress, node->left,offset,LEFT))
+        free_rec(adress,node->right,offset+(node->size/2),RIGHT);
+                    
 
     return FALSE;
 }
-
 void free (void * adress){
     free_rec(adress,buddy_tree,0,LEFT);
 }

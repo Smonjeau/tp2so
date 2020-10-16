@@ -3,7 +3,7 @@
 |-----------                                                                               			|
 | This file provides miscellaneous assembler functions.                                         	|
 ---------------------------------------------------------------------------------------------------*/
-
+.global _timer_tick
 .global _cli
 .global _sti
 .global _hlt
@@ -30,4 +30,8 @@ _sti:
 _xchg:
     mov rax, rsi
     xchg [rdi], eax
+    ret
+
+_timer_tick:
+    int 0x20
     ret

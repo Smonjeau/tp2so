@@ -9,3 +9,5 @@ void regDump(RegDump *dump);
 void halt();
 
 void sti();
+
+void _timer_tick();

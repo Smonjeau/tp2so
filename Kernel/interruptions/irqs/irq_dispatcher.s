@@ -73,24 +73,26 @@ picSlaveMask:
 
 
 _irq00Handler:			# Timer Tick
+	cli
 	pushState
 
 	; mov rdi, 0
 	; call irqDispatcher
-	cli
+	
 
 	call switchProcessContext
 
-	sti
 
 	mov al, 0x20
 	out 0x20, al
 
 	popState
+	sti
 	iretq
 
 
 _irq01Handler:			# Keyboard
+	cli
 	pushState
 
 	; call read			# Before lending control to dispatcher, it checks if TAB key has been pressed
@@ -106,4 +108,5 @@ _irq01Handler:			# Keyboard
 	out 0x20, al
 
 	popState
+	sti
 	iretq

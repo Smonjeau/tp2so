@@ -33,6 +33,7 @@ extern void test_mm();
 static Window w;
 
 
+
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
@@ -97,6 +98,8 @@ void shell(){
 
 	//startProcess(consumer, 0, NULL, "consumer");
 	// startProcess(producer, 0, NULL, "producer");
+
+
 
 	char c;
 	while ((c = getChar())){
@@ -262,3 +265,6 @@ void drawLine(int argc, char **argv){
 
 	kill(-1);	
 }
+
+
+

@@ -34,12 +34,14 @@ void printHelp(void){
 	newLine();
 	
 	printLine("- memdump n         to print memory starting at n");
-	printLine("- heapstat          to print heap status");
+	printLine("- mem          to print heap status");
 	newLine();
 
 	printLine("- ps                to list active processes");
 	printLine("- kill pid          to kill a process");
 	printLine("- block pid         to block a process");
+    printLine("- line              to draw a line (for testing)");
+    printLine("- loop              to start loop (for testing)");
 	newLine();
 	
 	printLine("To scroll the window up, press F3");
@@ -206,55 +208,17 @@ void printMemStatus(){
 ----------------------------------------------------------------------------------------------------- */
 
 void printProcData(){
-
-	ProcessInfo * buffer = malloc(50 * sizeof(ProcessInfo));
+	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
 		return;
 
-    int count=0;
-    ps(buffer, &count);
-	if(count==0){
-		printLine("The are no procceses");
-		return;
-	}
-
-	ProcessInfo pdata;
-	char str [10];
-	
-	for(int i=0; i<count; i++){
-		pdata=buffer[i];
-
-		printf("Name: %s    ",1,pdata.name);
-
-		print("Pid: ");
-		print(itoa(pdata.pid,str,10,-1)); //printf con %d está andando raro, por eso hay construcciones raras como esta, por ahora.
-		
-        print("        State: ");
-		switch (pdata.procState){
-            case READY:
-                print("READY");
-                break;
-
-            case RUN:
-                print("RUNNING");
-                break;
-
-            case BLOCKED:
-                print("BLOCKED");
-                break;
-
-            case DEAD:
-                print("DEAD");
-                break;
-		}	
-
-		printf("       Context RSP: %x", 1, (uint64_t)pdata.contextRSP);
-		printf("       Base RSP: %x\\n",1,(uint_fast64_t)pdata.baseRSP);
-	}
+    ps(buffer);    
+    printf(buffer, 0);  
 
 	free(buffer);
 
 }
+
 
 
 void killProcess(char * pid){
@@ -264,10 +228,10 @@ void killProcess(char * pid){
 		printLine("Argument must be a pid. Use ps to see processes");
 		return;
 	}
-	if(_pid==0){
-		printLine("Can not kill Shell process");
-		return;
-	}
+    else if(_pid==0){
+        printLine("Cannot kill Shell process");
+        return;
+    }
 
 	kill(_pid);
 }

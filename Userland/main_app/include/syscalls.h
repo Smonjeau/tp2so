@@ -59,7 +59,7 @@ int startProcess(void *main, int argc, char **argv, char * name);
 
 int getPid ();
 
-void ps (void * buffer, int * procCant);
+void ps (char * buffer/*, int * procCant*/);
 
 int block (int pid);
 
@@ -68,15 +68,17 @@ int nice(int pid, int newPrio);
 int kill (int pid);
 
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
-
-typedef struct ProcessInfo {
+typedef struct PCB {
     int pid;
-    char * name;
     ProcState procState;
     void * contextRSP;
     void * baseRSP;
-} ProcessInfo;
+    char * name;
+    unsigned char remainingTicks;
+    // pipe pipes [MAX_PIPES];
+    struct PCB * nextPCB;
 
+} * PCB;
 
 // ------------------------------------ SYNCHRONIZATION ------------------------------------
 

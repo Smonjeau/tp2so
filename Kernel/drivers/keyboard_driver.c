@@ -112,7 +112,6 @@ char getChar(){
     return buffer[--pos];
 
 }
-
 int readStdin (char * buff, int dim){
 //BLOQUEO??    
 

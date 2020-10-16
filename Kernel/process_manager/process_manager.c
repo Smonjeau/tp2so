@@ -34,7 +34,10 @@ void * lastRSP = NULL;
 PCB runningProc=NULL;
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
-	pcb->remainingTicks = 2;
+    if(pcb->pid == 0)
+	    pcb->remainingTicks = 5; //A la shell le damos mas quantum pues interactua con usuario
+    else
+        pcb->remainingTicks = 2;
 }
 
 // Decide el nivel de prioridad del proceso.
@@ -93,35 +96,84 @@ void swapQueues() {
 	actives = aux;
 }
 
-void memcpy_ps(void * buffer, PCB pcb, int count){
-	typedef struct ProcessData
-	{
-		int pid;
-    	char * name;
-    	ProcState procState;
-    	void * contextRSP;
-    	void * baseRSP;
-	}Pdata;
-	Pdata proc_info = {pcb->pid,pcb->name,pcb->procState,pcb->contextRSP,pcb->baseRSP};
-	memcpy(buffer + sizeof(Pdata)* count,&proc_info, sizeof(Pdata));
-
-	
+void copyFileDescriptorsFromParent(PCB pcb) {
+	//Heredamos los fds del ascendente
+	if(runningProc != NULL) {
+		for(int i = 0; i < PIPE_SIZE; i++) {
+			pcb->pipes[i] = runningProc->pipes[i];
+			if(pcb->pipes[i] != NULL)
+				(pcb->pipes[i])->open_ports++;
+		}
+	}
 }
 
-void ps(void * buffer, int * procCant) {
-	int structSize = sizeof(struct PCB);
-	int count = 0;
+int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign) {
+	int i, j;
+	pipe * aux = runningProc->pipes;
+	for(i = 0, j = 0; i < 2 && j < PIPE_SIZE; j++) {
+		if(aux[j] == NULL) {
+			fds[i++] = j;
+			aux[j] = pipe_to_assign;
+		}
+	}
+}
+
+void close_fd(int fd) {
+	if(runningProc != NULL) {
+		pipe aux = runningProc->pipes[fd];
+		runningProc->pipes[fd] = NULL;
+		aux->open_ports--;
+		free_pipe_if_empty(aux);
+	}
+}
+
+
+void copyPSInfoToBuffer(char * buffer, PCB pcb) {
+	strcat("Name: ", buffer);
+	strcat(pcb->name, buffer);
+	strcat("     Pid: ", buffer);
+	itoa(pcb->pid, buffer + strlen(buffer), 10, -1);
+	strcat("     State: ", buffer);
+	switch (pcb->procState){
+        case READY:
+            strcat("READY", buffer);
+            break;
+
+        case RUN:
+            strcat("RUNNING", buffer);
+            break;
+
+        case BLOCKED:
+            strcat("BLOCKED", buffer);
+            break;
+
+        case DEAD:
+            strcat("DEAD", buffer);
+            break;
+	}
+	strcat("     Context RSP: ", buffer);
+	strcat("0x", buffer);
+	itoa((uint64_t)pcb->contextRSP, buffer + strlen(buffer), 16, -1);
+
+	strcat("     Base RSP: ", buffer);
+	strcat("0x", buffer);
+	itoa((uint_fast64_t)pcb->baseRSP, buffer + strlen(buffer), 16, -1);
+	strcat("\\n", buffer);
+}
+
+void ps(char * buffer) {
+
 	ProcQueue * queue;
 	PCB pcb;
 	//Recorro activos
+
+	strcpy("", buffer);
 
 	for(int priority = 0; priority < 40; priority++) {
 		queue = actives + priority;
 		pcb = queue->first;
 		while(pcb != NULL) {
-			//memcpy(buffer + structSize * count++, pcb, structSize);
-			memcpy_ps(buffer,pcb,count++);
-
+			copyPSInfoToBuffer(buffer, pcb);		
 			pcb = pcb->nextPCB;
 		}
 	}
@@ -131,16 +183,11 @@ void ps(void * buffer, int * procCant) {
 		queue = expireds + priority;
 		pcb = queue->first;
 		while(pcb != NULL) {
-			//memcpy(buffer + structSize * count++, pcb, structSize);
-			memcpy_ps(buffer,pcb,count++);
-			count++;
+			copyPSInfoToBuffer(buffer, pcb);
 			pcb = pcb->nextPCB;
 		}
 	}
 
-
-	*procCant = count;
-	
 }
 
 void swapIfNeeded() {
@@ -217,17 +264,7 @@ void niceProcess(int pid, int priority) {
 
 }
 
-void copyFileDescriptorsFromParent(PCB pcb){
-	
-	//Heredamos los fds del ascendente 
-	if (runningProc){
-		for(int i=0; i<PIPE_SIZE;i++){
-			pcb->pipes[i] = runningProc->pipes[i];
-			if(pcb->pipes[i])
-				pcb->pipes[i]->open_ports++;
-		}
-	}
-}
+
 
 void blockProcess(int pid) {
 	if(pid == 0) 
@@ -275,19 +312,11 @@ void blockProcess(int pid) {
 			_sti();
 			
 		} else if(currentPCB->procState == RUN) {
-			/*actives[idx].first = currentPCB->nextPCB;
-			if(actives[idx].first == NULL)
-				actives[idx].last = NULL;*/
-			
-			if(currentPCB->pid == 1 && currentPCB->procState == RUN)
-				drawLine();
+
 			currentPCB->procState = BLOCKED;
-			//sendToExpired(currentPCB, BLOCKED, idx);
 			// Renuncia al CPU
 			//Solo en este caso bloqueamos y enviamos a expirados en vez de que lo haga el scheduler
-
-			_sti();
-			_hlt();
+			_timer_tick();
 		}
 
 			
@@ -301,12 +330,17 @@ void blockProcess(int pid) {
 }
 
 
-void * schedule(void *currContextRSP) {
+void * schedule(void * currContextRSP) {
 
 
 
 	PCB currentPCB = NULL;
 	int priorityIdx;
+
+	/* Para que sirve esta variable binaria? Resulta que cuando un proceso run se autobloquea, queda
+	 * en su misma posicion pero estado bloqueado. Por lo tanto si se encunetra un proceso bloqueado
+	 * en la primer posicion hallada entonces se trata de un proceso que se acaba de autobloquear*/
+	int primerProcEncontrado = 1;
 	do {
 		priorityIdx = 0;
 		do {
@@ -316,6 +350,10 @@ void * schedule(void *currContextRSP) {
 			while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
 				//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
 				//Primero lo sacamos de esta cola
+				if(primerProcEncontrado == 1) {
+				    primerProcEncontrado = 0;
+				    currentPCB->contextRSP = currContextRSP;
+				}
 				actives[priorityIdx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
 				if(actives[priorityIdx].first == NULL)
 					actives[priorityIdx].last = NULL; //Era el unico proceso
@@ -338,9 +376,7 @@ void * schedule(void *currContextRSP) {
 	} while(priorityIdx == 40);
 
 
-	/*if(priorityIdx == 40)
-		return currContextRSP; //Recibí un RSP de un proceso no añadido al scheduler, no tendría sentido por ahora.
-	*/
+
 
 	priorityIdx--; //Compenso el ultimo ++
 
@@ -452,8 +488,8 @@ void * schedule(void *currContextRSP) {
 
 static int pid=0;
 
-int createProcessPCB(void *contextRSP, void * baseRSP, char * name){
-	_cli();	
+int createProcessPCB(void * contextRSP, void * baseRSP, char * name){
+	
 
 	if(lastRSP == NULL)
 		lastRSP = contextRSP;
@@ -473,40 +509,7 @@ int createProcessPCB(void *contextRSP, void * baseRSP, char * name){
 
 	assignQuantumTime(new);
 
-	//copyFileDescriptorsFromParent(new);
-
-
-	int priority = getPriorityLevel(new) - 100;
-
-	
-	new->procState = READY;
-
-	queueProc(actives + priority, new);
-	_sti();	
-
-	return new->pid;
-
-}
-
-int createProcessPCBFromKernel(void *contextRSP){
-	
-	if(lastRSP == NULL)
-		lastRSP = contextRSP;
-	else if(contextRSP < lastRSP)
-		lastRSP = contextRSP;
-
-	PCB new = malloc(sizeof(struct PCB));
-	
-	if (new == NULL)
-		return -1;
-	
-    new->contextRSP = contextRSP;
-	new->pid = pid++;
-	new->nextPCB = NULL;
-
-	assignQuantumTime(new);
 	copyFileDescriptorsFromParent(new);
-
 
 	int priority = getPriorityLevel(new) - 100;
 
@@ -629,32 +632,6 @@ void killProcess(int pid) {
 		_hlt(); //Espero a que llegue el tick para cambiar de proceso
 
 	
-
-	
-}
-int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign){
-	int i=0;
-	int j=0;
-	pipe * aux = runningProc->pipes;
-	while(i<2 && j<PIPE_SIZE){
-		if(aux[j]==NULL){
-			fds[i] = j;
-			i++;
-			aux[j]=pipe_to_assign;
-
-		}
-		j++;
-	}
-	if(i<2)
-		return -1;
-	return 0;
-}
-
-void close_fd (int fd){
-	pipe aux = runningProc->pipes[fd];
-	runningProc->pipes[fd]=NULL;
-	aux->open_ports--;
-	free_pipe_if_empty(aux);
 
 	
 }

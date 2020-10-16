@@ -183,7 +183,9 @@ _get_pid:
     jmp endOfInt
 
 _ps:
+    cli
     call sysPS
+    sti
     jmp endOfInt
 
 _block:

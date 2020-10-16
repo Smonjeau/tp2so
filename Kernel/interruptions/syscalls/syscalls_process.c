@@ -5,6 +5,7 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <process_manager.h>
+#include <interrupts.h>
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     START_PROCESS
@@ -16,8 +17,8 @@ int sysStartProcess(void *main, int argc, char **argv, char * name){
 
 }
 
-void sysPS(void * buffer, int * procCant) {
-	ps(buffer, procCant);
+void sysPS(char * buffer) {
+    ps(buffer);
 }
 
 void sysKill(int pid){

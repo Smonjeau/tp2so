@@ -2,4 +2,4 @@ void handleKeyStroke();
 
 char getChar();
 
-int readStdin(char * buffer, int n);
+int readStdin (char * buff, int dim);

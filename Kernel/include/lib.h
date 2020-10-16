@@ -17,4 +17,12 @@ void release(int *lock);
 
 int _xchg();
 
+void strcpy(char *src, char *dest);
+
+void strcat(const char * source, char * destination);
+
+int strlen(char * source);
+
+char *itoa(int num, char *str, int base, int fixLen);
+
 #endif

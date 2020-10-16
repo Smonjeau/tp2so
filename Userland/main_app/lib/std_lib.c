@@ -353,6 +353,7 @@ void printf(char *format, int nargs, ...)
 
             if (format[pos] == 's')
             {
+                
                 print(va_arg(valist, char *));
                 formatChar = 0;
                 continue;

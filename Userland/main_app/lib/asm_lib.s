@@ -7,6 +7,7 @@
 .global regDump
 .global halt
 .global sti
+.global _timer_tick
 .intel_syntax noprefix
 
 .section .text
@@ -44,4 +45,8 @@ halt:
 
 sti:
     sti
+    ret
+
+_timer_tick:
+    int 0x20
     ret
