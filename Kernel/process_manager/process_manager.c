@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <screen_driver.h>
 #include <screen_driver.h>
+#include <interrupts.h>
 
 /*
 	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100 y
@@ -174,7 +175,7 @@ void ps(char * buffer) {
 
 	if(NULL){
 		drawLine();
-		return -1;
+		return;
 	}
 
 	ProcQueue * queue;
