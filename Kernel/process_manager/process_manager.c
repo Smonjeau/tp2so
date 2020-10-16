@@ -99,7 +99,7 @@ void swapQueues() {
 void copyFileDescriptorsFromParent(PCB pcb) {
 	//Heredamos los fds del ascendente
 	if(runningProc != NULL) {
-		for(int i = 0; i < PIPE_SIZE; i++) {
+		for(int i = 0; i < MAX_PIPES; i++) {
 			pcb->pipes[i] = runningProc->pipes[i];
 			if(pcb->pipes[i] != NULL)
 				(pcb->pipes[i])->open_ports++;
@@ -107,15 +107,23 @@ void copyFileDescriptorsFromParent(PCB pcb) {
 	}
 }
 
+pipe findPipe(int fd) {
+    pipe found = NULL;
+    if(runningProc != NULL && fd >= 0 && fd < MAX_PIPES && runningProc->pipes[fd] != NULL)
+        found = runningProc->pipes[fd];
+    return found;
+}
+
 int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign) {
 	int i, j;
 	pipe * aux = runningProc->pipes;
-	for(i = 0, j = 0; i < 2 && j < PIPE_SIZE; j++) {
+	for(i = 0, j = 0; i < 2 && j < MAX_PIPES; j++) {
 		if(aux[j] == NULL) {
 			fds[i++] = j;
 			aux[j] = pipe_to_assign;
 		}
 	}
+	return i == 2;
 }
 
 void close_fd(int fd) {

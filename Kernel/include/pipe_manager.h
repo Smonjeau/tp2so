@@ -4,7 +4,6 @@
 #include <semaphores.h>
 
 typedef struct pipe {
-    int lock;
     int index_w;
     int index_r;
     int write_bytes_sem;
@@ -13,9 +12,9 @@ typedef struct pipe {
     int open_ports; //Esto es para que el pipe sepa que puede liberar la memoria pedida si no hay más procesos usandolo.
 } * pipe;
 
-int pipe_write(pipe pipe,char * buffer, int bytes);
+int pipe_write(int fd, char * buffer, int bytes);
 
-int pipe_read (pipe pipe,char * buffer, int bytes);
+int pipe_read (int fd, char * buffer, int bytes);
 
 int create_pipe (int * fds);
 

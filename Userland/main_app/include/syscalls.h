@@ -68,7 +68,7 @@ int nice(int pid, int newPrio);
 int kill (int pid);
 
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
-typedef struct PCB {
+/*typedef struct PCB {
     int pid;
     ProcState procState;
     void * contextRSP;
@@ -78,7 +78,7 @@ typedef struct PCB {
     // pipe pipes [MAX_PIPES];
     struct PCB * nextPCB;
 
-} * PCB;
+} * PCB;*/
 
 // ------------------------------------ SYNCHRONIZATION ------------------------------------
 
@@ -89,3 +89,11 @@ int waitSem(int id);
 int postSem(int id);
 
 int deleteSem(int id);
+
+int pipe(int * fds);
+
+void close(int fd);
+
+int pipeWrite (int fd, char * buffer, int bytes);
+
+int pipeRead (int fd, char * buffer, int bytes);

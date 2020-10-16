@@ -33,6 +33,10 @@
 .extern sysWaitSemaphore
 .extern sysPostSemaphore
 .extern sysDeleteSemaphore
+.extern sysPipe
+.extern sysClosefd
+.extern sysPipeWrite
+.extern sysPipeRead
 
 .intel_syntax noprefix
 
@@ -109,6 +113,18 @@ _syscallDispatcher:
 
     cmp rax, 21
     je _deleteSemaphore
+
+    cmp rax, 22
+    je _pipe
+
+    cmp rax, 23
+    je _closefd
+
+    cmp rax, 24
+    je _pipe_write
+
+    cmp rax, 25
+        je _pipe_read
 
     jmp endOfInt
 
@@ -215,4 +231,20 @@ _postSemaphore:
 
 _deleteSemaphore:
     call sysDeleteSemaphore
+    jmp endOfInt
+
+_pipe:
+    call sysPipe
+    jmp endOfInt
+
+_closefd:
+    call sysClosefd
+    jmp endOfInt
+
+_pipe_write:
+    call sysPipeWrite
+    jmp endOfInt
+
+_pipe_read:
+    call sysPipeRead
     jmp endOfInt
