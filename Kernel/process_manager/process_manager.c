@@ -6,11 +6,6 @@
 #include <screen_driver.h>
 #include <interrupts.h>
 
-/*
-	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100 y
-	se asigna un quantum de tiempo fijo..
-	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
-*/
 
 void drawLine(){
 	static int c=0;
@@ -122,7 +117,7 @@ pipe findPipe(int fd) {
     return found;
 }
 
-int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign) {
+int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 	int i, j;
 	pipe * aux = runningProc->pipes;
 	for(i = 0, j = 0; i < 2 && j < MAX_PIPES; j++) {
@@ -644,8 +639,12 @@ void killProcess(int pid) {
 	}
 
 	ProcState state = currentPCB->procState;
-	free(currentPCB->segmentAddress);
-	free(currentPCB);
+	for(int pipe=0;pipe<MAX_PIPES;pipe++){
+	    if(currentPCB->pipes[pipe]!=NULL)
+	        close_fd(pipe);
+	}
+    free(currentPCB->segmentAddress);
+    free(currentPCB);
 
 	if(state == RUN) //El proceso se suicida
 		_timer_tick();

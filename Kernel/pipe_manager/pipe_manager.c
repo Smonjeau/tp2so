@@ -7,7 +7,7 @@
 #define READ 0
 #define WRITE 1
 static int semaphore_id = 0;
-int create_pipe(int * fds) {
+int create_pipe(int  fds [2]) {
 
     pipe new = malloc(sizeof(struct pipe));
     if(new == NULL)

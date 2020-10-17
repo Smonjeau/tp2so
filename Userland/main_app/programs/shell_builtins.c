@@ -5,6 +5,8 @@
 #include <shell_builtins.h>
 #include <stdint.h>
 
+
+
 /* ----------------------------------------------------------------------------------------------------
 						                MISCELLANEOUS
 ----------------------------------------------------------------------------------------------------- */
@@ -261,4 +263,29 @@ void niceProcess(char * pid, char * priority) {
 	}
 
 	nice(_pid, _prio);
+}
+typedef struct Semaphore{
+    int id;
+    int value;
+    int blockedPIDs[MAX_BLOCKED_PIDS];
+    int blockedPIDsSize;
+    int lock;
+    struct Semaphore * next;
+}  Semaphore;
+void printSemStatus(){
+    Semaphore * buffer = malloc(20*sizeof(struct Semaphore));
+    int qty =0;
+    semStatus(buffer,&qty);
+    Semaphore sem;
+    int i=0;
+    printf("Semaphores status\\n",0);
+    while(i<qty){
+        sem=*(buffer + i++);
+        printf("ID:%d  Value:%d   There are %d processes blocked in this semaphore:\\n",3,sem.id,sem.value,sem.blockedPIDsSize);
+        if(sem.blockedPIDsSize>0)
+            printf("PIDs:",0);
+        for(int j=0;j<sem.blockedPIDsSize;j++)
+            printf(" %d ",1,sem.blockedPIDs[j]);
+
+    }
 }
