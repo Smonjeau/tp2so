@@ -58,7 +58,7 @@ Semaphore * findSemaphore(int id, int prev){
 }
 
 
-int waitSemaphore(int id){
+int waitSemaphore(int id) {
 
     Semaphore *semaphore = findSemaphore(id, 0);
     if(semaphore == NULL)
@@ -106,15 +106,12 @@ int postSemaphore(int id){
         blockProcess(semaphore->blockedPIDs[i],0);
         semaphore->blockedPIDs[i]=0;
         unblocked++;
-
     }
     semaphore->blockedPIDsSize = 0;
-    //watch semaphore + 88
     release(&(semaphore->lock));
-    if(unblocked)
-        _timer_tick();
+    /*if(unblocked)
+        _timer_tick();*/
     return 0;
-
 }
 
 

@@ -34,13 +34,13 @@
 .extern sysPostSemaphore
 .extern sysDeleteSemaphore
 .extern sysPipe
+.extern sysForcePipe
 .extern sysClosefd
 .extern sysPipeWrite
 .extern sysPipeRead
 
 .extern sysCreatePipe
 .extern sysReadPipe 
-.extern sysWritePipe
 .intel_syntax noprefix
 
 .section .text
@@ -125,7 +125,7 @@ _syscallDispatcher:
     je _closefd
 
     cmp rax, 24
-    je _pipe_write
+    je _forcepipe
 
     cmp rax, 25
         je _pipe_read
@@ -242,12 +242,12 @@ _pipe:
     call sysPipe
     jmp endOfInt
 
-_closefd:
-    call sysClosefd
+_forcepipe:
+    call sysForcePipe
     jmp endOfInt
 
-_pipe_write:
-    call sysPipeWrite
+_closefd:
+    call sysClosefd
     jmp endOfInt
 
 _pipe_read:

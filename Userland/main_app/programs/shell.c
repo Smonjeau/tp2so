@@ -11,6 +11,7 @@
 #include <image_lib.h>
 #include <std_lib.h>
 #include <std_io.h>
+#include <asm_lib.h>
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		SHELL DEFINITIONS
@@ -22,8 +23,6 @@
 
 void parseCommand(char *cmdBuff);
 
-void clearWindow(void);
-
 void drawLine(int argc, char **argv);
 
 extern void loop();
@@ -31,7 +30,6 @@ extern void loop();
 extern void test_mm();
 
 static Window w;
-
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
@@ -55,13 +53,15 @@ static void createWindow(){
 
 }
 
-
 void dummy(int argc, char **argv) {
     while(1)
         halt();
 }
 
 void shell(){
+    startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
+
+	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 
     startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
@@ -74,7 +74,8 @@ void shell(){
 	w.activeCursor = bodyCursor;
 
 	char c;
-	while ((c = getChar())){
+	while (1){
+		c = getChar();
 
 		// Handle the chars that are not CR
 
@@ -146,7 +147,7 @@ void parseCommand(char *cmdBuff){
 		displayImage(tokens[1], 20, 200);
 	
 	else if(strncmp(tokens[0], "clear", 6) == 0)
-		clearWindow();
+		clearScreen();
 
 
 	// CPU management
@@ -213,21 +214,6 @@ void parseCommand(char *cmdBuff){
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	OTHER METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
-
-void clearWindow(){
-	for (int x = 0; x < w.xf; x++)
-	{
-		for (int y = 0; y < w.yf; y++)
-		{
-			//draw(x, y, 0);
-			drawPoint(x, y, 1, 0);
-		}
-	}
-
-	w.cursors[bodyCursor].x = 0;
-	w.cursors[bodyCursor].y = bodyY;
-}
-
 
 void drawLine(int argc, char **argv){
 	static int c=0;

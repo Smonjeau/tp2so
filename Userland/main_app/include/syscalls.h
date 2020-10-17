@@ -2,9 +2,9 @@
 
 // ------------------------------------ I/O BUFFERS ------------------------------------
 
-char read(int fd);
+int read(int fd, char * buffer, int n);
 
-int write(char c, int fd);
+int write(int fd, char * buffer, int n);
 
 
 // ------------------------------------- MISCELLANEOUS -------------------------------------
@@ -68,17 +68,7 @@ int nice(int pid, int newPrio);
 int kill (int pid);
 
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
-/*typedef struct PCB {
-    int pid;
-    ProcState procState;
-    void * contextRSP;
-    void * segmentAddress;
-    char * name;
-    unsigned char remainingTicks;
-    // pipe pipes [MAX_PIPES];
-    struct PCB * nextPCB;
 
-} * PCB;*/
 
 // ------------------------------------ SYNCHRONIZATION ------------------------------------
 
@@ -92,8 +82,8 @@ int deleteSem(int id);
 
 int pipe(int * fds);
 
-void close(int fd);
+int forcePipe(int fd);
 
-int pipeWrite (int fd, char * buffer, int bytes);
+void close(int fd);
 
 int pipeRead (int fd, char * buffer, int bytes);

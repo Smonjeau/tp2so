@@ -44,5 +44,5 @@ syscall postSem, 20
 syscall deleteSem, 21
 syscall pipe, 22
 syscall close, 23
-syscall pipeWrite, 24
+syscall forcePipe, 24
 syscall pipeRead, 25
