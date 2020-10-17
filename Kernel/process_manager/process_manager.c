@@ -96,6 +96,12 @@ void swapQueues() {
 	actives = aux;
 }
 
+int is_fd_free(int fd) {
+	if(runningProc != NULL && runningProc->pipes[fd] == NULL)
+		return 1;
+	return 0;
+}
+
 void copyFileDescriptorsFromParent(PCB pcb) {
 	//Heredamos los fds del ascendente
 	if(runningProc != NULL) {
@@ -124,6 +130,12 @@ int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign) {
 		}
 	}
 	return i == 2;
+}
+int assign_pipe_to_pcb_forced(int fd, pipe new) {
+	if(runningProc == NULL || fd < 0 || fd >= MAX_PIPES)
+		return -1;
+	runningProc->pipes[fd] = new;
+	return 0;
 }
 
 void close_fd(int fd) {
@@ -276,8 +288,10 @@ void niceProcess(int pid, int priority) {
 
 
 void blockProcess(int pid, int tick) {
-	if(pid == 0) 
-		return;
+    //OJO
+    /*if(pid == 0)
+		return;*/
+
 
 	int found = 0, idx;
 	PCB currentPCB = NULL;
@@ -312,20 +326,22 @@ void blockProcess(int pid, int tick) {
 		idx--;
 		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;			
+			_sti();
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
-			if(tick)
-			    _timer_tick();
-			
+			if(tick == 1)
+				_sti(); //Cuando post semaphore desbloquea un proceso no queremos que se haga sti
 		} else if(currentPCB->procState == RUN) {
 
 			currentPCB->procState = BLOCKED;
 			// Renuncia al CPU
 			//Solo en este caso bloqueamos y enviamos a expirados en vez de que lo haga el scheduler
-			if(tick)
+			if(tick == 1)
 			    _timer_tick();
 		}
 		
+	} else {
+		_sti();
 	}
 	
 }

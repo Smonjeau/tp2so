@@ -7,6 +7,10 @@
 #include <special_keys.h>
 #include <interrupts.h>
 #include <keyboard_driver.h>
+#include <pipe_manager.h>
+#define NULL (void *)0;
+
+pipe stdinPipe = NULL;
 
 
 /* ------------------------------------------------------------------------------------------------------
@@ -97,9 +101,11 @@ char keyCodeToChar(int keyCode){
 }
 
 
-void handleKeyStroke(){
+void handleKeyStroke() {
+    char aux = keyCodeToChar(read());
+    pipe_write_nofd(stdinPipe, &aux, 1);
 
-    buffer[pos++] = keyCodeToChar(read());
+    //buffer[pos++] = keyCodeToChar(read());
     
 }
 
@@ -128,4 +134,8 @@ int readStdin (char * buff, int dim){
     return i;
 
 
+}
+
+void assignKeyboardPipe(pipe new) {
+    stdinPipe = new;
 }

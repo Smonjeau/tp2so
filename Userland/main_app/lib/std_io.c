@@ -10,6 +10,11 @@
 
 char getChar(){
 
+	char c;
+	read(0, &c, 1);
+	return c;
+    /*
+	//WTF ES ESTO BRO
     char c;
 
     while((c = read(STDIN)) == 0){
@@ -17,12 +22,12 @@ char getChar(){
         halt();
     }
 
-    return c;
+    return c;*/
 
 }
 
 int putChar(char c){
-
-    return write(c, STDOUT);
+	return 0;
+    //return write(c, STDOUT);
 
 }

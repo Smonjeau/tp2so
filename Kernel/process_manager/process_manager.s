@@ -52,7 +52,7 @@ createProcessContext:
 	push rcx
 
 	# Reserve 4kb for process stack
-	mov rdi, 2048
+	mov rdi, 4096
 	call malloc
 	cmp rax,0
 	je no_space

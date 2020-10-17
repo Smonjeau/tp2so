@@ -11,6 +11,7 @@
 #include <image_lib.h>
 #include <std_lib.h>
 #include <std_io.h>
+#include <asm_lib.h>
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		SHELL DEFINITIONS
@@ -80,14 +81,14 @@ void producer(int argc, char **argv){
 		postSem(0);
 	}
 }*/
-
+/*
 void pipeTestHijo(int argc, char **argv) {
     int fds[2];
     fds[0] = atoi(argv[0]);
     fds[1] = atoi(argv[1]);
     close(fds[0]); //No leo, solo escribo
 
-    pipeWrite(fds[1], "Que lindoooooo!!!!!!", 400);
+    write(fds[1], "Que lindoooooo!!!!!!", 400);
 
 
     close(fds[1]);
@@ -109,10 +110,17 @@ void pipeTest(int argc, char **argv) {
     print(buffer);
     close(fds[0]);
 	kill(-1);
+}*/
+
+void dummy(int argc, char **argv) {
+    while(1)
+        halt();
 }
 
-
 void shell(){
+    startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
+
+	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 
 	createWindow();
 	setWindow(&w);
@@ -128,7 +136,7 @@ void shell(){
 
 	//startProcess(consumer, 0, NULL, "consumer");
 	// startProcess(producer, 0, NULL, "producer");
-	 startProcess(pipeTest, 0, NULL, "pipe_test");
+	//startProcess(pipeTest, 0, NULL, "pipe_test");
 
 	char c;
 	while ((c = getChar())){

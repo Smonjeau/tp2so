@@ -5,6 +5,7 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <keyboard_driver.h>
+#include <pipe_manager.h>
 
 #define STDIN 0
 #define STDOUT 1
@@ -13,14 +14,15 @@
                                                     READ
 --------------------------------------------------------------------------------------------------------------------------- */
 
-char sysRead(int fd, char * buffer, int n){
+char sysRead(int fd, char * buffer, int n) {
+	return pipe_read(fd, buffer, n);
 
-    if(fd == STDIN)
+    /*if(fd == STDIN)
         return getChar();
 
     //return readStdin(buffer, n)
     return getChar();
-    //return 0;
+    //return 0;*/
 
 }
 
@@ -29,8 +31,6 @@ char sysRead(int fd, char * buffer, int n){
 --------------------------------------------------------------------------------------------------------------------------- */
 
 
-int sysWrite(int fd, char * buffer, int n){
-    
-    return 0;
-
+int sysWrite(int fd, char * buffer, int n) {
+    return pipe_write(fd,buffer, n);
 }

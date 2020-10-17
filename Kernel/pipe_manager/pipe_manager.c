@@ -3,6 +3,7 @@
 #include <mem_manager.h>
 #include <semaphores.h>
 #include <interrupts.h>
+#include <keyboard_driver.h>
 #define READ 0
 #define WRITE 1
 static int semaphore_id = 0;
@@ -21,6 +22,32 @@ int create_pipe(int * fds) {
     return assign_pipe_to_pcb(fds, new);
 }
 
+int create_force_pipe(int fd) {
+    if(is_fd_free(fd) == 0 || fd < 0 || fd >= MAX_PIPES)
+        return -1;
+    //Tengo el fd indicado libre
+    pipe new = malloc(sizeof(struct pipe));
+    if(new == NULL)
+        return -1;
+    new->index_w = 0;
+    new->index_r = 0;
+    new->open_ports = 2;
+    new->write_bytes_sem = semaphore_id++;
+    new->read_bytes_sem = semaphore_id++;
+    createSemaphore(new->write_bytes_sem, PIPE_SIZE);
+    createSemaphore(new->read_bytes_sem, 0);
+    if(assign_pipe_to_pcb_forced(fd, new) == -1)
+        return -1;
+    switch(fd) {
+        case 0:
+            //STDIN es el teclado.
+            //Asignamos la segunda boca del pipe al keyboardDriver
+            assignKeyboardPipe(new);
+            break;
+    }
+    return 0;
+}
+
 void close_port(int fd) {
     close_fd(fd);
 }
@@ -36,6 +63,9 @@ void free_pipe_if_empty(pipe pipe) {
 int pipe_write(int fd, char * buffer, int bytes) {
 
     pipe pipe = findPipe(fd);
+    return pipe_write_nofd(pipe, buffer, bytes); //Reutilizamos la funcion
+}
+int pipe_write_nofd(pipe pipe, char * buffer, int bytes) {
     if(pipe == NULL)
         return -1;
     int i;

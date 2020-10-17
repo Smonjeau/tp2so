@@ -51,6 +51,9 @@ int createProcessContext(int argc, char **argv, void *main, char * name);
 int createProcessContextFromKernel(int argc, char **argv, void *main);
 
 
+/*Revis asi el proceso running tiene el fd indicado libre*/
+int is_fd_free(int fd);
+
 
 /* Kills a process and returns */
 
@@ -77,8 +80,12 @@ int getPID();
 
 
 /* Busca dos fds libres en el pcb del proceso y los asigna*/
-
 int assign_pipe_to_pcb(int * fds, pipe pipe);
+
+
+/* Asigna el pipe recibido al fd especificado del proceso running */
+int assign_pipe_to_pcb_forced(int fd, pipe new);
+
 
 void close_fd(int fd);
 
