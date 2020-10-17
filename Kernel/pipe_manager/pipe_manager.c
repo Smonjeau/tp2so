@@ -80,11 +80,11 @@ int pipe_write_nofd(pipe pipe, char * buffer, int bytes) {
         /*Esto es porque se puede dar el caso que el write acapare toda la cpu --> Si tenía 2 ticks al arrancar
         y libera procesos al hacer post, llama al scheduler pero sabemos que lo van a volver a elegir, entonces como despúes ya
         no se llama al scheduler(no desbloqueamos a nadie), el write acapara toda la cpu, entonces le pongo este límite*/
-        if(pipe->index_w % 100 == 0) {
+        /*if(pipe->index_w % 100 == 0) {
             postSemaphore(pipe->read_bytes_sem);
             _timer_tick();
 
-        }
+        }*/
     }
     return i;
 }

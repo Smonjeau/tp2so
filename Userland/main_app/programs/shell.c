@@ -139,7 +139,8 @@ void shell(){
 	//startProcess(pipeTest, 0, NULL, "pipe_test");
 
 	char c;
-	while ((c = getChar())){
+	while (1){
+		c = getChar();
 
 		// Handle the chars that are not CR
 
