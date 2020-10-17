@@ -36,6 +36,8 @@ PCB runningProc=NULL;
 void assignQuantumTime(PCB pcb) {
     if(pcb->pid == 0)
 	    pcb->remainingTicks = 5; //A la shell le damos mas quantum pues interactua con usuario
+	else if(pcb->pid == 1)
+		pcb->remainingTicks = 1; //Al proceso dummy le damos el menor quantum posible
     else
         pcb->remainingTicks = 2;
 }

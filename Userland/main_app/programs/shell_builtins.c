@@ -243,6 +243,9 @@ void blockProcess(char * pid){
 	if(_pid==-1){
 		printLine("Argument must be a pid. Use ps to see processes");
 		return;
+	} else if(_pid==0){
+		printLine("Can not block the shell");
+		return;
 	}
 
 	block(_pid);
