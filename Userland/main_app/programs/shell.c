@@ -55,64 +55,15 @@ static void createWindow(){
 
 }
 
-/*
-void consumer(int argc, char **argv){
 
-	static int x=0;
-
-	block(getPid());
-
-	for(; x<x+100; x++)
-			draw(x, 100, 0xFF0000);
-
-	kill(-1);
-
-	// while(1){
-	// 	waitSem(0);
-	// 	for(; x<x+100; x++)
-	// 		draw(x, 100, 0xFF0000);
-	// }
+void dummy(int argc, char **argv) {
+    while(1)
+        halt();
 }
-
-void producer(int argc, char **argv){
-	while(1){
-		for(int i=0; i<9999; i++);
-		postSem(0);
-	}
-}*/
-
-void pipeTestHijo(int argc, char **argv) {
-    int fds[2];
-    fds[0] = atoi(argv[0]);
-    fds[1] = atoi(argv[1]);
-    close(fds[0]); //No leo, solo escribo
-
-    pipeWrite(fds[1], "Que lindoooooo!!!!!!", 400);
-
-
-    close(fds[1]);
-    kill(-1);
-}
-
-void pipeTest(int argc, char **argv) {
-	int fds[2];
-	pipe(fds);
-	char fd0[5]; //Buffer para convertir int a string el fd0
-    char fd1[5]; //Buffer para convertir int a string el fd1
-	itoa(fds[0], fd0, 10, -1);
-    itoa(fds[1], fd1, 10, -1);
-    char * argv_for_son[2] = {fd0, fd1};
-    startProcess(pipeTestHijo, 2, argv_for_son, "pipe_test_hijo");
-    close(fds[1]); //No escribo, solo leo
-    char buffer[20];
-    pipeRead(fds[0], buffer, 400);
-    print(buffer);
-    close(fds[0]);
-	kill(-1);
-}
-
 
 void shell(){
+
+    startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
 	createWindow();
 	setWindow(&w);
@@ -121,14 +72,6 @@ void shell(){
 	int buffPos = 0;
 
 	w.activeCursor = bodyCursor;
-
-	// if(createSem(0, 0) == -1){
-	// 	printf("Failed to create semaphore\n", 0);
-	// }
-
-	//startProcess(consumer, 0, NULL, "consumer");
-	// startProcess(producer, 0, NULL, "producer");
-	 startProcess(pipeTest, 0, NULL, "pipe_test");
 
 	char c;
 	while ((c = getChar())){
