@@ -11,7 +11,7 @@
                                                     CREATE_SEM
 --------------------------------------------------------------------------------------------------------------------------- */
 
-int sysCreateSemaphore(int id, int initValue){
+int sysCreateSemaphore( int id,int initValue){
     return createSemaphore(id, initValue);
 }
 

@@ -209,14 +209,13 @@ void printMemStatus(){
 ----------------------------------------------------------------------------------------------------- */
 
 void printProcData(){
-	char * buffer = malloc(90 * 40);
+	char  buffer[90 * 40];
     if(buffer == (void *) 0)
 		return;
 
     ps(buffer);    
     printf(buffer, 0);  
 
-	free(buffer);
 
 }
 

@@ -59,7 +59,7 @@ void killProcess(int pid);
 
 /* Switch process state READY/BLOCKED.*/
 
-void blockProcess(int pid);
+void blockProcess(int pid,int tick);
 
 
 /* Change process priority (100 - 139) */

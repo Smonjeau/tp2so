@@ -87,7 +87,8 @@ void pipeTestHijo(int argc, char **argv) {
     fds[1] = atoi(argv[1]);
     close(fds[0]); //No leo, solo escribo
 
-    pipeWrite(fds[1], "hola mundo!", 11);
+    pipeWrite(fds[1], "Que lindoooooo!!!!!!", 400);
+
 
     close(fds[1]);
     kill(-1);
@@ -104,7 +105,7 @@ void pipeTest(int argc, char **argv) {
     startProcess(pipeTestHijo, 2, argv_for_son, "pipe_test_hijo");
     close(fds[1]); //No escribo, solo leo
     char buffer[20];
-    pipeRead(fds[0], buffer, 11);
+    pipeRead(fds[0], buffer, 400);
     print(buffer);
     close(fds[0]);
 	kill(-1);
@@ -127,7 +128,7 @@ void shell(){
 
 	//startProcess(consumer, 0, NULL, "consumer");
 	// startProcess(producer, 0, NULL, "producer");
-	// startProcess(pipeTest, 0, NULL, "pipe_test");
+	 startProcess(pipeTest, 0, NULL, "pipe_test");
 
 	char c;
 	while ((c = getChar())){

@@ -30,7 +30,7 @@ int sysGetPid(){
 }
 
 void sysBlock(int pid) {
-	blockProcess(pid);
+	blockProcess(pid,1);
 }
 
 void sysNice(int pid, int priority) {

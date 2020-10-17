@@ -275,7 +275,7 @@ void niceProcess(int pid, int priority) {
 
 
 
-void blockProcess(int pid) {
+void blockProcess(int pid, int tick) {
 	if(pid == 0) 
 		return;
 
@@ -313,13 +313,17 @@ void blockProcess(int pid) {
 		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;			
 		} else if(currentPCB->procState == BLOCKED) {
-			currentPCB->procState = READY;			
+			currentPCB->procState = READY;
+			if(tick)
+			    _timer_tick();
+			
 		} else if(currentPCB->procState == RUN) {
 
 			currentPCB->procState = BLOCKED;
 			// Renuncia al CPU
 			//Solo en este caso bloqueamos y enviamos a expirados en vez de que lo haga el scheduler
-			_timer_tick();
+			if(tick)
+			    _timer_tick();
 		}
 		
 	}

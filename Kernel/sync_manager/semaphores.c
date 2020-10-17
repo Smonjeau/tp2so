@@ -1,5 +1,6 @@
 #include <mem_manager.h>
 #include <process_manager.h>
+#include <interrupts.h>
 #include <lib.h>
 
 #define MAX_BLOCKED_PIDS 20
@@ -71,12 +72,15 @@ int waitSemaphore(int id){
         release(&(semaphore->lock));
 
         int currPid = getPID();
-        blockProcess(currPid);
+
         semaphore->blockedPIDs[semaphore->blockedPIDsSize++] = currPid;
-        
+        blockProcess(currPid,1);
+
         acquire(&(semaphore->lock));
 
         semaphore->value -= 1;
+
+     //   _timer_tick();
     }
 
     release(&(semaphore->lock));
@@ -95,13 +99,20 @@ int postSemaphore(int id){
     acquire(&(semaphore->lock));
 
     semaphore->value += 1;
+    int aux = semaphore->blockedPIDsSize;
+    int unblocked=0;
+    for(int i=0; i< aux; i++) {
+        //semaphore->blockedPIDsSize--;
+        blockProcess(semaphore->blockedPIDs[i],0);
+        semaphore->blockedPIDs[i]=0;
+        unblocked++;
 
-    for(int i=0; i<semaphore->blockedPIDsSize; i++)
-        blockProcess(semaphore->blockedPIDs[i]);
+    }
     semaphore->blockedPIDsSize = 0;
     //watch semaphore + 88
     release(&(semaphore->lock));
-
+    if(unblocked)
+        _timer_tick();
     return 0;
 
 }

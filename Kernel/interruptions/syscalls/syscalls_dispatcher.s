@@ -38,6 +38,9 @@
 .extern sysPipeWrite
 .extern sysPipeRead
 
+.extern sysCreatePipe
+.extern sysReadPipe 
+.extern sysWritePipe
 .intel_syntax noprefix
 
 .section .text

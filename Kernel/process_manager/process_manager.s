@@ -52,7 +52,7 @@ createProcessContext:
 	push rcx
 
 	# Reserve 4kb for process stack
-	mov rdi, 4096
+	mov rdi, 2048
 	call malloc
 	cmp rax,0
 	je no_space
@@ -74,7 +74,7 @@ createProcessContext:
 
     # Interrupt data
     movq [rax-8*0], 0     	# SS
-    movq [rax-8*1], rax    	# RSP
+    movq [rax-8*1], rax   	# RSP
     movq [rax-8*2], 0x202  	# RFLAGS
     movq [rax-8*3], 0x8    	# CS
     movq [rax-8*4], rdx 	# RIP	rsp+15*8
