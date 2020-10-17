@@ -71,6 +71,15 @@ picSlaveMask:
 													INTERRUPTIONS ATTENTION ROUTINES
 -------------------------------------------------------------------------------------------------------------------------------------------------- */
 
+_endOfInt:
+	mov al, 0x20
+	out 0x20, al
+
+	popState
+
+	sti
+	iretq
+
 
 _irq00Handler:			# Timer Tick
 	cli
@@ -79,16 +88,9 @@ _irq00Handler:			# Timer Tick
 	; mov rdi, 0
 	; call irqDispatcher
 	
-
 	call switchProcessContext
-
-
-	mov al, 0x20
-	out 0x20, al
-
-	popState
-	sti
-	iretq
+	
+	jmp _endOfInt	
 
 
 _irq01Handler:			# Keyboard
@@ -104,9 +106,4 @@ _irq01Handler:			# Keyboard
 	_skipStore: mov rdi, 1
 	call irqDispatcher
 
-	mov al, 0x20
-	out 0x20, al
-
-	popState
-	sti
-	iretq
+	jmp _endOfInt

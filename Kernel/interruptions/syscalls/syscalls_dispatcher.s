@@ -136,8 +136,9 @@ endOfInt:
 	out 0x20, al
     pop rax
 
+    popStateNoRax
+    
     sti
-	popStateNoRax
 	iretq
 
 

@@ -67,6 +67,10 @@ createProcessContext:
 	
 	# Calc the base of the stack
 	add rax, 4096
+	sub rax, 8
+
+	# The substracion of 8 bytes is because the last byte allowed to be written is malloc+4096
+	# so the RBP needs to point to the previous 8 bytes (stack word size)
 
     # Interrupt data
     movq [rax-8*0], 0     	# SS
@@ -99,6 +103,9 @@ createProcessContext:
 	mov rsi, rax
 	sub rsi, 4096
 
+    # The freaking padding
+	add rsi, 8
+
 	# Calc the contextRSP
 	mov rdi, rax
 	sub rdi, 8*19
@@ -119,4 +126,3 @@ no_space:
 .section .data
 	retAddress: .skip 8
 	firstArg: .skip 8
-

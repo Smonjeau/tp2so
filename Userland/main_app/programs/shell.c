@@ -127,7 +127,7 @@ void shell(){
 
 	//startProcess(consumer, 0, NULL, "consumer");
 	// startProcess(producer, 0, NULL, "producer");
-	startProcess(pipeTest, 0, NULL, "pipe_test");
+	// startProcess(pipeTest, 0, NULL, "pipe_test");
 
 	char c;
 	while ((c = getChar())){
