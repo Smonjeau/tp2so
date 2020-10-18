@@ -6,7 +6,6 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <stdint.h>
-#include <kernel_messages.h>
 #include <programs.h>
 #include <syscalls.h>
 
@@ -14,24 +13,11 @@ extern char bss;
 extern char endOfBinary;
 
 
-int _start(int message, int nargs, ...) {
+int _start() {
 
-	va_list valist;
-    va_start(valist, nargs);
+	startProcess(shell, 0, (void*) 0,"shell");
+	__asm__("hlt;\n\r");
 
-	for(int x=0; x<1024; x++)
-		draw(x, 5, 0xFF0000);
-
-	switch(message){
-		case START_SHELL:
-			startProcess(shell, 0, (void*) 0,"shell");
-			__asm__("hlt;\n\r");
-
-		case EXCEPTION_PRODUCED:
-			return exception(valist);
-
-		default:
-			return shell();
-	}
+	return 0;
 
 }

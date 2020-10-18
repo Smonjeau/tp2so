@@ -1,5 +1,11 @@
+#include <stdarg.h>
 #include <stdint.h>
+#include <video_lib.h>
 #include <lib.h>
+
+/* ----------------------------------------------------------------------------------------------------------------------
+                                                    MEMORY METHODS
+---------------------------------------------------------------------------------------------------------------------- */
 
 void * memset(void * destination, int32_t c, uint64_t length){
 	uint8_t chr = (uint8_t)c;
@@ -36,49 +42,29 @@ void * memcpy(void * destination, const void * source, uint64_t length){
 
 	return destination;
 }
-int div_ceil(int dividend, int divisor){
-    if (dividend%divisor == 0)
-        return  dividend / divisor;
-    else
-        return (dividend / divisor) +1;
-}
+
+
+/* ----------------------------------------------------------------------------------------------------------------------
+                                                    SYNCH METHODS
+---------------------------------------------------------------------------------------------------------------------- */
 
 void acquire(int *lock){
     while(_xchg(lock, 1) != 0);
 }
 
+
 void release(int *lock){
     _xchg(lock, 0);
 }
 
-void strcpy(char *src, char *dest)
-{
-    int i;
-    for (i = 0; src[i] != 0; i++)
-        dest[i] = src[i];
-    dest[i] = 0;
-}
 
-int strlen(char * source) {
-	int count = 0;
-	while(source[count] != 0)
-		count++;
-	return count;
-}
+/* ----------------------------------------------------------------------------------------------------------------------
+                                                    STRING METHODS
+---------------------------------------------------------------------------------------------------------------------- */
 
-void strcat(const char* source, char* destination)
-{
-	// make ptr point to the end of destination string
-	char* ptr = destination + strlen(destination);
-
-	// Appends characters of source to the destination string
-	while (*source != '\0')
-		*ptr++ = *source++;
-
-	// null terminate destination string
-	*ptr = '\0';
-
-}
+/* -----------------------------------------------------------
+ Function used in itoa and dtoa
+----------------------------------------------------------- */
 
 void reverseStr(char *str, int length)
 {
@@ -93,6 +79,49 @@ void reverseStr(char *str, int length)
         end--;
     }
 }
+
+
+/* -----------------------------------------------------------
+ Function used in atoi and printf
+----------------------------------------------------------- */
+
+int isDigit(char c){
+    if (c >= '0' && c <= '9')
+        return 1;
+    return 0;
+}
+
+
+/* -----------------------------------------------------------
+ Function to convert an string to integer.
+----------------------------------------------------------- */
+
+int atoi(char* str){ 
+    if (*str == '\0') 
+        return 0; 
+  
+    int res = 0; 
+    int sign = 1; 
+    int i = 0; 
+  
+    if (str[0] == '-') { 
+        sign = -1; 
+        i++; 
+    } 
+  
+    for (; str[i] != '\0'; ++i) { 
+        if (!isDigit(str[i])) 
+            return -1;   
+        res = res * 10 + str[i] - '0'; 
+    } 
+  
+    return sign * res; 
+} 
+
+
+/* -----------------------------------------------------------
+ Function to convert an integer to a string
+----------------------------------------------------------- */
 
 char *itoa(int num, char *str, int base, int fixLen)
 {
@@ -133,3 +162,149 @@ char *itoa(int num, char *str, int base, int fixLen)
     return str;
 }
 
+
+/* -----------------------------------------------------------
+ Function to convert a double to a string
+----------------------------------------------------------- */
+
+char *dtoa(double num, char *str)
+{
+
+    int isNegative = 0;
+    if (num < 0)
+    {
+        isNegative = 1;
+        num = -num;
+    }
+
+    int i = 0;
+
+    if (num < EPSILON && num > -EPSILON)
+    {
+        str[i++] = '0';
+        str[i++] = '.';
+        str[i++] = '0';
+
+        str[i] = '\0';
+        return str;
+    }
+
+    int auxNum = (int)num;
+    // --- Building the int part ---
+    while (auxNum > EPSILON)
+    {
+        int rem = auxNum % 10;
+        str[i++] = rem + '0';
+        auxNum = auxNum / 10;
+    }
+
+    if (isNegative == 1)
+        str[i++] = '-';
+
+    str[i] = '\0';
+    str[i] = '\0';
+    reverseStr(str, i);
+    str[i++] = '.';
+
+    for (int j = 0; j < DTOA_FLOAT_MAX_LEN; j++)
+    {
+        num = num * 10;
+        int aux = (int)num;
+        str[i++] = aux % 10 + '0';
+    }
+    return str;
+}
+
+
+/* -----------------------------------------------------------
+ Printf that supports integers, doubles, strings and hex
+ display as possible formats
+-------------------------------------------------------------- */
+
+void printf(char *format, int nargs, ...){
+
+    va_list valist;
+
+    va_start(valist, nargs);
+
+    int pos, formatChar = 0, fixLen = -1;
+    for (pos = 0; format[pos] != 0; pos++){
+
+        if (format[pos] == '%'){
+            formatChar = 1;
+            continue;
+        }
+
+        if (formatChar == 1){
+
+            if (isDigit(format[pos])){
+                fixLen = format[pos] - '0';
+                continue;
+            }
+
+            if (format[pos] == 'd'){
+                char str[20]={0};
+                print(itoa(va_arg(valist, int), str, 10, fixLen));
+                formatChar = 0;
+                continue;
+            }
+
+            if (format[pos] == 'x'){
+                char str[20]={0};
+                print("0x");
+                print(itoa(va_arg(valist, int), str, 16, fixLen));
+                formatChar = 0;
+                continue;
+            }
+
+            if (format[pos] == 'f'){
+                char str[20]={0};
+                print(dtoa(va_arg(valist, double), str));
+                formatChar = 0;
+                continue;
+            }
+
+            if (format[pos] == 's'){
+                
+                print(va_arg(valist, char *));
+                
+                formatChar = 0;
+                continue;
+            }
+        }
+
+        printChar(format[pos]);
+
+    }
+
+    va_end(valist);
+}
+
+
+void strcpy(char *src, char *dest){
+    int i;
+    for (i = 0; src[i] != 0; i++)
+        dest[i] = src[i];
+    dest[i] = 0;
+}
+
+
+int strlen(char * source) {
+	int count = 0;
+	while(source[count] != 0)
+		count++;
+	return count;
+}
+
+
+void strcat(const char* source, char* destination){
+	// make ptr point to the end of destination string
+	char* ptr = destination + strlen(destination);
+
+	// Appends characters of source to the destination string
+	while (*source != '\0')
+		*ptr++ = *source++;
+
+	// null terminate destination string
+	*ptr = '\0';
+}

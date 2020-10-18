@@ -82,6 +82,17 @@ int draw(int x, int y, int rgb){
 }
 
 
+int getRGB(int x, int y){
+
+	char * pos = (char *) ((uint64_t) screenInfo->framebuffer + (x + y * *WIDTH)*3);
+
+	int rgb =  *((int *) pos) & 0xFFFFFF;
+
+	return rgb;
+
+}
+
+
 int getResWidth(){
 	
 	return *WIDTH;

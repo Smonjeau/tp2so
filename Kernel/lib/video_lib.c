@@ -10,8 +10,6 @@
 #include <screen_driver.h>
 #include <video_lib.h>
 
-#define SCREEN_DATA_MAX 1500
-
 #define TEXT_COLOR 0xFFFFFF
 #define TEXT_SIZE 1
 #define TEXT_HOR_SPACING 1
@@ -25,18 +23,12 @@
 
 int curX, curY;
 
-// Holds the colors written on each position of the screen
-int screenData[SCREEN_DATA_MAX][SCREEN_DATA_MAX];
-
-
 /* --------------------------------------------------------------------------------------------------------------------------
                                             GENERAL METHODS
 -------------------------------------------------------------------------------------------------------------------------- */
 
 
 void drawPoint(int x, int y, int size, int rgb){
-
-    screenData[x][y] = rgb;
 
     for(int cx=x; cx<x+size; cx++)
         for (int cy=y; cy<y+size; cy++)
@@ -64,14 +56,12 @@ void scrollUp(int dy){
 
     for(int y=0; y<HEIGHT-dy; y++){
         for(int x=0; x<WIDTH; x++){
-            screenData[x][y] = screenData[x][y+dy];
-            draw(x, y, screenData[x][y]);
+            draw(x, y, getRGB(x, y+dy));
         }
     }
 
     for(int y=HEIGHT-dy; y<HEIGHT; y++){
         for(int x=0; x<WIDTH; x++){
-            screenData[x][y] = 0;
             draw(x, y, 0);
         }
     }

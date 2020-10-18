@@ -33,6 +33,14 @@ char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
     0b11101111, 0b11011111, 0b10111111, 0b01111111};
 
 
+int div_ceil(int dividend, int divisor){
+    if (dividend%divisor == 0)
+        return  dividend / divisor;
+    else
+        return (dividend / divisor) +1;
+}
+
+
 void * malloc(int size){
 
     int nblocks = div_ceil(size , BLOCK_SIZE);    // Number of blocks to assing

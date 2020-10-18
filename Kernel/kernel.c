@@ -10,7 +10,6 @@
 #include <module_loader.h>
 #include <idt_loader.h>
 #include <screen_driver.h>
-#include <kernel_messages.h>
 #include <process_manager.h>
 #include <video_lib.h>
 #include <mem_manager.h>
@@ -21,6 +20,11 @@ extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
 
 static const uint64_t PageSize = 0x1000;
+
+
+static void * const mainApp = (void*)0x400000;
+
+typedef int (*EntryPoint)();
 
 
 void clearBSS(void * bssAddress, uint64_t bssSize){
@@ -57,13 +61,15 @@ void printError() {
 int sysWrite(int fd, char * buffer, int n);
 
 
+void scrollUp(int dy);
+
+int getRGB(int x, int y);
+
 int main(){
 
 	load_idt();
 
-	sysWrite(1, "Leaving kernel\n", 16);
-
-	((EntryPoint) mainApp)(START_SHELL, 0);
+	((EntryPoint) mainApp)();
 
 	return 0;
 

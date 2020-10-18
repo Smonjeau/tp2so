@@ -39,8 +39,6 @@ void dummy(int argc, char **argv);
 
 void shell(){
 
-	write(1, "Arriving shell\n", 16);
-
     startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
@@ -70,6 +68,8 @@ void shell(){
 				putChar('\n');
 				continue;
 			}
+
+			putChar('\n');
 
 			cmdBuff[buffPos] = 0;
 			parseCommand(cmdBuff);
