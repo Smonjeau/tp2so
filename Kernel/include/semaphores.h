@@ -9,4 +9,6 @@ int postSemaphore(int id);
 int deleteSemaphore(int id);
 
 void semStatus(void * buffer, int * qty);
+
+void getBlockedProc(char * buffer, int id);
 #endif

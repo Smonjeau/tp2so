@@ -95,6 +95,18 @@ void copyPipeInfoToBuffer(char * buffer, pipe aux) {
     strcat("Bocas abiertas: ", buffer);
     //strcat(pcb->name, buffer);
     itoa(aux->open_ports, buffer + strlen(buffer), 10, -1);
+    strcat("    Bytes escritos: ", buffer);
+    itoa(aux->index_w, buffer + strlen(buffer), 10, -1);
+    strcat("    Bytes leidos: ", buffer);
+    itoa(aux->index_r, buffer + strlen(buffer), 10, -1);
+    strcat("    Id sem write: ", buffer);
+    itoa(aux->write_bytes_sem, buffer + strlen(buffer), 10, -1);
+    strcat("    Id sem read: ", buffer);
+    itoa(aux->read_bytes_sem, buffer + strlen(buffer), 10, -1);
+    strcat("    Proc bloqueados: ", buffer);
+    //Primero reviso el sem write
+    char buff[20];
+    getBlockedProc(buff, aux->write_bytes_sem);
     strcat("\n", buffer);
 }
 

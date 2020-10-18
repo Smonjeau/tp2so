@@ -30,7 +30,7 @@ void printHelp(void){
 	printf("- storedreg         to get the Stored Register's Values\n\n", 0);
 	
 	printf("- memdump n         to print memory starting at n\n", 0);
-	printf("- mem          to print heap status\n\n", 0);
+	printf("- mem               to print heap status\n\n", 0);
 
 	printf("- ps                to list all processes\n", 0);
 	printf("- kill pid          to kill a process\n", 0);

@@ -129,6 +129,22 @@ int postSemaphore(int id){
     return 0;
 }
 
+void getBlockedProc(char * buffer, int id) {
+    buffer[0] = 0; //Inicia vacío
+    Semaphore * semaphore = findSemaphore(id, 0);
+    if(semaphore == NULL)
+        return;
+
+    acquire(&(semaphore->lock));
+    for(int i=0; i < semaphore->blockedPIDsSize; i++) {
+        getProcName(semaphore->blockedPIDs[i], buffer + strlen(buffer));
+        strcat(", ", buffer);
+    }
+    release(&(semaphore->lock));
+    if(semaphore->blockedPIDsSize > 0)
+        buffer[strlen(buffer)-2] = 0; //Quitamos el ultimo ", "
+}
+
 
 int deleteSemaphore(int id){
 

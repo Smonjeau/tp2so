@@ -98,4 +98,8 @@ void close_fd_proc(PCB pcb, int fd);
 pipe findPipe(int fd);
 
 
+/* Copia el nombre del proceso en el buffer*/
+void getProcName(int pid, char * buffer);
+
+
 #endif

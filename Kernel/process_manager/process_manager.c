@@ -124,6 +124,48 @@ pipe findPipe(int fd) {
     return found;
 }
 
+void getProcName(int pid, char * buffer) {
+	ProcQueue * queue;
+	PCB pcb = NULL;
+
+	//Recorro activos
+	for(int priority = 0; priority < 40; priority++) {
+		queue = actives + priority;
+		pcb = queue->first;
+		while(pcb != NULL) {
+			if(pcb->pid == pid)		
+				break;
+			pcb = pcb->nextPCB;
+		}
+		if(pcb->pid == pid)		
+			break;
+	}
+	if(pcb->pid != pid) {
+		//Recorro expirados
+		for(int priority = 0; priority < 40; priority++) {
+			queue = expireds + priority;
+			pcb = queue->first;
+			while(pcb != NULL) {
+				if(pcb->pid == pid)		
+					break;
+				pcb = pcb->nextPCB;
+			}
+			if(pcb->pid == pid)		
+				break;
+		}
+	}
+
+	if(pcb->pid == pid) {
+		//Lo encontro
+		int i = 0;
+		while(pcb->name[i] != 0)
+			buffer[i] = pcb->name[i];
+		buffer[i] = 0;
+	}
+
+	
+}
+
 int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 	int i, j;
 	pipe * aux = runningProc->pipes;
