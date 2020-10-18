@@ -14,8 +14,10 @@ static int semaphore_id = 0;
 pipe pipeList = NULL;
 
 void addToPipeList(pipe new) {
+
     if(new == NULL)
         return;
+
     if(pipeList == NULL) {
         pipeList = new;
     } else {
@@ -24,75 +26,103 @@ void addToPipeList(pipe new) {
             aux = aux->nextPipe;
         aux->nextPipe = new;
     }
+
 }
+
+
 void removeFromPipeList(pipe pipe_rem) {
+
     if(pipe_rem == NULL || pipeList == NULL)
         return;
+
     pipe aux = pipeList;
     while(aux->nextPipe != NULL && aux->nextPipe != pipe_rem)
         aux = aux->nextPipe;
+        
     if(aux == pipe_rem)
         pipeList = pipe_rem->nextPipe; //Era el primer pipe
     else if(aux->nextPipe == pipe_rem)
         aux->nextPipe = pipe_rem->nextPipe;
+
 }
 
-int initializePipe(pipe new) {
+
+int initializePipe(pipe new, int isStdio) {
+
     if(new == NULL)
         return 0;
+
     new->index_w = 0;
     new->index_r = 0;
     new->open_ports = 2;
     new->write_bytes_sem = semaphore_id++;
     new->read_bytes_sem = semaphore_id++;
     new->nextPipe = NULL;
+    new->isStdio = isStdio;
+    
     addToPipeList(new);
+
     createSemaphore(new->write_bytes_sem, PIPE_SIZE);
     createSemaphore(new->read_bytes_sem, 0);
+
     return 1;
+
 }
 
-int create_pipe(int  fds [2]) {
+
+int create_pipe(int fds[2]) {
 
     pipe new = malloc(sizeof(struct pipe));
-    if(initializePipe(new))
+
+    if(initializePipe(new, -1))
         return assign_pipe_to_pcb(fds, new);
+
     return -1;
     
-    
 }
 
+
 int create_force_pipe(int fd) {
+
     if(is_fd_free(fd) == 0 || fd < 0 || fd >= MAX_PIPES)
         return -1;
+
     pipe new = malloc(sizeof(struct pipe));
-    if(initializePipe(new) == 1) {
+
+    if(initializePipe(new, fd) == 1) {
+
+        // Assign one end of pipe to running process
+
         if(assign_pipe_to_pcb_forced(fd, new) == -1)
             return -1;
-        switch(fd) {
-            case 0:
-                //STDIN es el teclado.
-                //Asignamos la segunda boca del pipe al keyboardDriver
-                assignKeyboardPipe(new);
-                break;
-            case 1:
-                //STDOUT es la impresion en pantalla de texto
-                //Asignamos la segunda boca del pipe al video_lib
-                assignStdoutPipe(new);
-                break;
-        }
+
+        // If STDIN assign other end to keyboard
+        if(fd == 0)
+            assignKeyboardPipe(new);
+        
+
+        // If STOUD it wont have another end, the pipe will be unbuffered
+        // and as soon as data arrives it will be printed to the screen
+
         return 0;
     }
+
     return -1;   
     
 }
 
+
 void close_port(int fd) {
+
     close_fd(fd);
+
 }
 
+
 void copyPipeInfoToBuffer(char * buffer, pipe aux) {
+
     strcat("Bocas abiertas: ", buffer);
+  
     //strcat(pcb->name, buffer);
     itoa(aux->open_ports, buffer + strlen(buffer), 10, -1);
     strcat("    Bytes escritos: ", buffer);
@@ -104,13 +134,18 @@ void copyPipeInfoToBuffer(char * buffer, pipe aux) {
     strcat("    Id sem read: ", buffer);
     itoa(aux->read_bytes_sem, buffer + strlen(buffer), 10, -1);
     strcat("    Proc bloqueados: ", buffer);
+
     //Primero reviso el sem write
     char buff[20];
     getBlockedProc(buff, aux->write_bytes_sem);
+
     strcat("\n", buffer);
+
 }
 
+
 void pipeInfo(char * buffer) {
+
     if(buffer == NULL)
         return;
 
@@ -121,9 +156,12 @@ void pipeInfo(char * buffer) {
         copyPipeInfoToBuffer(buffer, aux);
         aux = aux->nextPipe;
     }
+
 }
 
+
 void free_pipe_if_empty(pipe pipe) {
+
 	if(pipe->open_ports == 0) {
 
 	    if(deleteSemaphore(pipe->read_bytes_sem) == -1 || deleteSemaphore(pipe->write_bytes_sem) == -1) {
@@ -132,19 +170,34 @@ void free_pipe_if_empty(pipe pipe) {
             removeFromPipeList(pipe);
             free(pipe);
         }
+
 	}
 }
+
 
 int pipe_write(int fd, char * buffer, int bytes) {
 
     pipe pipe = findPipe(fd);
+
     return pipe_write_nofd(pipe, buffer, bytes); //Reutilizamos la funcion
+
 }
+
+
 int pipe_write_nofd(pipe pipe, char * buffer, int bytes) {
+
     if(pipe == NULL)
         return -1;
+
+    // STDOUT will behave unbuffered, writing directly to screen, without a consumer process
+    if(pipe->isStdio == STDOUT){
+        print(buffer);
+        return bytes;
+    }
+
     int i;
     for(i = 0; i < bytes; i++) {
+
         waitSemaphore(pipe->write_bytes_sem);
         pipe->buffer[pipe->index_w++ % PIPE_SIZE] = buffer[i];
 
@@ -161,15 +214,25 @@ int pipe_write_nofd(pipe pipe, char * buffer, int bytes) {
 
         }*/
     }
+
     return i;
+
 }
+
+
 int pipe_read(int fd, char * buffer, int bytes) {
+
     pipe pipe = findPipe(fd);
     return pipe_read_nofd(pipe, buffer, bytes); //Reutilizamos la funcion
+
 }
+
+
 int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
+ 
     if(pipe == NULL)
         return -1;
+
     int i;
     for(i = 0; i < bytes; i++) {
         waitSemaphore(pipe->read_bytes_sem);
@@ -180,4 +243,5 @@ int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
     }
 
     return i;
+
 }

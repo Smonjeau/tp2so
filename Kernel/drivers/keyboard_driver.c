@@ -42,9 +42,6 @@ char shifted_keyboard_map[64] = {
 int shift=0;
 int caps=0;
 
-char buffer[BUFF_SIZE]={0};
-int pos=0;
-
 
 /* ------------------------------------------------------------------------------------------------------
                                             KEYBOARD METHODS
@@ -102,40 +99,16 @@ char keyCodeToChar(int keyCode){
 
 
 void handleKeyStroke() {
+   
     char aux = keyCodeToChar(read());
+   
     pipe_write_nofd(stdinPipe, &aux, 1);
-
-    //buffer[pos++] = keyCodeToChar(read());
     
 }
 
-
-char getChar(){
-
-    if(pos == 0)
-        return 0;
-    
-    return buffer[--pos];
-
-}
-int readStdin (char * buff, int dim){
-//BLOQUEO??    
-
-    unsigned int i;
-    for(i = 0; i < dim && i < pos; i++)
-        buff[i] = buffer[i];
-  //Ahora muevo el buffer a la izquierda "i" veces
-    if(i > 0)
-    for(int j = 0; j < pos-i; j++)
-        buffer[j] = buffer[j+i];
-    
-    pos -= i;
-
-    return i;
-
-
-}
 
 void assignKeyboardPipe(pipe new) {
+
     stdinPipe = new;
+
 }
