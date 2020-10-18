@@ -38,7 +38,7 @@ void stdoutProc(int argc, char **argv) {
     //Siempre que haya algo, lo mostramos en pantalla
     while(1) {
         char aux[2];
-        pipe_read_nofd(stdoutPipe, &aux, 2);
+        pipe_read_nofd(stdoutPipe, aux, 2);
         print(aux);
         //printChar(aux);
     }
