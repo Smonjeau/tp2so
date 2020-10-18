@@ -3,9 +3,6 @@
 #include <shell_cmds.h>
 
 
-#define MAX_BLOCKED_PIDS 20
-
-
 void printProcData(){
 
 	char * buffer = malloc(90 * 40);
@@ -85,16 +82,6 @@ void niceProcess(char * pid, char * priority) {
 }
 
 
-
-typedef struct Semaphore{
-    int id;
-    int value;
-    int blockedPIDs[MAX_BLOCKED_PIDS];
-    int blockedPIDsSize;
-    int lock;
-    struct Semaphore * next;
-}  Semaphore;
-
 void printSemStatus(){
 
     Semaphore * buffer = malloc(20*sizeof(struct Semaphore));
@@ -119,5 +106,5 @@ void printSemStatus(){
     }
 
     free(buffer);
-    
+
 }
