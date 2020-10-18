@@ -62,8 +62,8 @@ int initializePipe(pipe new, int isStdio) {
     
     addToPipeList(new);
 
-    createSemaphore(new->write_bytes_sem, PIPE_SIZE);
-    createSemaphore(new->read_bytes_sem, 0);
+    openSemaphore(new->write_bytes_sem, PIPE_SIZE);
+    openSemaphore(new->read_bytes_sem, 0);
 
     return 1;
 
@@ -164,7 +164,7 @@ void free_pipe_if_empty(pipe pipe) {
 
 	if(pipe->open_ports == 0) {
 
-	    if(deleteSemaphore(pipe->read_bytes_sem) == -1 || deleteSemaphore(pipe->write_bytes_sem) == -1) {
+	    if(closeSemaphore(pipe->read_bytes_sem) == -1 || closeSemaphore(pipe->write_bytes_sem) == -1) {
             return;
         } else {
             removeFromPipeList(pipe);

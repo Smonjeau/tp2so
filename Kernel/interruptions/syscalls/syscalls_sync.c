@@ -12,7 +12,7 @@
 --------------------------------------------------------------------------------------------------------------------------- */
 
 int sysCreateSemaphore( int id,int initValue){
-    return createSemaphore(id, initValue);
+    return openSemaphore(id, initValue);
 }
 
 int sysWaitSemaphore(int id){
@@ -24,7 +24,7 @@ int sysPostSemaphore(int id){
 }
 
 int sysDeleteSemaphore(int id){
-    return deleteSemaphore(id);
+    return closeSemaphore(id);
 }
 
 void sysSemStatus(void * buffer, int * qty){

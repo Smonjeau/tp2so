@@ -109,7 +109,7 @@ _syscallDispatcher:
     je _kill
 
     cmp rax, 18
-    je _createSemaphore
+    je _openSemaphore
 
     cmp rax, 19
     je _waitSemaphore
@@ -118,7 +118,7 @@ _syscallDispatcher:
     je _postSemaphore
 
     cmp rax, 21
-    je _deleteSemaphore
+    je _closeSemaphore
 
     cmp rax, 22
     je _pipe
@@ -230,7 +230,7 @@ _kill:
     jmp endOfInt
 
 
-_createSemaphore:
+_openSemaphore:
     call sysCreateSemaphore
     jmp endOfInt
 
@@ -242,7 +242,7 @@ _postSemaphore:
     call sysPostSemaphore
     jmp endOfInt
 
-_deleteSemaphore:
+_closeSemaphore:
     call sysDeleteSemaphore
     jmp endOfInt
 

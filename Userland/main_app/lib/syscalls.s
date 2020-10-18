@@ -38,10 +38,10 @@ syscall block, 15
 syscall nice, 16
 syscall kill, 17
 
-syscall createSem, 18
+syscall openSem, 18
 syscall waitSem, 19
 syscall postSem, 20
-syscall deleteSem, 21
+syscall closeSem, 21
 syscall pipe, 22
 syscall close, 23
 syscall forcePipe, 24

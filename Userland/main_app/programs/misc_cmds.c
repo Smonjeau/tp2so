@@ -184,7 +184,7 @@ void phyloAdmin(int argc, char ** argv){
     // int aux;
     // //Como puede fallar 
     // do{
-    //     aux=createSem(mutex++,1)
+    //     aux=openSem(mutex++,1)
     // }while(aux == -1);
     // mutex--;
 

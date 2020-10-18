@@ -30,6 +30,14 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
+void puto(){
+	for(int i=0; i<999; i++);
+	kill(-1);
+	printf("Sigo vivo\n", 0);
+	while(1);
+}
+
+
 void shell(){
 
     startProcess(dummy, 0, (void *) 0, "dummy"); //Necesario en ciertos casos
@@ -41,6 +49,10 @@ void shell(){
 	int buffPos = 0;
 
 	printf("\f", 0);
+
+	// startProcess(puto, 0, NULL, "puto");
+
+	// startProcess(test_proc, 0, NULL, "test_proc");
 
 	char c;
 	while (1){
@@ -113,6 +125,9 @@ void parseCommand(char *cmdBuff){
 
 	else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
 		displayImage(tokens[1], 20, 200);
+
+	else if(strncmp(tokens[0], "filter", 7) == 0)
+		startFilter();
 	
 	else if(strncmp(tokens[0], "clear", 6) == 0)
 		putChar('\f');
@@ -170,20 +185,19 @@ void parseCommand(char *cmdBuff){
 	else if(strncmp(*tokens,"sem",4)==0)
 	    printSemStatus();
 
+	else if(strncmp(tokens[0], "pipe", 5) == 0)
+		printPipeInfo();
+
+
 	//Testing
 	else if(strncmp(tokens[0],"testmm",7) == 0)
 		startProcess(test_mm, 0, NULL, "testmm");
 
-	//Aplicacion pipe (estado de pipes)
-	else if(strncmp(tokens[0], "pipe", 5) == 0)
-		printPipeInfo();
-
-	//Aplicacion filter (filtra vocales)
-	else if(strncmp(tokens[0],"filter",7) == 0)
-		startFilter();
-
 	else if(strncmp(tokens[0],"testproc",7) == 0)
 		startProcess(test_proc, 0, NULL, "testproc");
+
+	else if(strncmp(tokens[0],"testsync",7) == 0)
+		startProcess(test_sync, 0, NULL, "testsync");
 
 	// Command not found
 	else

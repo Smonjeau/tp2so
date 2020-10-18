@@ -44,5 +44,6 @@ void printSemStatus();
 
 void test_mm(int argc, char **argv);
 void test_proc(int argc, char **argv);
+void test_sync();
 
 #endif

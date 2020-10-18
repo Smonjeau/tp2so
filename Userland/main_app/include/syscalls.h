@@ -72,13 +72,13 @@ typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
 
 // ------------------------------------ SYNCHRONIZATION ------------------------------------
 
-int createSem(int id, int initValue);
+int openSem(int id, int initValue);
 
 int waitSem(int id);
 
 int postSem(int id);
 
-int deleteSem(int id);
+int closeSem(int id);
 
 void semStatus(void * buffer, int * qty);
 

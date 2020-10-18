@@ -130,7 +130,7 @@ int  itoa(int num, char *str, int base, int fixLen)
 
     if (num < 0)
     {
-        isNegative = -1;
+        isNegative = 1;
         num = -num;
     }
 
