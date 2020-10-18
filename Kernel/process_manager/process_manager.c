@@ -5,6 +5,7 @@
 #include <screen_driver.h>
 #include <interrupts.h>
 
+int procCount = 0;
 
 void drawLine(){
 	static int c=0;
@@ -28,10 +29,17 @@ void * lastRSP = NULL;
 PCB runningProc=NULL;
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
-    if(pcb->pid == 0)
-	    pcb->remainingTicks = 5; //A la shell le damos mas quantum pues interactua con usuario
-	else if(pcb->pid == 1)
+    if(pcb->pid == 0) {
+    	//A la shell le asignamos de forma dinamica
+    	//Cuantos mas procesos hay, mas quantum tiene
+    	pcb->remainingTicks = 2 + procCount*2 ; //A la shell le damos mas quantum pues interactua con usuario
+    } else if(pcb->pid == 1)
 		pcb->remainingTicks = 1; //Al proceso dummy le damos el menor quantum posible
+	else if(pcb->pid == 2) {
+		//Al proceso que gestiona el stdout le asignamos de forma dinamica
+    	//Cuantos mas procesos hay, mas quantum tiene
+    	pcb->remainingTicks = 2 + procCount; //Al interactuar con el usuario es muy importante
+	}
     else
         pcb->remainingTicks = 2;
 }
@@ -534,7 +542,7 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name){
 	new->procState = READY;
 
 	queueProc(actives + priority, new);
-
+	procCount++;
 	return new->pid;
 
 }
@@ -654,6 +662,8 @@ void killProcess(int pid) {
 
 	if(state == RUN) //El proceso se suicida
 		_timer_tick();
+
+	procCount--;
 
 	
 
