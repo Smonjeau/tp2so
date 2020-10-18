@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <std_io.h>
 #include <std_lib.h>
+#include <syscalls.h>
+#define NULL (void*)0
 
 /* ------------------------------------------------------------------------------------------------------------------
                                                 MEMORY FUNCTIONS
@@ -115,7 +117,7 @@ int atoi(char* str){
  Function to convert an integer to a string
 ----------------------------------------------------------- */
 
-char *itoa(int num, char *str, int base, int fixLen)
+int  itoa(int num, char *str, int base, int fixLen)
 {
     int i = 0;
     int isNegative = 0;
@@ -151,7 +153,7 @@ char *itoa(int num, char *str, int base, int fixLen)
 
     reverseStr(str, i);
 
-    return str;
+    return i;
 }
 
 
@@ -159,7 +161,7 @@ char *itoa(int num, char *str, int base, int fixLen)
  Function to convert a double to a string
 ----------------------------------------------------------- */
 
-char *dtoa(double num, char *str)
+int dtoa(double num, char *str)
 {
 
     int isNegative = 0;
@@ -178,7 +180,7 @@ char *dtoa(double num, char *str)
         str[i++] = '0';
 
         str[i] = '\0';
-        return str;
+        return i;
     }
 
     int auxNum = (int)num;
@@ -204,7 +206,7 @@ char *dtoa(double num, char *str)
         int aux = (int)num;
         str[i++] = aux % 10 + '0';
     }
-    return str;
+    return i;
 }
 
 
@@ -220,8 +222,20 @@ void printf(char *format, int nargs, ...){
     va_start(valist, nargs);
 
     int pos, formatChar = 0, fixLen = -1;
+    int buffPos=0;
+    char buffer[255]={0};
     for (pos = 0; format[pos] != 0; pos++){
 
+  
+        if(format[pos]=='\n'){
+            //Imprimo y flusheo buffer
+            buffer[buffPos]=0;
+            write(1,buffer,buffPos+1);
+            putChar('\n');
+            buffPos=0;
+            buffer[0] = 0;
+            continue;
+        }
         if (format[pos] == '%'){
             formatChar = 1;
             continue;
@@ -234,40 +248,51 @@ void printf(char *format, int nargs, ...){
                 continue;
             }
 
-            // if (format[pos] == 'd'){
-            //     char str[20]={0};
-            //     print(itoa(va_arg(valist, int), str, 10, fixLen));
-            //     formatChar = 0;
-            //     continue;
-            // }
-
-            // if (format[pos] == 'x'){
-            //     char str[20]={0};
-            //     print("0x");
-            //     print(itoa(va_arg(valist, int), str, 16, fixLen));
-            //     formatChar = 0;
-            //     continue;
-            // }
-
-            // if (format[pos] == 'f'){
-            //     char str[20]={0};
-            //     print(dtoa(va_arg(valist, double), str));
-            //     formatChar = 0;
-            //     continue;
-            // }
-
-            // if (format[pos] == 's'){
+            if (format[pos] == 'd'){
+                char str[20]={0};
+                int len = itoa(va_arg(valist,int),str,10,fixLen);
+                for(int i=0;i<len;i++)
+                    buffer[buffPos++]=str[i];
                 
-            //     print(va_arg(valist, char *));
+                formatChar = 0;
+                continue;
+            }
+
+            if (format[pos] == 'x'){
+                char str[20]={0};
+                buffer[buffPos++]='0';
+                buffer[buffPos++]='x';
+                int len =itoa(va_arg(valist, int), str, 16, fixLen);
+                for(int i=0;i<len;i++)
+                    buffer[buffPos++]=str[i];
+                formatChar = 0;
+                continue;
+            }
+
+            if (format[pos] == 'f'){
+                char str[20]={0};
+                int len = dtoa(va_arg(valist, double), str);
+                for(int i=0;i<len;i++)
+                    buffer[buffPos]=str[i];
+                formatChar = 0;
+                continue;
+            }
+
+            if (format[pos] == 's'){
                 
-            //     formatChar = 0;
-            //     continue;
-            // }
+                char * str = va_arg(valist, char *);
+                for(int i=0;str[i];i++)
+                    buffer[buffPos]=str[i];
+                
+                formatChar = 0;
+                continue;
+            }
         }
-
-        putChar(format[pos]);
+        else if(format[pos]!=0)
+            buffer[buffPos++] = format[pos];
 
     }
+        write(1,buffer,buffPos+1);
 
     va_end(valist);
 }

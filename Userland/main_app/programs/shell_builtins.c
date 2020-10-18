@@ -197,9 +197,10 @@ void printMemStatus(){
 
     memStatus(&total_mem,&avail_mem,&occ_mem);
     
-    printf("Total memory: %d KB\n", 0,1,total_mem);
-    printf("Free memory: %d KB\n", 0,1,avail_mem);
-    printf("Occupied memory: %d KB\n", 0,1,occ_mem);
+    printf("Total memory: %d KB\n",1,total_mem);
+    printf("Free memory: %d KB\n",1,avail_mem);
+    printf("Occupied memory: %d KB\n",1,occ_mem);
+    
 
 }
 
@@ -291,14 +292,16 @@ void printSemStatus(){
     semStatus(buffer,&qty);
     Semaphore sem;
     int i=0;
-    printf("Semaphores status\\n",0);
+    printf("Semaphores status\n",0);
     while(i<qty){
         sem=*(buffer + i++);
-        printf("ID:%d  Value:%d   There are %d processes blocked in this semaphore:\\n",3,sem.id,sem.value,sem.blockedPIDsSize);
-        if(sem.blockedPIDsSize>0)
-            printf("PIDs:",0);
+        printf("ID:%d  Value:%d   There are %d processes blocked in this semaphore.\n",3,sem.id,sem.value,sem.blockedPIDsSize);
+        
+       	if(sem.blockedPIDsSize>0)
+            printf("The blocked processes are:",0);
         for(int j=0;j<sem.blockedPIDsSize;j++)
             printf(" %d ",1,sem.blockedPIDs[j]);
 
     }
+    free(buffer);
 }

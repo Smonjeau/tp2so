@@ -12,9 +12,9 @@ void * memset(void * destination, int32_t c, uint64_t length);
 
 int atoi (char * str);
 
-char *itoa(int num, char *str, int base, int fixLen);
+int itoa(int num, char *str, int base, int fixLen);
 
-char *dtoa(double num, char *str);
+int dtoa(double num, char *str);
 
 void printf(char *format, int nargs, ...);
 

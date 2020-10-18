@@ -30,12 +30,25 @@ void semStatus(void * buffer, int * sem_count){
 
 
 }
+Semaphore * findSemaphore(int id, int prev){
+    
+    Semaphore *semaphore = semaphores;
+    if(!prev)
+        while(semaphore!=NULL && semaphore->id != id)
+            semaphore = semaphore->next;
+    else
+        while(semaphore!=NULL && semaphore->next!=NULL && semaphore->next->id != id)
+            semaphore = semaphore->next;
+
+    return semaphore;
+
+}
 
 
 int createSemaphore(int id, int initValue){
 
     Semaphore *newSem = malloc(sizeof(Semaphore));
-    if(newSem == NULL)
+    if(newSem == NULL || findSemaphore(id,0) != NULL)
         return -1;
 
     newSem->id = id;
@@ -58,19 +71,6 @@ int createSemaphore(int id, int initValue){
 }
 
 
-Semaphore * findSemaphore(int id, int prev){
-    
-    Semaphore *semaphore = semaphores;
-    if(!prev)
-        while(semaphore!=NULL && semaphore->id != id)
-            semaphore = semaphore->next;
-    else
-        while(semaphore!=NULL && semaphore->next!=NULL && semaphore->next->id != id)
-            semaphore = semaphore->next;
-
-    return semaphore;
-
-}
 
 
 int waitSemaphore(int id) {
