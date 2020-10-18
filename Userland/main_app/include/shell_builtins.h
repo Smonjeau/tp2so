@@ -20,6 +20,7 @@ void printPipeInfo();
 void killProcess(char * pid);
 void blockProcess(char * pid);
 void niceProcess(char * pid, char * priority);
+void startFilter();
 
 
 void printSemStatus();
