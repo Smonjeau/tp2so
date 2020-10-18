@@ -53,17 +53,6 @@ void * initializeKernelBinary(){
 	return getStackBase();
 }
 
-void printError() {
-	for(int x=0; x<1024; x++)
-		draw(x, 5, 0xFF0000);
-}
-
-int sysWrite(int fd, char * buffer, int n);
-
-
-void scrollUp(int dy);
-
-int getRGB(int x, int y);
 
 int main(){
 

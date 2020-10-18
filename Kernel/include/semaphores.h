@@ -7,4 +7,6 @@ int waitSemaphore(int id);
 int postSemaphore(int id);
 
 int deleteSemaphore(int id);
+
+void semStatus(void * buffer, int * qty);
 #endif

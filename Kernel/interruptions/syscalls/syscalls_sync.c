@@ -27,6 +27,10 @@ int sysDeleteSemaphore(int id){
     return deleteSemaphore(id);
 }
 
+void sysSemStatus(void * buffer, int * qty){
+    semStatus(buffer,qty);
+}
+
 int sysPipe(int * fds) {
 	return create_pipe(fds);
 }

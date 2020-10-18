@@ -16,3 +16,8 @@ void printProcData();
 void killProcess(char * pid);
 void blockProcess(char * pid);
 void niceProcess(char * pid, char * priority);
+
+
+void printSemStatus();
+
+#define MAX_BLOCKED_PIDS 20

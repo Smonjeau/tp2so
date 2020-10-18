@@ -3,14 +3,8 @@
 #include <mem_manager.h>
 #include <stddef.h>
 #include <screen_driver.h>
-#include <screen_driver.h>
 #include <interrupts.h>
 
-/*
-	Aclaración: para esta version del scheduler se utiliza unicamente el nivel de prioridad 100 y
-	se asigna un quantum de tiempo fijo..
-	Se tienen 2 juegos de colas de procesos para "Activos" y "Expirados".
-*/
 
 void drawLine(){
 	static int c=0;
@@ -36,6 +30,8 @@ PCB runningProc=NULL;
 void assignQuantumTime(PCB pcb) {
     if(pcb->pid == 0)
 	    pcb->remainingTicks = 5; //A la shell le damos mas quantum pues interactua con usuario
+	else if(pcb->pid == 1)
+		pcb->remainingTicks = 1; //Al proceso dummy le damos el menor quantum posible
     else
         pcb->remainingTicks = 2;
 }
@@ -120,7 +116,7 @@ pipe findPipe(int fd) {
     return found;
 }
 
-int assign_pipe_to_pcb(int * fds, pipe pipe_to_assign) {
+int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 	int i, j;
 	pipe * aux = runningProc->pipes;
 	for(i = 0, j = 0; i < 2 && j < MAX_PIPES; j++) {
@@ -138,14 +134,20 @@ int assign_pipe_to_pcb_forced(int fd, pipe new) {
 	return 0;
 }
 
-void close_fd(int fd) {
-	if(runningProc != NULL) {
-		pipe aux = runningProc->pipes[fd];
-		runningProc->pipes[fd] = NULL;
-		aux->open_ports--;
-		free_pipe_if_empty(aux);
-	}
+void close_fd_proc(PCB pcb, int fd) {
+    if(pcb != NULL) {
+        pipe aux = pcb->pipes[fd];
+        pcb->pipes[fd] = NULL;
+        aux->open_ports--;
+        free_pipe_if_empty(aux);
+    }
 }
+
+void close_fd(int fd) {
+	close_fd_proc(runningProc, fd);
+}
+
+
 
 
 void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
@@ -185,10 +187,8 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 
 void ps(char * buffer) {
 
-	if(NULL){
-		drawLine();
+	if(buffer == NULL)
 		return;
-	}
 
 	ProcQueue * queue;
 	PCB pcb;
@@ -219,7 +219,7 @@ void ps(char * buffer) {
 
 void swapIfNeeded() {
 	int idx, found = 0;
-	for(idx = 0; idx < 40; idx++)
+	for(idx = 0; idx < 40 && found == 0; idx++)
 		if(actives[idx].first != NULL)
 			found = 1;
 
@@ -326,7 +326,7 @@ void blockProcess(int pid, int tick) {
 		idx--;
 		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;			
-			_sti();
+			//_sti();
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
 			if(tick == 1)
@@ -341,7 +341,7 @@ void blockProcess(int pid, int tick) {
 		}
 		
 	} else {
-		_sti();
+		//_sti();
 	}
 	
 }
@@ -552,26 +552,24 @@ void killProcess(int pid) {
 	PCB currentPCB;
 	int priorityIdx;
 	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
-		//Buscamos proceso en estado RUN
-		for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
-			currentPCB = actives[priorityIdx].first;
-			if(currentPCB != NULL)// && currentPCB->procState == RUN)
-				break; //Lo encontré. Se que está en estado RUN porque aun no consideramos estado bloqueado.
-		}
-
-		
 
 
-		actives[priorityIdx].first = currentPCB->nextPCB;
+        for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
+            currentPCB = actives[priorityIdx].first;
+            if(currentPCB->pid == runningProc->pid)
+                break;
+        }
+
+
+		actives[priorityIdx].first = runningProc->nextPCB;
+
+
+
 
 
 		if(actives[priorityIdx].first == NULL) {
-
 			actives[priorityIdx].last = NULL;
 			swapIfNeeded();
-
-			
-			
 		}
 
 
@@ -620,19 +618,22 @@ void killProcess(int pid) {
 					}
 				}			
 			}
-			
-			priorityIdx--; //Para compensar el ultimo ++ del for
-			if((expireds[priorityIdx].first)->pid == pid) {
-				//Es el primero
-				expireds[priorityIdx].first = currentPCB->nextPCB;
-				if(expireds[priorityIdx].first == NULL)
-					expireds[priorityIdx].last = NULL;
-			} else {
-				//No es el primero
-				if((expireds[priorityIdx].last)->pid == pid)
-					expireds[priorityIdx].last = prevPCB; //Es el ultimo	
-				prevPCB->nextPCB = currentPCB->nextPCB;
+			if(found == 1) {
+                priorityIdx--; //Para compensar el ultimo ++ del for
+                if((expireds[priorityIdx].first)->pid == pid) {
+                    //Es el primero
+                    expireds[priorityIdx].first = currentPCB->nextPCB;
+                    if(expireds[priorityIdx].first == NULL)
+                        expireds[priorityIdx].last = NULL;
+                } else {
+                    //No es el primero
+                    if((expireds[priorityIdx].last)->pid == pid)
+                        expireds[priorityIdx].last = prevPCB; //Es el ultimo
+                    prevPCB->nextPCB = currentPCB->nextPCB;
+                }
 			}
+			
+
 
 		}
 
@@ -642,8 +643,12 @@ void killProcess(int pid) {
 	}
 
 	ProcState state = currentPCB->procState;
-	free(currentPCB->segmentAddress);
-	free(currentPCB);
+	for(int pipe=0;pipe<MAX_PIPES;pipe++){
+	    if(currentPCB->pipes[pipe] != NULL)
+	        close_fd_proc(currentPCB, pipe);
+	}
+    free(currentPCB->segmentAddress);
+    free(currentPCB);
 
 	if(state == RUN) //El proceso se suicida
 		_timer_tick();

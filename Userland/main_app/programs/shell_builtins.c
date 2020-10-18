@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <shell_builtins.h>
 
+
+
 /* ----------------------------------------------------------------------------------------------------
 						                MISCELLANEOUS
 ----------------------------------------------------------------------------------------------------- */
@@ -206,12 +208,14 @@ void printMemStatus(){
 ----------------------------------------------------------------------------------------------------- */
 
 void printProcData(){
-	char  buffer[90 * 40];
+	//char buffer[90 * 150];
+	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
 		return;
 
     ps(buffer);    
-    printf(buffer, 0);  
+    printf(buffer, 0);
+    free(buffer);
 
 
 }
@@ -240,7 +244,13 @@ void blockProcess(char * pid){
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
 		return;
-	}
+	} else if(_pid==0){
+		printf("Can not block the shell", 0);
+		return;
+	} else if(_pid==1){
+        printf("Dont kill the dummy proccess", 0);
+        return;
+    }
 
 	block(_pid);
 }
@@ -255,4 +265,29 @@ void niceProcess(char * pid, char * priority) {
 	}
 
 	nice(_pid, _prio);
+}
+typedef struct Semaphore{
+    int id;
+    int value;
+    int blockedPIDs[MAX_BLOCKED_PIDS];
+    int blockedPIDsSize;
+    int lock;
+    struct Semaphore * next;
+}  Semaphore;
+void printSemStatus(){
+    Semaphore * buffer = malloc(20*sizeof(struct Semaphore));
+    int qty =0;
+    semStatus(buffer,&qty);
+    Semaphore sem;
+    int i=0;
+    printf("Semaphores status\\n",0);
+    while(i<qty){
+        sem=*(buffer + i++);
+        printf("ID:%d  Value:%d   There are %d processes blocked in this semaphore:\\n",3,sem.id,sem.value,sem.blockedPIDsSize);
+        if(sem.blockedPIDsSize>0)
+            printf("PIDs:",0);
+        for(int j=0;j<sem.blockedPIDsSize;j++)
+            printf(" %d ",1,sem.blockedPIDs[j]);
+
+    }
 }

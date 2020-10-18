@@ -86,8 +86,11 @@ int assign_pipe_to_pcb(int * fds, pipe pipe);
 /* Asigna el pipe recibido al fd especificado del proceso running */
 int assign_pipe_to_pcb_forced(int fd, pipe new);
 
-
+/* Cierra cierto fd del proceso running */
 void close_fd(int fd);
+
+/*Cierra cierto fd de cierto proceso*/
+void close_fd_proc(PCB pcb, int fd);
 
 
 /* Busca el pipe al cual esta coenctado el fd indicado */

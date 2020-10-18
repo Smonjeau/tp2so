@@ -4,7 +4,6 @@
 #include <lib.h>
 
 #define MAX_BLOCKED_PIDS 20
-
 typedef struct Semaphore{
     int id;
     int value;
@@ -15,6 +14,22 @@ typedef struct Semaphore{
 } Semaphore;
 
 Semaphore * semaphores = NULL;
+
+
+void semStatus(void * buffer, int * sem_count){
+    //Recorremos todos los semáforos y pasamamos el struct
+    Semaphore * semaphore = semaphores;
+
+    int count=0;
+    int size= sizeof(Semaphore);
+    while (semaphore!=NULL) {
+        memcpy(buffer + size * count++, semaphore, size);
+        semaphore = semaphore->next;
+    }
+    *sem_count=count;
+
+
+}
 
 
 int createSemaphore(int id, int initValue){
@@ -118,16 +133,15 @@ int postSemaphore(int id){
 int deleteSemaphore(int id){
 
     Semaphore *prevSemaphore = findSemaphore(id, 1);
+    Semaphore *semaphore = findSemaphore(id,0);
+    if(semaphore==NULL || semaphore->blockedPIDsSize>0 )
+        return -1;
     if(prevSemaphore == NULL)
-        return -1;
+        semaphores = semaphore->next;
+    else
+        prevSemaphore->next=semaphore->next;
 
-    Semaphore *semaphore = prevSemaphore->next;
-    if(semaphore->blockedPIDsSize > 0)
-        return -1;
-
-    prevSemaphore->next = semaphore->next;
     free(semaphore);
-
     return 0;
 
 }

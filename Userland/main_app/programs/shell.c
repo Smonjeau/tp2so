@@ -38,7 +38,6 @@ void dummy(int argc, char **argv);
 ------------------------------------------------------------------------------------------------------------------------- */
 
 void shell(){
-
     startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
@@ -49,6 +48,7 @@ void shell(){
 	char c;
 	while (1){
 		c = getChar();
+
 
 		// Handle the chars that are not CR
 
@@ -170,9 +170,14 @@ void parseCommand(char *cmdBuff){
 		startProcess(loop, 0, NULL, "loop");
 
 
+	//Sync
+	else if(strncmp(*tokens,"sem",4)==0)
+	    printSemStatus();
+
 	//Testing
 	else if(strncmp(tokens[0],"testmm",7) == 0)
 		startProcess(test_mm,0,NULL,"testmm");
+
 
 
 	// Command not found

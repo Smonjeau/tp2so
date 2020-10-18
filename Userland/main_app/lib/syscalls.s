@@ -46,3 +46,4 @@ syscall pipe, 22
 syscall close, 23
 syscall forcePipe, 24
 syscall pipeRead, 25
+syscall semStatus,26

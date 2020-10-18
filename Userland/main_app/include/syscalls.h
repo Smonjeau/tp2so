@@ -80,6 +80,8 @@ int postSem(int id);
 
 int deleteSem(int id);
 
+void semStatus(void * buffer, int * qty);
+
 int pipe(int * fds);
 
 int forcePipe(int fd);
