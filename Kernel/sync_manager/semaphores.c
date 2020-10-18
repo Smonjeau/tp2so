@@ -134,23 +134,14 @@ int deleteSemaphore(int id){
 
     Semaphore *prevSemaphore = findSemaphore(id, 1);
     Semaphore *semaphore = findSemaphore(id,0);
-    if(prevSemaphore == NULL && semaphore==NULL)
+    if(semaphore==NULL || semaphore->blockedPIDsSize>0 )
         return -1;
+    if(prevSemaphore == NULL)
+        semaphores = semaphore->next;
+    else
+        prevSemaphore->next=semaphore->next;
 
-    else if(semaphore->blockedPIDsSize > 0)
-        return -1;
-
-    else if(prevSemaphore!=NULL && prevSemaphore!=semaphore) {
-        prevSemaphore->next = semaphore->next;
-        free(semaphore);
-    }
-    else{
-        struct Semaphore * aux = semaphore;
-        semaphores=NULL;
-        free(aux);
-
-    }
-
+    free(semaphore);
     return 0;
 
 }
