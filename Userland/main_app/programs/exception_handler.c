@@ -6,7 +6,6 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <programs.h>
-#include <windows_lib.h>
 #include <std_lib.h>
 #include <std_io.h>
 #include <syscalls.h>
@@ -18,82 +17,45 @@
 
 #define cursor 0
 
-static Window w;
-
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         		METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
-
-
-static void createWindow(){
-
-	ScreenRes res;
-	getRes(&res);
-
-	w.xi = 0; w.xf = res.width;
-    w.yi = 0; w.yf = res.height;
-
-    w.textBackground = 0x0000FF;
-
-	w.cursors[cursor].x=0;	w.cursors[cursor].y=0;
-	w.cursors[cursor].fontColor=0xFFFFFF;	w.cursors[cursor].fontSize=2;
-
-    setWindow(&w);
-
-}
-
 
 int exception(va_list args){
 
     int id = va_arg(args, int);
     void * eip = va_arg(args, void *);
 
-    createWindow();
-	w.activeCursor = cursor;
-
-    for(int x=0; x<w.xf-w.xi; x++){
-        for(int y=0; y<w.yf-w.yi; y++){
-            draw(x, y, 0x0000FF);
-        }
-    }
+    putChar('\f');
 
     switch(id){
         case DIV_ZERO_EXCEPTION:
-            printf("Division by zero detected!\\n", 0);
-            printf("Possible causes: \\n", 0);
-            printf(" - You didn't finish elementary school\\n", 0);
+            printf("Division by zero detected!\n", 0);
+            printf("Possible causes: \n", 0);
+            printf(" - You didn't finish elementary school\n", 0);
             break;
 
         case INV_OPCODE_EXCEPTION:
-            printf("Invalid opcode detected!\\n", 0);
-            printf("Possible causes: \\n", 0);
-            printf(" - You received an EMP attack\\n", 0);
-            printf(" - You tried to destroy the machine\\n", 0);
+            printf("Invalid opcode detected!\n", 0);
+            printf("Possible causes: \n", 0);
+            printf(" - You received an EMP attack\n", 0);
+            printf(" - You tried to destroy the machine\n", 0);
             break;
 
         default:
-            printf("Exception code: %d\\n", 1, id);
+            printf("Exception code: %d\n", 1, id);
     }
 
     RegBkp bkp;
     getRegBkp(&bkp);
 
-    printf("\\nFeed this information to the developers:", 0);
-    printf("\\nRAX: %x - RBX: %x - RCX: %x - RDX: %x", 4, bkp.rax, bkp.rbx, bkp.rcx, bkp.rcx);
-    printf("\\nRIP: %x - RBP: %x - RSI: %x - RDI: %x", 4, eip, bkp.rbp, bkp.rsi, bkp.rdi);
-    printf("\\n\\nPress enter to restart the system", 0);
+    printf("\nFeed this information to the developers:", 0);
+    printf("\nRAX: %x - RBX: %x - RCX: %x - RDX: %x", 4, bkp.rax, bkp.rbx, bkp.rcx, bkp.rcx);
+    printf("\nRIP: %x - RBP: %x - RSI: %x - RDI: %x", 4, eip, bkp.rbp, bkp.rsi, bkp.rdi);
+    printf("\n\nPress enter to restart the system", 0);
 
-    while(1){
-        if(getChar()==13){
-            for(int x=w.xi; x<w.xf; x++){
-                for(int y=w.yi; y<w.yf; y++){
-                    draw(x, y, 0x000000);
-                }
-            }
-            shell();
-        }
-    }
+    while(1);
 
     return 1;
     

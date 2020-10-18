@@ -4,7 +4,7 @@
 | These functions implement syscalls related to the input/output.   	                            |
 ---------------------------------------------------------------------------------------------------*/
 
-#include <keyboard_driver.h>
+#include <video_lib.h>
 #include <pipe_manager.h>
 
 #define STDIN 0
@@ -15,14 +15,8 @@
 --------------------------------------------------------------------------------------------------------------------------- */
 
 char sysRead(int fd, char * buffer, int n) {
+
 	return pipe_read(fd, buffer, n);
-
-    /*if(fd == STDIN)
-        return getChar();
-
-    //return readStdin(buffer, n)
-    return getChar();
-    //return 0;*/
 
 }
 
@@ -32,5 +26,10 @@ char sysRead(int fd, char * buffer, int n) {
 
 
 int sysWrite(int fd, char * buffer, int n) {
+
+    if(fd == 1)
+        print(buffer);
+
     return pipe_write(fd,buffer, n);
+
 }

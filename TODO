@@ -13,8 +13,6 @@
 - Implement semaphores      !
 - Implement pipes           !
 
-Errores:
- - El hijo de pipe aumenta el pid pero no figura en ps
 
 On exception handling:
  - Kill the causing process

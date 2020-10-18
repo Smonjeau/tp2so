@@ -19,17 +19,16 @@ int _start(int message, int nargs, ...) {
 	va_list valist;
     va_start(valist, nargs);
 
+	for(int x=0; x<1024; x++)
+		draw(x, 5, 0xFF0000);
+
 	switch(message){
 		case START_SHELL:
-			// return shell();
 			startProcess(shell, 0, (void*) 0,"shell");
 			__asm__("hlt;\n\r");
 
 		case EXCEPTION_PRODUCED:
 			return exception(valist);
-
-		case IRQ_PRODUCED:
-			return interruption(valist);
 
 		default:
 			return shell();

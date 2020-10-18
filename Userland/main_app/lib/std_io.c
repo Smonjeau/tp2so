@@ -11,23 +11,15 @@
 char getChar(){
 
 	char c;
-	read(0, &c, 1);
+
+	read(STDIN, &c, 1);
+
 	return c;
-    /*
-	//WTF ES ESTO BRO
-    char c;
-
-    while((c = read(STDIN)) == 0){
-        sti();
-        halt();
-    }
-
-    return c;*/
 
 }
 
 int putChar(char c){
-	return 0;
-    //return write(c, STDOUT);
+    
+    return write(STDOUT, &c, 1);
 
 }

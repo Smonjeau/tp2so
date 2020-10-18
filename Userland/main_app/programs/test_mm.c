@@ -17,7 +17,7 @@ void test_mm(){
   mm_rq mm_rqs[MAX_BLOCKS];
   uint8_t rq;
   uint32_t total;
-  //printf("ARRANCO A TESTEAR TU MM\\n",0);
+  //printf("ARRANCO A TESTEAR TU MM\n",0);
   while (1){
     rq = 0;
     total = 0;
@@ -28,7 +28,7 @@ void test_mm(){
       mm_rqs[rq].address = malloc(mm_rqs[rq].size); // TODO: Port this call as required
                                                                                                         
       if(mm_rqs[rq].address==NULL);
-  //      printf("NULL CON MALLOC\\n",0);    
+  //      printf("NULL CON MALLOC\n",0);    
         
       total += mm_rqs[rq].size;
       rq++;
@@ -36,25 +36,25 @@ void test_mm(){
 
     // Set
     uint32_t i;
- //   printf("VOY A ESCRIBIR\\n",0);
+ //   printf("VOY A ESCRIBIR\n",0);
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address != NULL)
         memset(mm_rqs[i].address, i, mm_rqs[i].size); // TODO: Port this call as required
 
     // Check
-  // printf("VOY A CHECKEAR\\n",0);
+  // printf("VOY A CHECKEAR\n",0);
    // printProcData();
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address != NULL)
         if(!memcheck(mm_rqs[i].address, i, mm_rqs[i].size))
-          printf("ERROR!\\n",0); // TODO: Port this call as required
+          printf("ERROR!\n",0); // TODO: Port this call as required
 
     // Free
- //   printf("ESTOY LIBERANDO\\n",0);
+ //   printf("ESTOY LIBERANDO\n",0);
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address != NULL)
         free(mm_rqs[i].address);  // TODO: Port this call as required
-  //  printf("SALIO TODO OK\\n",0);
+  //  printf("SALIO TODO OK\n",0);
   } 
 
 }

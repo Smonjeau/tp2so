@@ -1,7 +1,10 @@
-#include <stdio.h>
+#include <std_io.h>
+#include <std_lib.h>
 #include <syscalls.h>
 #include <test_util.h>
 #include <tests.h>
+
+#define NULL ((void *) 0)
 
 //TO BE INCLUDED
 void endless_loop(){
@@ -50,7 +53,7 @@ void test_processes(){
       p_rqs[rq].pid = my_create_process(rq);  // TODO: Port this call as required
 
       if (p_rqs[rq].pid == -1){
-        printf("ERROR creating process\n");
+        printf("ERROR creating process\n", 0);
         return;
       }else{
         p_rqs[rq].state = SRUNNING;
@@ -73,7 +76,7 @@ void test_processes(){
             if (p_rqs[rq].state == SRUNNING || p_rqs[rq].state == SBLOCKED){
 
               if (my_kill(p_rqs[rq].pid) == -1){
-                printf("ERROR killing process\n");
+                printf("ERROR killing process\n", 0);
                 return;
               }
 
@@ -86,7 +89,7 @@ void test_processes(){
             if (p_rqs[rq].state == SRUNNING){
 
               if(my_block(p_rqs[rq].pid) == -1){
-                printf("ERROR blocking process\n");
+                printf("ERROR blocking process\n", 0);
                 return;
               }
 
@@ -104,7 +107,7 @@ void test_processes(){
         if (p_rqs[rq].state == SBLOCKED && GetUniform(2) % 2){
 
           if(my_unblock(p_rqs[rq].pid) == -1){
-            printf("ERROR unblocking process\n");
+            printf("ERROR unblocking process\n", 0);
             return;
           }
 

@@ -1,56 +1,43 @@
 #include <syscalls.h>
 #include <asm_lib.h>
-#include <windows_lib.h>
 #include <std_lib.h>
-#include <shell_builtins.h>
+#include <std_io.h>
 #include <stdint.h>
+#include <shell_builtins.h>
 
 /* ----------------------------------------------------------------------------------------------------
 						                MISCELLANEOUS
 ----------------------------------------------------------------------------------------------------- */
 
 void printHelp(void){
-	newLine();
-	printLine("---------------------------------------------------");
-	newLine();
+	printf("---------------------------------------------------\n", 0);
 
-	printLine("- help              to go to the Help Manual");
-	printLine("- clear             to clear the screen");
-	newLine();
+	printf("- help              to go to the Help Manual\n", 0);
+	printf("- clear             to clear the screen\n\n", 0);
 	
-	printLine("- time              to get the system time");
-	printLine("- divzero           to execute a Div by Zero");
-	printLine("- invopcode         to exectue an invalid opcode");
-	newLine();
+	printf("- time              to get the system time\n", 0);
+	printf("- divzero           to execute a Div by Zero\n", 0);
+	printf("- invopcode         to exectue an invalid opcode\n\n", 0);
 	
-	printLine("- display anon      to show an image of Anonymous");
-	printLine("- display matrix    to show an image of Matrix");
-	newLine();
+	printf("- display anon      to show an image of Anonymous\n", 0);
+	printf("- display matrix    to show an image of Matrix\n\n", 0);
 
-	printLine("- cputemp           to get the CPU Temp");
-	printLine("- cpuinfo           to get the CPU Brand Data");
-	printLine("- inforeg           to get the Register's Values");
-	printLine("- storedreg         to get the Stored Register's Values");
-	newLine();
+	printf("- cputemp           to get the CPU Temp\n", 0);
+	printf("- cpuinfo           to get the CPU Brand Data\n", 0);
+	printf("- inforeg           to get the Register's Values\n", 0);
+	printf("- storedreg         to get the Stored Register's Values\n\n", 0);
 	
-	printLine("- memdump n         to print memory starting at n");
-	printLine("- mem          to print heap status");
-	newLine();
+	printf("- memdump n         to print memory starting at n\n", 0);
+	printf("- mem          to print heap status\n\n", 0);
 
-	printLine("- ps                to list active processes");
-	printLine("- kill pid          to kill a process");
-	printLine("- block pid         to block a process");
-	printLine("- nice pid priority to change priority (100 - 139)");
-    printLine("- line              to draw a line (for testing)");
-    printLine("- loop              to start loop (for testing)");
-	newLine();
-	
-	printLine("To scroll the window up, press F3");
-	printLine("To store registers value, press TAB");
-	newLine();
-	
-	printLine("---------------------------------------------------");
-	newLine();
+	printf("- ps                to list active processes\n", 0);
+	printf("- kill pid          to kill a process\n", 0);
+	printf("- block pid         to block a process\n", 0);
+	printf("- nice pid priority to change priority (100 - 139)\n", 0);
+    printf("- line              to draw a line (for testing)\n", 0);
+    printf("- loop              to start loop (for testing)\n\n", 0);
+		
+	printf("---------------------------------------------------", 0);
 }
 
 
@@ -58,7 +45,7 @@ void printTime(void){
 	Time t;
 	getTime(&t);
 
-	printf("\\nTime now: %2d:%2d:%2d\\n", 3, t.hours, t.minutes, t.seconds);
+	printf("\nTime now: %2d:%2d:%2d\n", 0, 3, t.hours, t.minutes, t.seconds);
 }
 
 
@@ -76,9 +63,9 @@ void invOpcodeException(void){
 
 
 void printWarning(){
-	printf("\\n >> Error: ", 0);
-	printLine("Command not found");
-	printLine("If you want to see the command manual type 'help'.");
+	printf(">> Error:\n", 0, 0);
+	printf("Command not found\n", 0);
+	printf("If you want to see the command manual type 'help'.\n", 0);
 }
 
 
@@ -88,7 +75,7 @@ void printWarning(){
 
 void printCPUTemp(void){
 	int temp = cpuTemp();
-	printf("\\n Computer's Temperature: %d\\n", 1, temp);
+	printf("\n Computer's Temperature: %d\n", 0, 1, temp);
 }
 
 
@@ -101,8 +88,8 @@ void printCPUInfo(void){
 
 	cpuInfo(&info);
 
-	printf("\\nBrand name: %s", 1, info.brandName);
-	printf("\\nBrand description: %s\\n", 1, info.brandDesc);
+	printf("\nBrand name: %s", 1, info.brandName);
+	printf("\nBrand description: %s\n", 0, 1, info.brandDesc);
 }
 
 
@@ -110,27 +97,27 @@ void printInfoReg(void){
 	RegDump reg;
 	regDump(&reg);
 
-	printLine("Register's values:");
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
-	printf("\\n - rax - %x", 1, reg.rax);
-	printf("\\n - rbx - %x", 1, reg.rbx);
-	printf("\\n - rcx - %x", 1, reg.rcx);
-	printf("\\n - rdx - %x", 1, reg.rdx);
-	printf("\\n - rsi - %x", 1, reg.rsi);
-	printf("\\n - rdi - %x", 1, reg.rdi);
-	printf("\\n - rbp - %x", 1, reg.rbp);
-	printf("\\n - rsp - %x", 1, reg.rsp);
+	printf("Register's values:\n", 0);
+	printf("--- --- --- --- --- --- --- --- --- --- --- --- ---\n", 0);
+	printf("\n - rax - %x", 1, reg.rax);
+	printf("\n - rbx - %x", 1, reg.rbx);
+	printf("\n - rcx - %x", 1, reg.rcx);
+	printf("\n - rdx - %x", 1, reg.rdx);
+	printf("\n - rsi - %x", 1, reg.rsi);
+	printf("\n - rdi - %x", 1, reg.rdi);
+	printf("\n - rbp - %x", 1, reg.rbp);
+	printf("\n - rsp - %x", 1, reg.rsp);
 
-	printf("\\n - r8 - %x", 1, reg.r8);
-	printf("\\n - r9 - %x", 1, reg.r9);
-	printf("\\n - r10 - %x", 1, reg.r10);
-	printf("\\n - r11 - %x", 1, reg.r11);
-	printf("\\n - r12 - %x", 1, reg.r12);
-	printf("\\n - r13 - %x", 1, reg.r13);
-	printf("\\n - r14 - %x", 1, reg.r14);
-	printf("\\n - r15 - %x\\n", 1, reg.r15);
+	printf("\n - r8 - %x", 1, reg.r8);
+	printf("\n - r9 - %x", 1, reg.r9);
+	printf("\n - r10 - %x", 1, reg.r10);
+	printf("\n - r11 - %x", 1, reg.r11);
+	printf("\n - r12 - %x", 1, reg.r12);
+	printf("\n - r13 - %x", 1, reg.r13);
+	printf("\n - r14 - %x", 1, reg.r14);
+	printf("\n - r15 - %x\n", 0, 1, reg.r15);
 
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
+	printf("--- --- --- --- --- --- --- --- --- --- --- --- ---\n", 0);
 }
 
 
@@ -138,26 +125,26 @@ void printStoredReg(void){
 	RegBkp reg;
 	getRegBkp(&reg);
 
-	printLine("Stored register's values:");
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
-	printf("\\n - rax - %x", 1, reg.rax);
-	printf("\\n - rbx - %x", 1, reg.rbx);
-	printf("\\n - rcx - %x", 1, reg.rcx);
-	printf("\\n - rdx - %x", 1, reg.rdx);
-	printf("\\n - rsi - %x", 1, reg.rsi);
-	printf("\\n - rdi - %x", 1, reg.rdi);
-	printf("\\n - rbp - %x", 1, reg.rbp);
+	printf("Stored register's values:\n", 0);
+	printf("--- --- --- --- --- --- --- --- --- --- --- --- ---\n", 0);
+	printf("\n - rax - %x", 1, reg.rax);
+	printf("\n - rbx - %x", 1, reg.rbx);
+	printf("\n - rcx - %x", 1, reg.rcx);
+	printf("\n - rdx - %x", 1, reg.rdx);
+	printf("\n - rsi - %x", 1, reg.rsi);
+	printf("\n - rdi - %x", 1, reg.rdi);
+	printf("\n - rbp - %x", 1, reg.rbp);
 
-	printf("\\n - r8 - %x", 1, reg.r8);
-	printf("\\n - r9 - %x", 1, reg.r9);
-	printf("\\n - r10 - %x", 1, reg.r10);
-	printf("\\n - r11 - %x", 1, reg.r11);
-	printf("\\n - r12 - %x", 1, reg.r12);
-	printf("\\n - r13 - %x", 1, reg.r13);
-	printf("\\n - r14 - %x", 1, reg.r14);
-	printf("\\n - r15 - %x\\n", 1, reg.r15);
+	printf("\n - r8 - %x", 1, reg.r8);
+	printf("\n - r9 - %x", 1, reg.r9);
+	printf("\n - r10 - %x", 1, reg.r10);
+	printf("\n - r11 - %x", 1, reg.r11);
+	printf("\n - r12 - %x", 1, reg.r12);
+	printf("\n - r13 - %x", 1, reg.r13);
+	printf("\n - r14 - %x", 1, reg.r14);
+	printf("\n - r15 - %x\n", 0, 1, reg.r15);
 
-	printLine("--- --- --- --- --- --- --- --- --- --- --- --- ---");
+	printf("--- --- --- --- --- --- --- --- --- --- --- --- ---\n", 0);
 }
 
 
@@ -170,9 +157,9 @@ void printMemDump(char *sourceStr){
 	uint64_t sourceHex = 0;
 	for (int i = 2; sourceStr[i]; i++){
 		char c = '0';
-		if (isDigit(sourceStr[i]))
+		if (sourceStr[i] >= '0' && sourceStr[i] <= '9')
 			c = '0';
-		else if (isLower(sourceStr[i]))
+		else if (sourceStr[i] >= 'a' && sourceStr[i] <= 'z')
 			c = 'a';
 		else
 			c = 'A';
@@ -180,7 +167,7 @@ void printMemDump(char *sourceStr){
 	}
 
 	if (sourceHex < 0){
-		printLine("Parameter not allowed");
+		printf("Parameter not allowed\n", 0);
 		return;
 	}
 
@@ -190,9 +177,9 @@ void printMemDump(char *sourceStr){
 
 	memDump((void *)src, (void *)dst);
 
-	newLine();
+	putChar('\n');
 	for (int i = 0; i < 33; i += 8){
-		printf("%2x: %2x %2x %2x %2x %2x %2x %2x %2x\\n", 9, src + i, src[i], src[i + 1], src[i + 2], src[i + 3],
+		printf("%2x: %2x %2x %2x %2x %2x %2x %2x %2x\n", 0, 9, src + i, src[i], src[i + 1], src[i + 2], src[i + 3],
 			   src[i + 4], src[i + 5], src[i + 6], src[i + 7]);
 	}
 	
@@ -200,7 +187,17 @@ void printMemDump(char *sourceStr){
 
 
 void printMemStatus(){
-	print_mem_status();
+
+	int total_mem=0;
+    int  avail_mem=0;
+    int occ_mem=0;
+
+    memStatus(&total_mem,&avail_mem,&occ_mem);
+    
+    printf("Total memory: %d KB\n", 0,1,total_mem);
+    printf("Free memory: %d KB\n", 0,1,avail_mem);
+    printf("Occupied memory: %d KB\n", 0,1,occ_mem);
+
 }
 
 
@@ -225,11 +222,11 @@ void killProcess(char * pid){
 	int _pid = atoi(pid);
 
 	if(_pid==-1){
-		printLine("Argument must be a pid. Use ps to see processes");
+		printf("Argument must be a pid. Use ps to see processes\n", 0);
 		return;
 	}
     else if(_pid==0){
-        printLine("Cannot kill Shell process");
+        printf("Cannot kill shell process\n", 0);
         return;
     }
 
@@ -241,7 +238,7 @@ void blockProcess(char * pid){
 	int _pid= atoi(pid);
 
 	if(_pid==-1){
-		printLine("Argument must be a pid. Use ps to see processes");
+		printf("Argument must be a pid. Use ps to see processes\n", 0);
 		return;
 	}
 
@@ -253,7 +250,7 @@ void niceProcess(char * pid, char * priority) {
 	int _prio = atoi(priority);
 
 	if(_pid==-1){
-		printLine("Argument must be a pid. Use ps to see processes");
+		printf("Argument must be a pid. Use ps to see processes\n", 0);
 		return;
 	}
 

@@ -4,13 +4,10 @@
 | This libary implements a bare version of C stdlib, providing functions such as prinf, itoa, etc.  |
 ---------------------------------------------------------------------------------------------------*/
 
-#include <windows_lib.h>
 #include <stdarg.h>
-#include <std_lib.h>
-#include <syscalls.h>
 #include <stdint.h>
-#include <asm_lib.h>
-
+#include <std_io.h>
+#include <std_lib.h>
 
 /* ------------------------------------------------------------------------------------------------------------------
                                                 MEMORY FUNCTIONS
@@ -40,6 +37,8 @@ void * memcpy(void * destination, const void * source, int length){
 
 	return destination;
 }
+
+
 void * memset(void * destination, int32_t c, uint64_t length){
 	uint8_t chr = (uint8_t)c;
 	char * dst = (char*)destination;
@@ -50,104 +49,6 @@ void * memset(void * destination, int32_t c, uint64_t length){
 	return destination;
 }
 
-void print_mem_status(){
-    int total_mem=0;
-    int  avail_mem=0;
-    int occ_mem=0;
-    memStatus(&total_mem,&avail_mem,&occ_mem);
-    printf("Total memory: %d KB\\n",1,total_mem);
-    printf("Free memory: %d KB\\n",1,avail_mem);
-    printf("Occupied memory: %d KB\\n",1,occ_mem);
-}
-/* ------------------------------------------------------------------------------------------------------------------
-                                                CHAR FUNCTIONS
- -------------------------------------------------------------------------------------------------------------------- */
-
-int isLower(char c)
-{
-    if (c >= 'a' && c <= 'z')
-        return 1;
-    return 0;
-}
-
-int isUpper(char c)
-{
-    if (c >= 'A' && c <= 'Z')
-        return 1;
-    return 0;
-}
-
-char toLower(char c)
-{
-    if (isUpper(c))
-        return c + 'a' - 'A';
-    return c;
-}
-
-int isAlpha(char c)
-{
-    if (isLower(c) || isUpper(c))
-        return 1;
-    return 0;
-}
-
-int isDigit(char c)
-{
-    if (c >= '0' && c <= '9')
-        return 1;
-    return 0;
-}
-
-int isHexa(char c)
-{
-    if (isDigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
-        return 1;
-    return 0;
-}
-
-int isDecimalPoint(char c)
-{
-    if (c == '.' || c == ',')
-        return 1;
-    return 0;
-}
-
-int isSpace(char c)
-{
-    if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == 0)
-        return 1;
-    return 0;
-}
-
-int isOperator(char c)
-{
-    if (isSign(c) || c == MULT || c == DIV || isParenthesis(c) != 0)
-        return 1;
-    return 0;
-}
-
-int isSign(char c)
-{
-    if (c == ADD || c == SUBS)
-        return 1;
-    return 0;
-}
-
-int isParenthesis(char c)
-{
-    if (c == PRTH_OP)
-        return 1;
-    if (c == PRTH_CL)
-        return -1;
-
-    return 0;
-}
-
-// The extended ASCII is not supported by the used font, thus they are marked as not printable
-
-int isPrintableChar(char c){
-    return c >= 32 && c <= 127;
-}
 
 /* ------------------------------------------------------------------------------------------------------------------
                                             STRING FUNCTIONS
@@ -155,7 +56,6 @@ int isPrintableChar(char c){
 
 /* -----------------------------------------------------------
  Function used in itoa and dtoa
- Taken from https://www.geeksforgeeks.org/implement-itoa/
 ----------------------------------------------------------- */
 
 void reverseStr(char *str, int length)
@@ -170,6 +70,17 @@ void reverseStr(char *str, int length)
         start++;
         end--;
     }
+}
+
+
+/* -----------------------------------------------------------
+ Function used in atoi and printf
+----------------------------------------------------------- */
+
+int isDigit(char c){
+    if (c >= '0' && c <= '9')
+        return 1;
+    return 0;
 }
 
 
@@ -243,6 +154,7 @@ char *itoa(int num, char *str, int base, int fixLen)
     return str;
 }
 
+
 /* -----------------------------------------------------------
  Function to convert a double to a string
 ----------------------------------------------------------- */
@@ -295,111 +207,71 @@ char *dtoa(double num, char *str)
     return str;
 }
 
+
 /* -----------------------------------------------------------
  Printf that supports integers, doubles, strings and hex
  display as possible formats
 -------------------------------------------------------------- */
 
-void printf(char *format, int nargs, ...)
-{
+void printf(char *format, int nargs, ...){
 
     va_list valist;
 
     va_start(valist, nargs);
 
-    int pos, formatChar = 0, specialChar = 0, fixLen = -1;
-    for (pos = 0; format[pos] != 0; pos++)
-    {
+    int pos, formatChar = 0, fixLen = -1;
+    for (pos = 0; format[pos] != 0; pos++){
 
-        if (format[pos] == '%')
-        {
+        if (format[pos] == '%'){
             formatChar = 1;
             continue;
         }
 
-        if (formatChar == 1)
-        {
+        if (formatChar == 1){
 
-            if (isDigit(format[pos]))
-            {
+            if (isDigit(format[pos])){
                 fixLen = format[pos] - '0';
                 continue;
             }
 
-            if (format[pos] == 'd')
-            {
-                char str[20]={0};
-                print(itoa(va_arg(valist, int), str, 10, fixLen));
-                formatChar = 0;
-                continue;
-            }
+            // if (format[pos] == 'd'){
+            //     char str[20]={0};
+            //     print(itoa(va_arg(valist, int), str, 10, fixLen));
+            //     formatChar = 0;
+            //     continue;
+            // }
 
-            if (format[pos] == 'x')
-            {
-                char str[20]={0};
-                print("0x");
-                print(itoa(va_arg(valist, int), str, 16, fixLen));
-                formatChar = 0;
-                continue;
-            }
+            // if (format[pos] == 'x'){
+            //     char str[20]={0};
+            //     print("0x");
+            //     print(itoa(va_arg(valist, int), str, 16, fixLen));
+            //     formatChar = 0;
+            //     continue;
+            // }
 
-            if (format[pos] == 'f')
-            {
-                char str[20]={0};
-                print(dtoa(va_arg(valist, double), str));
-                formatChar = 0;
-                continue;
-            }
+            // if (format[pos] == 'f'){
+            //     char str[20]={0};
+            //     print(dtoa(va_arg(valist, double), str));
+            //     formatChar = 0;
+            //     continue;
+            // }
 
-            if (format[pos] == 's')
-            {
+            // if (format[pos] == 's'){
                 
-                print(va_arg(valist, char *));
-                formatChar = 0;
-                continue;
-            }
+            //     print(va_arg(valist, char *));
+                
+            //     formatChar = 0;
+            //     continue;
+            // }
         }
 
-        if (format[pos] == '\\')
-        {
-            specialChar = 1;
-            continue;
-        }
+        putChar(format[pos]);
 
-        if (specialChar == 1)
-        {
-
-            specialChar = 0;
-
-            if (format[pos] == 'n')
-            {
-                printLine("");
-                continue;
-            }
-        }
-
-        printChar(format[pos]);
     }
 
     va_end(valist);
 }
 
-/* -----------------------------------------------------------
- Compares two strings until one of the two ends and returns 1
- if they are equal or 0 otherwise
------------------------------------------------------------ */
-
-int strcmp(char *str1, char *str2)
-{
-
-    for (int i = 0; str1[i] != 0 || str2[i] != 0; i++)
-    {
-        if (str1[i] != str2[i])
-            return 0;
-    }
-
-    return 1;
-}
 
 /* --------------------------------------------------------------
  Compares a certain amount of chars of two strings and returns 1
@@ -421,8 +293,12 @@ int strncmp(char *s1, char *s2, int n){
     return 0;
 }
 
-void strcpy(char *src, char *dest)
-{
+
+/* --------------------------------------------------------------
+ Copies a string from src to dest
+-------------------------------------------------------------- */
+
+void strcpy(char *src, char *dest){
     int i;
     for (i = 0; src[i] != 0; i++)
         dest[i] = src[i];

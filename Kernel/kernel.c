@@ -12,6 +12,7 @@
 #include <screen_driver.h>
 #include <kernel_messages.h>
 #include <process_manager.h>
+#include <video_lib.h>
 #include <mem_manager.h>
 
 extern void _hlt();
@@ -49,22 +50,18 @@ void * initializeKernelBinary(){
 }
 
 void printError() {
-	//pinta rayitas blancas arriba
-	int xerror=0;
-	for(; xerror<1024; xerror++)
-		draw(xerror, 5, 0xFF0000);
-	xerror=0;
-	for(; xerror<1024; xerror++)
-		draw(xerror, 6, 0xFF0000);
-	xerror=0;
-	for(; xerror<1024; xerror++)
-		draw(xerror, 7, 0xFF0000);
+	for(int x=0; x<1024; x++)
+		draw(x, 5, 0xFF0000);
 }
+
+int sysWrite(int fd, char * buffer, int n);
 
 
 int main(){
 
 	load_idt();
+
+	sysWrite(1, "Leaving kernel\n", 16);
 
 	((EntryPoint) mainApp)(START_SHELL, 0);
 

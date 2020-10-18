@@ -180,7 +180,7 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	strcat("     Base RSP: ", buffer);
 	strcat("0x", buffer);
 	itoa((uint_fast64_t)pcb->segmentAddress, buffer + strlen(buffer), 16, -1);
-	strcat("\\n", buffer);
+	strcat("\n", buffer);
 }
 
 void ps(char * buffer) {

@@ -14,4 +14,5 @@
 // The following are syscall wrappers for reading/writing to stdin/stdout
 
 char getChar();
+
 int putChar(char c);

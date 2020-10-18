@@ -7,7 +7,6 @@
 
 #include <shell_builtins.h>
 #include <syscalls.h>
-#include <windows_lib.h>
 #include <image_lib.h>
 #include <std_lib.h>
 #include <std_io.h>
@@ -17,61 +16,37 @@
                                         		SHELL DEFINITIONS
 ------------------------------------------------------------------------------------------------------------------------- */
 
+#define NULL ((void *) 0)
+
 #define MAX_TOKENS 10
 #define MAX_TOKEN_LEN 20
 #define MAX_CMD_LEN MAX_TOKENS*MAX_TOKEN_LEN
 
 void parseCommand(char *cmdBuff);
 
-void drawLine(int argc, char **argv);
+void test_mm(int argc, char **argv);
 
-extern void loop();
+void line(int argc, char **argv);
 
-extern void test_mm();
+void loop(int argc, char **argv);
 
-static Window w;
+void dummy(int argc, char **argv);
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-static void createWindow(){
-	
-	ScreenRes res;
-	getRes(&res);
-
-	w.xi = 0; w.xf = res.width;
-	w.yi = 0; w.yf = res.height;
-	
-	w.textBackground = 0;
-
-	w.cursors[bodyCursor].x = 0; w.cursors[bodyCursor].y = 0;
-	w.cursors[bodyCursor].fontColor = bodyColor;
-	w.cursors[bodyCursor].fontSize = bodySize;
-	w.cursors[bodyCursor].withIndicator = 1;
-
-}
-
-void dummy(int argc, char **argv) {
-    while(1)
-        halt();
-}
-
 void shell(){
+
+	write(1, "Arriving shell\n", 16);
+
     startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 
-    startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
-
-	createWindow();
-	setWindow(&w);
-
 	char cmdBuff[MAX_CMD_LEN] = {0};
 	int buffPos = 0;
-
-	w.activeCursor = bodyCursor;
 
 	char c;
 	while (1){
@@ -79,30 +54,27 @@ void shell(){
 
 		// Handle the chars that are not CR
 
-		if(c == F3)
-			scrollUp(8);
-
 		if (c == '\b' && buffPos > 0)
 			cmdBuff[--buffPos] = 0;
 		
-		if (isPrintableChar(c) && buffPos < MAX_CMD_LEN)
+		if (c >= 32 && c <= 127 && buffPos < MAX_CMD_LEN)
 			cmdBuff[buffPos++] = c;
 
-		printChar(c);
+		putChar(c);
 
 		// Handle the CR char, parse command
 
 		if (c == '\r'){
 
 			if(buffPos==0){
-				newLine();
+				putChar('\n');
 				continue;
 			}
 
 			cmdBuff[buffPos] = 0;
 			parseCommand(cmdBuff);
 
-			newLine();
+			putChar('\n');
 
 			buffPos = 0;
 		}
@@ -123,7 +95,7 @@ void parseCommand(char *cmdBuff){
 
 	int j=1;
 	for (int i=0; cmdBuff[i]; i++){
-		if(isSpace(cmdBuff[i])){
+		if (cmdBuff[i] == ' ' || cmdBuff[i] == '\t' || cmdBuff[i] == '\n' || cmdBuff[i] == '\r' || cmdBuff[i] == 0){
 			cmdBuff[i] = 0;
 			tokens[j++] = cmdBuff+i+1;
 		}
@@ -147,7 +119,7 @@ void parseCommand(char *cmdBuff){
 		displayImage(tokens[1], 20, 200);
 	
 	else if(strncmp(tokens[0], "clear", 6) == 0)
-		clearScreen();
+		putChar('\f');
 
 
 	// CPU management
@@ -192,7 +164,7 @@ void parseCommand(char *cmdBuff){
 	// New processes
 
 	else if(strncmp(tokens[0], "line", 5) == 0)	
-		startProcess(drawLine, 0, NULL, "line");
+		startProcess(line, 0, NULL, "line");
 
 	else if(strncmp(tokens[0], "loop", 5) == 0)
 		startProcess(loop, 0, NULL, "loop");
@@ -215,7 +187,14 @@ void parseCommand(char *cmdBuff){
                                         	OTHER METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-void drawLine(int argc, char **argv){
+void dummy(int argc, char **argv) {
+    while(1)
+        halt();
+}
+
+
+void line(int argc, char **argv){
+
 	static int c=0;
 	c+=1;
 
@@ -224,8 +203,6 @@ void drawLine(int argc, char **argv){
 			for(int i=0; i<999; i++)
 				draw(x,y,0xFF0000);
 
-	kill(-1);	
+	kill(-1);
+
 }
-
-
-

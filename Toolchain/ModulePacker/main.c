@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <std_io.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <sys/stat.h>

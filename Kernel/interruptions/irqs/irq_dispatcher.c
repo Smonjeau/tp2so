@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <keyboard_driver.h>
-#include <kernel_messages.h>
+#include <video_lib.h>
 #include <process_manager.h>
 
 static void int_20();
@@ -37,7 +37,7 @@ void irqDispatcher(uint64_t irq) {
 // TIMER TICK
 void int_20() {
 
-	 ((EntryPoint) mainApp)(IRQ_PRODUCED, 1, TIMER_TICK_IRQ);
+	 cursorTickListener();
 
 }
 
