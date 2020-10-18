@@ -56,34 +56,12 @@ static void createWindow(){
 void dummy(int argc, char **argv) {
     while(1)
         halt();
-
-void consumer2(int argc, char **argv){
-
-
-
-
-
-    waitSem(4);
-    kill(-1);
-
-}
-void consumer(int argc, char **argv){
-
-
-
-
-
-    waitSem(4);
-	kill(-1);
-
 }
 
 void shell(){
     startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
-
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 
-    startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
 	createWindow();
 	setWindow(&w);
@@ -96,17 +74,7 @@ void shell(){
 	char c;
 	while (1){
 		c = getChar();
-	// if(createSem(0, 0) == -1){
-	// 	printf("Failed to create semaphore\n", 0);
-	// }
-    createSem(4, 0);
-    startProcess(consumer, 0, NULL, "consumer");
-    startProcess(consumer2,0,NULL,"consumer2");
-	 //startProcess(pipeTest, 0, NULL, "pipe_test");
 
-
-    char c;
-	while ((c = getChar())){
 
 		// Handle the chars that are not CR
 

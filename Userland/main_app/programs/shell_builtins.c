@@ -211,12 +211,14 @@ void printMemStatus(){
 ----------------------------------------------------------------------------------------------------- */
 
 void printProcData(){
-	char  buffer[90 * 40];
+	//char buffer[90 * 150];
+	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
 		return;
 
     ps(buffer);    
-    printf(buffer, 0);  
+    printf(buffer, 0);
+    free(buffer);
 
 
 }
@@ -248,7 +250,10 @@ void blockProcess(char * pid){
 	} else if(_pid==0){
 		printLine("Can not block the shell");
 		return;
-	}
+	} else if(_pid==1){
+        printLine("Dont kill the dummy proccess");
+        return;
+    }
 
 	block(_pid);
 }

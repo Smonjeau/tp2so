@@ -135,14 +135,20 @@ int assign_pipe_to_pcb_forced(int fd, pipe new) {
 	return 0;
 }
 
-void close_fd(int fd) {
-	if(runningProc != NULL) {
-		pipe aux = runningProc->pipes[fd];
-		runningProc->pipes[fd] = NULL;
-		aux->open_ports--;
-		free_pipe_if_empty(aux);
-	}
+void close_fd_proc(PCB pcb, int fd) {
+    if(pcb != NULL) {
+        pipe aux = pcb->pipes[fd];
+        pcb->pipes[fd] = NULL;
+        aux->open_ports--;
+        free_pipe_if_empty(aux);
+    }
 }
+
+void close_fd(int fd) {
+	close_fd_proc(runningProc, fd);
+}
+
+
 
 
 void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
@@ -182,10 +188,8 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 
 void ps(char * buffer) {
 
-	if(NULL){
-		drawLine();
+	if(buffer == NULL)
 		return;
-	}
 
 	ProcQueue * queue;
 	PCB pcb;
@@ -323,7 +327,7 @@ void blockProcess(int pid, int tick) {
 		idx--;
 		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;			
-			_sti();
+			//_sti();
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
 			if(tick == 1)
@@ -338,7 +342,7 @@ void blockProcess(int pid, int tick) {
 		}
 		
 	} else {
-		_sti();
+		//_sti();
 	}
 	
 }
@@ -549,28 +553,22 @@ void killProcess(int pid) {
 	PCB currentPCB;
 	int priorityIdx;
 	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
-		//Buscamos proceso en estado RUN
-		for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
-			currentPCB = actives[priorityIdx].first;
-			if(currentPCB != NULL)// && currentPCB->procState == RUN)
-				break; //Lo encontré. Se que está en estado RUN porque aun no consideramos estado bloqueado.
-		}
 
 		
 
 
-		actives[priorityIdx].first = currentPCB->nextPCB;
+		actives[priorityIdx].first = runningProc->nextPCB;
+
+
+
 
 
 		if(actives[priorityIdx].first == NULL) {
-
 			actives[priorityIdx].last = NULL;
 			swapIfNeeded();
-
-			
-			
 		}
 
+		currentPCB = runningProc;
 
 	} else {
 		//Buscamos proceso con el mismo pid
@@ -640,8 +638,8 @@ void killProcess(int pid) {
 
 	ProcState state = currentPCB->procState;
 	for(int pipe=0;pipe<MAX_PIPES;pipe++){
-	    if(currentPCB->pipes[pipe]!=NULL)
-	        close_fd(pipe);
+	    if(currentPCB->pipes[pipe] != NULL)
+	        close_fd_proc(currentPCB, pipe);
 	}
     free(currentPCB->segmentAddress);
     free(currentPCB);
