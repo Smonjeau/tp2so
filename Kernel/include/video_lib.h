@@ -13,6 +13,8 @@ void drawChar(int x, int y, char c);
 
 // Text definitions
 
+extern int backColor;
+
 void printChar(char c);
 
 void print(char c[]);

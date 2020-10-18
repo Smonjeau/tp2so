@@ -16,13 +16,12 @@
 #define TEXT_HOR_SPACING 1
 #define TEXT_VER_SPACING 1
 
-#define BACK_COLOR 0x000000
-
 #define WIDTH getResWidth()
 #define HEIGHT getResHeight()
 
+int backColor = 0;
 
-int curX, curY;
+int curX = 0, curY = 0;
 
 pipe stdoutPipe = NULL;
 /* --------------------------------------------------------------------------------------------------------------------------
@@ -80,7 +79,7 @@ void clearScreen(){
 
     for (int x=0; x<WIDTH; x++)
         for (int y=0; y<HEIGHT; y++)
-            drawPoint(x, y, 1, 0);
+            drawPoint(x, y, 1, backColor);
 
     curX=0; curY=0;
 
@@ -97,7 +96,7 @@ void scrollUp(int dy){
 
     for(int y=HEIGHT-dy; y<HEIGHT; y++){
         for(int x=0; x<WIDTH; x++){
-            draw(x, y, 0);
+            draw(x, y, backColor);
         }
     }
 
@@ -176,7 +175,7 @@ void printChar(char c){
     printing=1;
 
     for (int y=0; y<fontHeight; y++)
-        drawPoint(curX+2, curY+y, 2, 0x000000);
+        drawPoint(curX+2, curY+y, 2, backColor);
 
     switch(c){
 
@@ -186,7 +185,7 @@ void printChar(char c){
 
         case '\b':
             prevChar();
-            drawPoint(curX, curY, TEXT_SIZE * fontHeight, 0);
+            drawPoint(curX, curY, TEXT_SIZE * fontHeight, backColor);
             break;
 
         case '\f':
@@ -225,7 +224,7 @@ void cursorTickListener(){
 
     if((ticks%15) == 0 ){
         for (int y=0; y<fontHeight; y++)
-            drawPoint(curX+2, curY+y, 2, cursorActive ? 0xFFFFFF : 0x000000);
+            drawPoint(curX+2, curY+y, 2, cursorActive ? 0xFFFFFF : backColor);
         cursorActive = cursorActive ? 0 : 1;
     }
 

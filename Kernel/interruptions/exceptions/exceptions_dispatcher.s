@@ -56,7 +56,7 @@
 	popState
 
 	mov rdi, \exception 	# Exception code
-	mov rsi, [rsp+8]		# EIP at exception generation
+	mov rsi, [rsp]		# EIP at exception generation
 	call exceptionDispatcher
 	
 	iretq

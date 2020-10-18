@@ -37,12 +37,14 @@ typedef struct P_rq{
 }p_rq;
 
 
-void test_processes(){
+void test_proc(){
 
   p_rq p_rqs[MAX_PROCESSES];
   uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;
+
+  printf("Begin of process test\n", 0);
 
   while (1){
 
@@ -72,18 +74,18 @@ void test_processes(){
 
         switch(action){
 
-          case 0:
-            if (p_rqs[rq].state == SRUNNING || p_rqs[rq].state == SBLOCKED){
+          // case 0:
+          //   if (p_rqs[rq].state == SRUNNING || p_rqs[rq].state == SBLOCKED){
 
-              if (my_kill(p_rqs[rq].pid) == -1){
-                printf("ERROR killing process\n", 0);
-                return;
-              }
+          //     if (my_kill(p_rqs[rq].pid) == -1){
+          //       printf("ERROR killing process\n", 0);
+          //       return;
+          //     }
 
-              p_rqs[rq].state = SKILLED; 
-              alive--;
-            }
-            break;
+          //     p_rqs[rq].state = SKILLED; 
+          //     alive--;
+          //   }
+          //   break;
 
           case 1:
             if (p_rqs[rq].state == SRUNNING){
@@ -116,11 +118,7 @@ void test_processes(){
         }
       }
 
-    } 
-  }
-}
+    }
 
-int main(){
-  test_processes();
-  return 0;
+  }
 }

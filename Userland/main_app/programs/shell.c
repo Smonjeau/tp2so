@@ -26,6 +26,8 @@ void parseCommand(char *cmdBuff);
 
 void test_mm(int argc, char **argv);
 
+void test_proc(int argc, char **argv);
+
 void line(int argc, char **argv);
 
 void loop(int argc, char **argv);
@@ -38,7 +40,8 @@ void dummy(int argc, char **argv);
 ------------------------------------------------------------------------------------------------------------------------- */
 
 void shell(){
-    startProcess(dummy, 0, (void*) 0,"dummy"); //Necesario en ciertos casos
+
+    startProcess(dummy, 0, (void *) 0, "dummy_proc"); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 	forcePipe(1); //Creamos el pipe que comunica fd 1 con salida estandar
@@ -46,10 +49,11 @@ void shell(){
 	char cmdBuff[MAX_CMD_LEN] = {0};
 	int buffPos = 0;
 
+	printf("\f", 0);
+
 	char c;
 	while (1){
 		c = getChar();
-
 
 		// Handle the chars that are not CR
 
@@ -177,16 +181,16 @@ void parseCommand(char *cmdBuff){
 
 	//Testing
 	else if(strncmp(tokens[0],"testmm",7) == 0)
-		startProcess(test_mm,0,NULL,"testmm");
+		startProcess(test_mm, 0, NULL, "testmm");
 
 	//Aplicacion pipe (estado de pipes)
 	else if(strncmp(tokens[0], "pipe", 5) == 0)
 		printPipeInfo();
 
-
+	else if(strncmp(tokens[0],"testproc",7) == 0)
+		startProcess(test_proc, 0, NULL, "testproc");
 
 	// Command not found
-
 	else
 		printWarning();
 	

@@ -8,12 +8,12 @@
 - Block/unblock process     ✓
 - Change process priority   ✓
 - Kill process              ✓
-- Pass processes tests      X
+- Pass processes tests      ✓
 
-- Implement semaphores      !
-- Implement pipes           !
+- Implement semaphores      ✓
+- Implement pipes           ✓
+- Pass synch test           X
 
-
-On exception handling:
- - Kill the causing process
- - Screen painting is to slow
+- Process piping (|)        X
+- Phylosopher command       X
+- Cat command               X
