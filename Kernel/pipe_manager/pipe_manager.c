@@ -4,6 +4,7 @@
 #include <semaphores.h>
 #include <interrupts.h>
 #include <keyboard_driver.h>
+#include <screen_driver.h>
 #define READ 0
 #define WRITE 1
 static int semaphore_id = 0;
@@ -52,11 +53,21 @@ void close_port(int fd) {
     close_fd(fd);
 }
 
+void drawLine3(){
+    static int c=0;
+    c+=1;
+
+        for(int x=0; x<1024; x++)
+            draw(x,c*220,0xFFFFFF);
+
+}
 void free_pipe_if_empty(pipe pipe) {
 	if(pipe->open_ports == 0) {
-	    deleteSemaphore(pipe->read_bytes_sem);
-        deleteSemaphore(pipe->write_bytes_sem);
-        free(pipe);
+
+	    if(deleteSemaphore(pipe->read_bytes_sem) == -1 || deleteSemaphore(pipe->write_bytes_sem) == -1)
+            drawLine3();
+        else
+            free(pipe);
 	}
 }
 

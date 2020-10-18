@@ -3,7 +3,6 @@
 #include <mem_manager.h>
 #include <stddef.h>
 #include <screen_driver.h>
-#include <screen_driver.h>
 #include <interrupts.h>
 
 
@@ -220,7 +219,7 @@ void ps(char * buffer) {
 
 void swapIfNeeded() {
 	int idx, found = 0;
-	for(idx = 0; idx < 40; idx++)
+	for(idx = 0; idx < 40 && found == 0; idx++)
 		if(actives[idx].first != NULL)
 			found = 1;
 
@@ -554,7 +553,12 @@ void killProcess(int pid) {
 	int priorityIdx;
 	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
 
-		
+
+        for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
+            currentPCB = actives[priorityIdx].first;
+            if(currentPCB->pid == runningProc->pid)
+                break;
+        }
 
 
 		actives[priorityIdx].first = runningProc->nextPCB;
@@ -568,7 +572,6 @@ void killProcess(int pid) {
 			swapIfNeeded();
 		}
 
-		currentPCB = runningProc;
 
 	} else {
 		//Buscamos proceso con el mismo pid
@@ -615,19 +618,22 @@ void killProcess(int pid) {
 					}
 				}			
 			}
-			
-			priorityIdx--; //Para compensar el ultimo ++ del for
-			if((expireds[priorityIdx].first)->pid == pid) {
-				//Es el primero
-				expireds[priorityIdx].first = currentPCB->nextPCB;
-				if(expireds[priorityIdx].first == NULL)
-					expireds[priorityIdx].last = NULL;
-			} else {
-				//No es el primero
-				if((expireds[priorityIdx].last)->pid == pid)
-					expireds[priorityIdx].last = prevPCB; //Es el ultimo	
-				prevPCB->nextPCB = currentPCB->nextPCB;
+			if(found == 1) {
+                priorityIdx--; //Para compensar el ultimo ++ del for
+                if((expireds[priorityIdx].first)->pid == pid) {
+                    //Es el primero
+                    expireds[priorityIdx].first = currentPCB->nextPCB;
+                    if(expireds[priorityIdx].first == NULL)
+                        expireds[priorityIdx].last = NULL;
+                } else {
+                    //No es el primero
+                    if((expireds[priorityIdx].last)->pid == pid)
+                        expireds[priorityIdx].last = prevPCB; //Es el ultimo
+                    prevPCB->nextPCB = currentPCB->nextPCB;
+                }
 			}
+			
+
 
 		}
 
