@@ -1,1 +1,0 @@
-void displayImage(char *imageName, int x, int y);

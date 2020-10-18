@@ -5,9 +5,8 @@
 | Press ENTER to execute a command.																	|
 ---------------------------------------------------------------------------------------------------*/
 
-#include <shell_builtins.h>
+#include <shell_cmds.h>
 #include <syscalls.h>
-#include <image_lib.h>
 #include <std_lib.h>
 #include <std_io.h>
 #include <asm_lib.h>
@@ -24,17 +23,7 @@
 
 void parseCommand(char *cmdBuff);
 
-void test_mm(int argc, char **argv);
-
-void test_proc(int argc, char **argv);
-
-void line(int argc, char **argv);
-
-void loop(int argc, char **argv);
-
 void dummy(int argc, char **argv);
-
-
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
@@ -210,19 +199,4 @@ void parseCommand(char *cmdBuff){
 void dummy(int argc, char **argv) {
     while(1)
         halt();
-}
-
-
-void line(int argc, char **argv){
-
-	static int c=0;
-	c+=1;
-
-	for(int y=50*c; y<50*(c+1); y++)
-		for(int x=0; x<1024; x++)
-			for(int i=0; i<999; i++)
-				draw(x,y,0xFF0000);
-
-	kill(-1);
-
 }

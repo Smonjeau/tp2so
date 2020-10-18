@@ -6,16 +6,17 @@
 ---------------------------------------------------------------------------------------------------*/
 
 #include <stdint.h>
-#include <programs.h>
 #include <syscalls.h>
 
 extern char bss;
 extern char endOfBinary;
 
 
+int shell();
+
 int _start() {
 
-	startProcess(shell, 0, (void*) 0,"shell");
+	startProcess(shell, 0, (void*) 0, "shell");
 	__asm__("hlt;\n\r");
 
 	return 0;

@@ -2,7 +2,6 @@
 #include <std_lib.h>
 #include <syscalls.h>
 #include <test_util.h>
-#include <tests.h>
 
 #define NULL ((void *) 0)
 

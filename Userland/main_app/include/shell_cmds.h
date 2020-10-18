@@ -1,30 +1,48 @@
 #ifndef SHELL_BUILTINS_H
 #define SHELL_BUILTINS_H
 
+// MISCELANEOUS COMMANDS
+
 void printHelp(void);
+void printWarning(void);
+void printTime(void);
 void divZeroException(void);
 void invOpcodeException(void);
-void printTime(void);
-void printWarning(void);
+
+void displayImage(char *name, int x, int y);
+void startFilter();
+void line(int argc, char **argv);
+void loop(int argc, char **argv);
+
+
+// CPU COMMANDS
 
 void printCPUTemp(void);
 void printCPUInfo(void);
 void printInfoReg(void);
 void printStoredReg(void);
 
+
+// MEMORY COMMANDS
+
 void printMemDump(char * start);
 void printMemStatus(void);
 
+
+// PROCESSES COMMANDS
+
 void printProcData();
-void printPipeInfo();
 void killProcess(char * pid);
 void blockProcess(char * pid);
 void niceProcess(char * pid, char * priority);
-void startFilter();
 
-
+void printPipeInfo();
 void printSemStatus();
 
-#define MAX_BLOCKED_PIDS 20
+
+// TEST COMMANDS
+
+void test_mm(int argc, char **argv);
+void test_proc(int argc, char **argv);
 
 #endif
