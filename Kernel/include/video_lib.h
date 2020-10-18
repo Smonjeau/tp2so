@@ -1,4 +1,8 @@
+#ifndef VIDEO_LIB_H
+#define VIDEO_LIB_H
+
 #include <stdint.h>
+#include <pipe_manager.h>
 
 // General definitions
 
@@ -19,3 +23,7 @@ void cursorTickListener();
 // Image definitions
 
 void drawImage(int xi, int yi, uint8_t *image, int height, int width);
+
+void assignStdoutPipe(pipe new);
+
+#endif

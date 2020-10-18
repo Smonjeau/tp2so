@@ -19,6 +19,8 @@ int pipe_write_nofd(pipe pipe, char * buffer, int bytes);
 
 int pipe_read (int fd, char * buffer, int bytes);
 
+int pipe_read_nofd (pipe pipe, char * buffer, int bytes);
+
 int create_pipe (int * fds);
 
 /* Crea un pipe con una unica boca definida por parametro y la otra boca de acuerdo al fd recibido. Usado para teclado y consola de texto*/

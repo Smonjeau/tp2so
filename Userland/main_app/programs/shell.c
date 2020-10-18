@@ -41,6 +41,7 @@ void shell(){
     startProcess(dummy, 0, (void*) 0,"dummy_proc"); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
+	forcePipe(1); //Creamos el pipe que comunica fd 1 con salida estandar
 
 	char cmdBuff[MAX_CMD_LEN] = {0};
 	int buffPos = 0;

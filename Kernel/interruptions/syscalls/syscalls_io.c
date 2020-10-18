@@ -27,8 +27,8 @@ char sysRead(int fd, char * buffer, int n) {
 
 int sysWrite(int fd, char * buffer, int n) {
 
-    if(fd == 1)
-        print(buffer);
+    /*if(fd == 1)
+        print(buffer);*/
 
     return pipe_write(fd,buffer, n);
 

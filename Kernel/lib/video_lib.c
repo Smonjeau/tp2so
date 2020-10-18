@@ -9,6 +9,7 @@
 #include <font.h>
 #include <screen_driver.h>
 #include <video_lib.h>
+#include <process_manager.h>
 
 #define TEXT_COLOR 0xFFFFFF
 #define TEXT_SIZE 1
@@ -23,6 +24,27 @@
 
 int curX, curY;
 
+pipe stdoutPipe = NULL;
+/* --------------------------------------------------------------------------------------------------------------------------
+                                            STDOUT PROC
+-------------------------------------------------------------------------------------------------------------------------- */
+void stdoutProc(int argc, char **argv) {
+    //Por defecto heredamos los fds de nuestro padre. En este caso la shell
+    //Este proceso solo lee del buffer, por lo que en principio cierro el fd 1.
+    close_fd(1);
+    //Al haber heredado, tambien tenemos STDIN en fd 0, lo cual tampoco nos interesa.
+    close_fd(0);
+    //En este caso especial no utilizamos ningun fd, pues ya tenemos el pipe especifico.
+    //Siempre que haya algo, lo mostramos en pantalla
+    while(1) {
+        char aux[2];
+        pipe_read_nofd(stdoutPipe, &aux, 2);
+        print(aux);
+        //printChar(aux);
+    }
+}
+
+
 /* --------------------------------------------------------------------------------------------------------------------------
                                             GENERAL METHODS
 -------------------------------------------------------------------------------------------------------------------------- */
@@ -34,6 +56,19 @@ void drawPoint(int x, int y, int size, int rgb){
         for (int cy=y; cy<y+size; cy++)
             draw(cx, cy, rgb);
 
+}
+
+void assignStdoutPipe(pipe new) {
+    if(stdoutPipe == NULL)
+        stdoutPipe = new;
+
+    /*Vamos a crear un proceso para la impresion de texto.
+    ¿Por que?
+    Al hacer write a STDOUT desde userland lo que se hace es escribir a un pipe especial.
+    Por lo tanto, del otro extremo debe existir un proceso que lea de este pipe y muestre en pantalla.
+    De esta forma tambien garantizamos que si no existe nada para mostrar en pantalla, esto proceso que
+    crearemos a continuación quedará bloqueado hasta que otro proceso le escriba algo.*/
+    createProcessContext(0, NULL, stdoutProc, "stdout");
 }
 
 

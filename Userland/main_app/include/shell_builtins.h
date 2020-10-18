@@ -1,3 +1,6 @@
+#ifndef SHELL_BUILTINS_H
+#define SHELL_BUILTINS_H
+
 void printHelp(void);
 void divZeroException(void);
 void invOpcodeException(void);
@@ -22,3 +25,5 @@ void niceProcess(char * pid, char * priority);
 void printSemStatus();
 
 #define MAX_BLOCKED_PIDS 20
+
+#endif

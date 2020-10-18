@@ -5,6 +5,7 @@
 #include <interrupts.h>
 #include <keyboard_driver.h>
 #include <screen_driver.h>
+#include <video_lib.h>
 #include <lib.h>
 #define READ 0
 #define WRITE 1
@@ -73,6 +74,11 @@ int create_force_pipe(int fd) {
                 //STDIN es el teclado.
                 //Asignamos la segunda boca del pipe al keyboardDriver
                 assignKeyboardPipe(new);
+                break;
+            case 1:
+                //STDOUT es la impresion en pantalla de texto
+                //Asignamos la segunda boca del pipe al video_lib
+                assignStdoutPipe(new);
                 break;
         }
         return 0;
@@ -147,6 +153,9 @@ int pipe_write_nofd(pipe pipe, char * buffer, int bytes) {
 }
 int pipe_read(int fd, char * buffer, int bytes) {
     pipe pipe = findPipe(fd);
+    return pipe_read_nofd(pipe, buffer, bytes); //Reutilizamos la funcion
+}
+int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
     if(pipe == NULL)
         return -1;
     int i;

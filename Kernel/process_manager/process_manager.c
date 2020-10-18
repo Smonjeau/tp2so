@@ -631,6 +631,8 @@ void killProcess(int pid) {
                         expireds[priorityIdx].last = prevPCB; //Es el ultimo
                     prevPCB->nextPCB = currentPCB->nextPCB;
                 }
+			} else {
+				return;
 			}
 			
 
