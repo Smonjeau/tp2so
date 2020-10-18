@@ -34,6 +34,7 @@
 .extern sysPostSemaphore
 .extern sysDeleteSemaphore
 .extern sysPipe
+.extern sysPipeInfo
 .extern sysForcePipe
 .extern sysClosefd
 .extern sysPipeWrite
@@ -133,6 +134,9 @@ _syscallDispatcher:
 
     cmp rax,26
     je _semStatus
+
+    cmp rax, 27
+    je _pipeInfo
 
     jmp endOfInt
 
@@ -244,6 +248,10 @@ _deleteSemaphore:
 
 _pipe:
     call sysPipe
+    jmp endOfInt
+
+_pipeInfo:
+    call sysPipeInfo
     jmp endOfInt
 
 _forcepipe:

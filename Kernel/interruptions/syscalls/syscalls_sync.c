@@ -35,6 +35,10 @@ int sysPipe(int * fds) {
 	return create_pipe(fds);
 }
 
+void sysPipeInfo(char * buffer) {
+	pipeInfo(buffer);
+}
+
 int sysForcePipe(int fd) {
 	return create_force_pipe(fd);
 }

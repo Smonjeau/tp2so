@@ -10,6 +10,7 @@ typedef struct pipe {
     int read_bytes_sem;
     char buffer [PIPE_SIZE];
     int open_ports; //Esto es para que el pipe sepa que puede liberar la memoria pedida si no hay más procesos usandolo.
+    struct pipe * nextPipe;
 } * pipe;
 
 int pipe_write(int fd, char * buffer, int bytes);
@@ -26,6 +27,8 @@ int create_force_pipe(int fd);
 void close_port(int fd);
 
 void free_pipe_if_empty(pipe pipe);
+
+void pipeInfo(char * buffer);
 
 
 #endif

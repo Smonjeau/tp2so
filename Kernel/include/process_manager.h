@@ -71,7 +71,7 @@ void niceProcess(int pid, int priority);
 
 
 /* PS devuelve arreglo de structs PCB existentes y numero de procesos */
-void ps(char * buffer/*, int * procCant*/);
+void ps(char * buffer);
 
 
 /* Returns the PID of the running process, or -1 if none */

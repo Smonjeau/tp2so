@@ -13,6 +13,7 @@ void printMemDump(char * start);
 void printMemStatus(void);
 
 void printProcData();
+void printPipeInfo();
 void killProcess(char * pid);
 void blockProcess(char * pid);
 void niceProcess(char * pid, char * priority);

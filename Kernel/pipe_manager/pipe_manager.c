@@ -5,69 +5,115 @@
 #include <interrupts.h>
 #include <keyboard_driver.h>
 #include <screen_driver.h>
+#include <lib.h>
 #define READ 0
 #define WRITE 1
 static int semaphore_id = 0;
-int create_pipe(int  fds [2]) {
 
-    pipe new = malloc(sizeof(struct pipe));
+pipe pipeList = NULL;
+
+void addToPipeList(pipe new) {
     if(new == NULL)
-        return -1;
+        return;
+    if(pipeList == NULL) {
+        pipeList = new;
+    } else {
+        pipe aux = pipeList;
+        while(aux->nextPipe != NULL)
+            aux = aux->nextPipe;
+        aux->nextPipe = new;
+    }
+}
+void removeFromPipeList(pipe pipe_rem) {
+    if(pipe_rem == NULL || pipeList == NULL)
+        return;
+    pipe aux = pipeList;
+    while(aux->nextPipe != NULL && aux->nextPipe != pipe_rem)
+        aux = aux->nextPipe;
+    if(aux == pipe_rem)
+        pipeList = pipe_rem->nextPipe; //Era el primer pipe
+    else if(aux->nextPipe == pipe_rem)
+        aux->nextPipe = pipe_rem->nextPipe;
+}
+
+int initializePipe(pipe new) {
+    if(new == NULL)
+        return 0;
     new->index_w = 0;
     new->index_r = 0;
     new->open_ports = 2;
     new->write_bytes_sem = semaphore_id++;
     new->read_bytes_sem = semaphore_id++;
+    new->nextPipe = NULL;
+    addToPipeList(new);
     createSemaphore(new->write_bytes_sem, PIPE_SIZE);
     createSemaphore(new->read_bytes_sem, 0);
-    return assign_pipe_to_pcb(fds, new);
+    return 1;
+}
+
+int create_pipe(int  fds [2]) {
+
+    pipe new = malloc(sizeof(struct pipe));
+    if(initializePipe(new))
+        return assign_pipe_to_pcb(fds, new);
+    return -1;
+    
+    
 }
 
 int create_force_pipe(int fd) {
     if(is_fd_free(fd) == 0 || fd < 0 || fd >= MAX_PIPES)
         return -1;
-    //Tengo el fd indicado libre
     pipe new = malloc(sizeof(struct pipe));
-    if(new == NULL)
-        return -1;
-    new->index_w = 0;
-    new->index_r = 0;
-    new->open_ports = 2;
-    new->write_bytes_sem = semaphore_id++;
-    new->read_bytes_sem = semaphore_id++;
-    createSemaphore(new->write_bytes_sem, PIPE_SIZE);
-    createSemaphore(new->read_bytes_sem, 0);
-    if(assign_pipe_to_pcb_forced(fd, new) == -1)
-        return -1;
-    switch(fd) {
-        case 0:
-            //STDIN es el teclado.
-            //Asignamos la segunda boca del pipe al keyboardDriver
-            assignKeyboardPipe(new);
-            break;
+    if(initializePipe(new) == 1) {
+        if(assign_pipe_to_pcb_forced(fd, new) == -1)
+            return -1;
+        switch(fd) {
+            case 0:
+                //STDIN es el teclado.
+                //Asignamos la segunda boca del pipe al keyboardDriver
+                assignKeyboardPipe(new);
+                break;
+        }
+        return 0;
     }
-    return 0;
+    return -1;   
+    
 }
 
 void close_port(int fd) {
     close_fd(fd);
 }
 
-void drawLine3(){
-    static int c=0;
-    c+=1;
-
-        for(int x=0; x<1024; x++)
-            draw(x,c*220,0xFFFFFF);
-
+void copyPipeInfoToBuffer(char * buffer, pipe aux) {
+    strcat("Bocas abiertas: ", buffer);
+    //strcat(pcb->name, buffer);
+    itoa(aux->open_ports, buffer + strlen(buffer), 10, -1);
+    strcat("\n", buffer);
 }
+
+void pipeInfo(char * buffer) {
+    if(buffer == NULL)
+        return;
+
+    pipe aux = pipeList;
+    strcpy("", buffer);
+
+    while(aux != NULL) {
+        copyPipeInfoToBuffer(buffer, aux);
+        aux = aux->nextPipe;
+    }
+}
+
 void free_pipe_if_empty(pipe pipe) {
 	if(pipe->open_ports == 0) {
 
-	    if(deleteSemaphore(pipe->read_bytes_sem) == -1 || deleteSemaphore(pipe->write_bytes_sem) == -1)
-            drawLine3();
-        else
+	    if(deleteSemaphore(pipe->read_bytes_sem) == -1 || deleteSemaphore(pipe->write_bytes_sem) == -1) {
+            return;
+        } else {
+            removeFromPipeList(pipe);
             free(pipe);
+        }
 	}
 }
 

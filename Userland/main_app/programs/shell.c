@@ -178,6 +178,10 @@ void parseCommand(char *cmdBuff){
 	else if(strncmp(tokens[0],"testmm",7) == 0)
 		startProcess(test_mm,0,NULL,"testmm");
 
+	//Aplicacion pipe (estado de pipes)
+	else if(strncmp(tokens[0], "pipe", 5) == 0)
+		printPipeInfo();
+
 
 
 	// Command not found

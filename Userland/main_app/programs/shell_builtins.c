@@ -32,10 +32,11 @@ void printHelp(void){
 	printf("- memdump n         to print memory starting at n\n", 0);
 	printf("- mem          to print heap status\n\n", 0);
 
-	printf("- ps                to list active processes\n", 0);
+	printf("- ps                to list all processes\n", 0);
 	printf("- kill pid          to kill a process\n", 0);
 	printf("- block pid         to block a process\n", 0);
 	printf("- nice pid priority to change priority (100 - 139)\n", 0);
+	printf("- pipe              to list all pipes\n", 0);
     printf("- line              to draw a line (for testing)\n", 0);
     printf("- loop              to start loop (for testing)\n\n", 0);
 		
@@ -208,7 +209,6 @@ void printMemStatus(){
 ----------------------------------------------------------------------------------------------------- */
 
 void printProcData(){
-	//char buffer[90 * 150];
 	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
 		return;
@@ -253,6 +253,17 @@ void blockProcess(char * pid){
     }
 
 	block(_pid);
+}
+
+void printPipeInfo() {
+	char * buffer = malloc(90 * 40);
+    if(buffer == (void *) 0)
+		return;
+
+    pipeInfo(buffer);    
+    printf(buffer, 0);
+    free(buffer);
+	
 }
 
 void niceProcess(char * pid, char * priority) {
