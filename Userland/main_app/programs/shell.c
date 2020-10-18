@@ -35,6 +35,8 @@ void loop(int argc, char **argv);
 void dummy(int argc, char **argv);
 
 
+
+
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
@@ -186,6 +188,10 @@ void parseCommand(char *cmdBuff){
 	//Aplicacion pipe (estado de pipes)
 	else if(strncmp(tokens[0], "pipe", 5) == 0)
 		printPipeInfo();
+
+	//Aplicacion filter (filtra vocales)
+	else if(strncmp(tokens[0],"filter",7) == 0)
+		startFilter();
 
 	else if(strncmp(tokens[0],"testproc",7) == 0)
 		startProcess(test_proc, 0, NULL, "testproc");
