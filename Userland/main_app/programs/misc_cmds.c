@@ -108,7 +108,7 @@ void filter(int argc, char **argv) {
 		if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
 			bufferAux[idxBuffer++] = c;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
-	} while(c != '\n');
+	} while(c != EOT);
 
 
 	bufferAux[idxBuffer] = 0;
@@ -127,7 +127,7 @@ void cat(int argc, char ** argv) {
 			c = '\n';
 		bufferAux[idxBuffer++] = c;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
-	} while(c != '\n');
+	} while(c != EOT);
 
 
 	bufferAux[idxBuffer] = 0;

@@ -14,13 +14,12 @@
 - Implement pipes           ✓
 - Pass synch test           ✓
 
+- Process background (&)    ✓
 - Process piping (|)        X
-- Process background (&)    X
 
 - Phylo command             X
-- Filter command            X
-- Cat command               X
+- Filter command            ✓
+- Cat command               ✓
 - Wc command                X
 
-- List blocked processes on sems and pipes
 - Add named pipes

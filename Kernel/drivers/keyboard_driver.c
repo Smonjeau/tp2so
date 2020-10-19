@@ -4,7 +4,6 @@
 | This library handles the reading of the keyboard, considering its layout and special key combinations. |
 --------------------------------------------------------------------------------------------------------*/
 
-#include <special_keys.h>
 #include <interrupts.h>
 #include <keyboard_driver.h>
 #include <pipe_manager.h>
@@ -42,7 +41,7 @@ char shifted_keyboard_map[64] = {
 
 int shift=0;
 int caps=0;
-
+int ctrl=0;
 
 /* ------------------------------------------------------------------------------------------------------
                                             KEYBOARD METHODS
@@ -68,25 +67,13 @@ char keyCodeToChar(int keyCode){
         return 14;
     }
 
-    // F1
-    if(keyCode == 59)
-        return F1;
-
-    // F2
-    if(keyCode == 60)
-        return F2;
-
-    // F3
-    if(keyCode == 61)
-        return F3;
-
     // ESC
     if(keyCode == 1)
-        return ESC;
+        return 4;
 
     // Unmapped key
     if(keyCode >= 129)
-        return NA;
+        return 0;
     
     // If it is a letter check for shift/caps
     if((keyCode>=16 && keyCode<=25) || (keyCode>=30 && keyCode<=38) || (keyCode>=44 && keyCode<=50)){      
