@@ -133,13 +133,14 @@ void cat(int argc, char ** argv) {
 			c = '\n';
 		bufferAux[idxBuffer++] = c;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
-	} while(c != EOT);
+	} while(c != '\n');
 
 
 	bufferAux[idxBuffer] = 0;
 
 	printf("\n", 0);
 	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
+	putChar(EOT);
 
 	kill(-1); //Exit
 }

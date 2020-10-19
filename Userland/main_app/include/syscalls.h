@@ -100,6 +100,4 @@ int forcePipe(int fd);
 
 void close(int fd);
 
-int pipeRead (int fd, char * buffer, int bytes);
-
 void pipeInfo(char * buffer);

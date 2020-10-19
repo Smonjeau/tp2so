@@ -225,9 +225,9 @@ void close_fd(int fd) {
 void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	strcat("Name: ", buffer);
 	strcat(pcb->name, buffer);
-	strcat("     Pid: ", buffer);
+	strcat("   Pid: ", buffer);
 	itoa(pcb->pid, buffer + strlen(buffer), 10, -1);
-	strcat("     State: ", buffer);
+	strcat("   State: ", buffer);
 	switch (pcb->procState){
         case READY:
             strcat("READY", buffer);
@@ -248,13 +248,17 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	        strcat("BLOCKED",buffer);
 	        break;
 	}
-	strcat("     Priority: ", buffer);
+	if(pcb->bg == 0)
+		strcat("   FG", buffer);
+	else
+		strcat("   BG", buffer);
+	strcat("   Priority: ", buffer);
 	itoa(priority, buffer + strlen(buffer), 10, -1);
-	strcat("     Context RSP: ", buffer);
+	strcat("   Context RSP: ", buffer);
 	strcat("0x", buffer);
 	itoa((uint64_t)pcb->contextRSP, buffer + strlen(buffer), 16, -1);
 
-	strcat("     Base RSP: ", buffer);
+	strcat("   Base RSP: ", buffer);
 	strcat("0x", buffer);
 	itoa((uint_fast64_t)pcb->segmentAddress, buffer + strlen(buffer), 16, -1);
 	strcat("\n", buffer);
