@@ -89,6 +89,8 @@ void close_fd(int fd);
 /*Cierra cierto fd de cierto proceso*/
 void close_fd_proc(PCB pcb, int fd);
 
+/* Mueve el fd recibido al fd mas chico libre */
+int dup_fd(int fd);
 
 /* Busca el pipe al cual esta coenctado el fd indicado */
 

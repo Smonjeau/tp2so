@@ -113,10 +113,9 @@ int create_force_pipe(int fd) {
 
 
 void close_port(int fd) {
-
     close_fd(fd);
-
 }
+
 
 
 void copyPipeInfoToBuffer(char * buffer, pipe aux) {

@@ -207,7 +207,7 @@ int assign_pipe_to_pcb_forced(int fd, pipe new) {
 }
 
 void close_fd_proc(PCB pcb, int fd) {
-    if(pcb != NULL) {
+    if(pcb != NULL && fd >= 0 && fd < MAX_PIPES) {
         pipe aux = pcb->pipes[fd];
         pcb->pipes[fd] = NULL;
         aux->open_ports--;
@@ -219,7 +219,24 @@ void close_fd(int fd) {
 	close_fd_proc(runningProc, fd);
 }
 
+int dup_fd(int fd) {
+	if(runningProc == NULL || fd < 0 || fd >= MAX_PIPES)
+		return -1;
 
+	int i = 0;
+	while(runningProc->pipes[i++] != NULL);
+	i--; //Compenso
+
+	if(i > fd)
+		return -1; //Fue a parar a un fd incluso mas grande
+
+	pipe * aux = runningProc->pipes[fd];
+	runningProc->pipes[fd] = NULL;
+	runningProc->pipes[i] = aux;
+	return 0;
+
+
+}
 
 
 void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {

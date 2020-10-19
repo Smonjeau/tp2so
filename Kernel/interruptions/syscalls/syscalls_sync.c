@@ -47,6 +47,10 @@ void sysClosefd(int fd) {
 	close_port(fd);
 }
 
+int sysDup(int fd) {
+    return dup_fd(fd);
+}
+
 int sysPipeRead (int fd, char * buffer, int bytes) {
     return pipe_read (fd,buffer, bytes);
 }
