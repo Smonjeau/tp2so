@@ -39,6 +39,8 @@ void printHelp(void){
     printf("- loop              to start loop (for testing)\n\n", 0);
 		
 	printf("---------------------------------------------------", 0);
+
+	kill(-1);
 }
 
 
@@ -46,6 +48,8 @@ void printWarning(){
 	printf(">> Error:\n", 0, 0);
 	printf("Command not found\n", 0);
 	printf("If you want to see the command manual type 'help'.\n", 0);
+
+	kill(-1);
 }
 
 
@@ -54,6 +58,8 @@ void printTime(void){
 	getTime(&t);
 
 	printf("\nTime now: %2d:%2d:%2d\n", 0, 3, t.hours, t.minutes, t.seconds);
+
+	kill(-1);
 }
 
 
@@ -63,6 +69,8 @@ void printTime(void){
 void divZeroException(void){
 	int a;
 	a = 2 / 0;
+
+	kill(-1);
 }
 
 
@@ -70,15 +78,18 @@ void invalidOpcode();
 
 void invOpcodeException(void){
 	invalidOpcode();
+
+	kill(-1);
 }
 
 
 /* ------------------------------------------- USER APPS ------------------------------------------------------ */
 
-void displayImage(char *name, int x, int y){
+void displayImage(char *name){
 
-    // drawImage(x, y, anon_img, anon_width, anon_height);
+    // drawImage(20, 200, anon_img, anon_width, anon_height);
     
+	kill(-1);
 }
 
 
@@ -90,7 +101,7 @@ void line(int argc, char **argv){
 	for(int y=50*c; y<50*(c+1); y++)
 		for(int x=0; x<1024; x++)
 			for(int i=0; i<999; i++)
-				draw(x,y,0xFF0000);
+				draw(x, y, 0xFF0000);
 
 	kill(-1);
 

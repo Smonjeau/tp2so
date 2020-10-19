@@ -83,11 +83,12 @@ void shell(){
                                 COMMAND-CHECK METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
+char *tokens[MAX_TOKENS] = {0};
+
 void parseCommand(char *cmdBuff) {
 
 	// Separate on tokens
-
-	char *tokens[MAX_TOKENS] = {0};
+	
 	tokens[0] = cmdBuff;
 
 	int j=1;
@@ -107,19 +108,19 @@ void parseCommand(char *cmdBuff) {
 	// Miscellaneous
 
 	if (strncmp(tokens[0], "help", 5) == 0 && j==1)
-		printHelp();
+		startProcess(printHelp, 0, NULL, "testnosync", foreground);
 
 	else if (strncmp(tokens[0], "divzero", 8) == 0 && j==1)
-		divZeroException();
+		startProcess(divZeroException, 0, NULL, "testnosync", foreground);
 
 	else if (strncmp(tokens[0], "invopcode", 10) == 0 && j==1)
-		invOpcodeException();
+		startProcess(invOpcodeException, 0, NULL, "testnosync", foreground);
 
 	else if (strncmp(tokens[0], "time", 5) == 0 && j==1)
-		printTime();
+		startProcess(printTime, 0, NULL, "testnosync", foreground);
 
 	else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
-		displayImage(tokens[1], 20, 200);
+		startProcess(displayImage, 1, tokens, "display", foreground);
 
 
 	else if(strncmp(tokens[0], "filter", 7) == 0 && j == 1)
@@ -138,40 +139,40 @@ void parseCommand(char *cmdBuff) {
 	// CPU management
 
 	else if (strncmp(tokens[0], "cputemp", 8) == 0 && j==1)
-		printCPUTemp();
+		startProcess(printCPUTemp, 0, NULL, "cputemp", foreground);
 
 	else if (strncmp(tokens[0], "cpuinfo", 8) == 0 && j==1)
-		printCPUInfo();
+		startProcess(printCPUInfo, 0, NULL, "cpuinfo", foreground);
 
 	else if (strncmp(tokens[0], "inforeg", 8) == 0 && j==1)
-		printInfoReg();
+		startProcess(printInfoReg, 0, NULL, "inforeg", foreground);
 
 	else if (strncmp(tokens[0], "storedreg", 10) == 0 && j==1)
-		printStoredReg();
+		startProcess(printStoredReg, 0, NULL, "storedreg", foreground);
 
 
 	// Memory management
 
 	else if (strncmp(tokens[0], "memdump", 8) == 0 && j == 2)
-		printMemDump(tokens[1]);
+		startProcess(printMemDump, 1, tokens, "memdump", foreground);
 
 	else if (strncmp(tokens[0], "mem", 4) == 0 && j==1)
-		printMemStatus();
+		startProcess(printMemStatus, 0, NULL, "mem", foreground);
 
 
 	// Process management
 
 	else if (strncmp(tokens[0], "kill", 5) == 0 && j == 2)
-		killProcess(tokens[1]);
+		startProcess(killProcess, 1, tokens, "kill", foreground);
 
 	else if (strncmp(tokens[0], "block", 6) == 0 && j == 2)
-		blockProcess(tokens[1]);
+		startProcess(blockProcess, 1, tokens, "block", foreground);
 
 	else if (strncmp(tokens[0], "nice", 5) == 0 && j == 3)
-		niceProcess(tokens[1], tokens[2]);
+		startProcess(niceProcess, 2, tokens+1, "ps", foreground);
 
 	else if(strncmp(tokens[0],"ps",3)==0 && j==1)
-		printProcData();
+		startProcess(printProcData, 0, NULL, "ps", foreground);
 
 
 	// New processes
@@ -186,10 +187,10 @@ void parseCommand(char *cmdBuff) {
 	//Sync
 
 	else if (strncmp(*tokens, "sem", 4) == 0 && j==1)
-		printSemStatus();
+		startProcess(printSemStatus, 0, NULL, "sem", foreground);
 
 	else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
-		printPipeInfo();
+		startProcess(printPipeInfo, 0, NULL, "pipe", foreground);
 
 
 	//Testing
@@ -198,10 +199,10 @@ void parseCommand(char *cmdBuff) {
 		startProcess(test_mm, 0, NULL, "testmm", foreground);
 
 	else if(strncmp(tokens[0],"testproc",7) == 0)
-		startProcess(test_proc, 0, NULL, "test_proc", foreground);
+		startProcess(test_proc, 0, NULL, "testproc", foreground);
 
 	else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
-		printPipeInfo();
+		startProcess(printPipeInfo, 0, NULL, "pipe", foreground);
 
 
 	else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)

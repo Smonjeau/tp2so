@@ -13,46 +13,46 @@ void printProcData(){
     printf(buffer, 0);
     free(buffer);
 
+    kill(-1);
+
 }
 
 
-void killProcess(char * pid){
+void killProcess(int argc, char **argv){
 
-	int _pid = atoi(pid);
+	int _pid = atoi(argv[1]);
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
-		return;
 	}
     else if(_pid==0){
         printf("Cannot kill shell process\n", 0);
-        return;
 
     } else if(_pid==1){
         printf("Dont kill the dummy proccess", 0);
-        return;
+    }else{
+        kill(_pid);
     }
 
-	kill(_pid);
+    kill(-1);
 
 }
 
 
-void blockProcess(char * pid){
+void blockProcess(int argc, char **argv){
 
-	int _pid= atoi(pid);
+	int _pid = atoi(argv[1]);
 
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
-		return;
 	} else if(_pid==0){
 		printf("Can not block the shell", 0);
-		return;
 	} else if(_pid==1){
         printf("Dont block the dummy proccess", 0);
-        return;
+    }else{
+        block(_pid);
     }
 
-	block(_pid);
+    kill(-1);
 
 }
 
@@ -61,11 +61,13 @@ void printPipeInfo() {
 
 	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
-		return;
+		kill(-1);
 
     pipeInfo(buffer);    
     printf(buffer, 0);
     free(buffer);
+
+    kill(-1);
 	
 }
 
@@ -77,10 +79,12 @@ void niceProcess(char * pid, char * priority) {
 
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
-		return;
+		kill(-1);
 	}
 
 	nice(_pid, _prio);
+
+    kill(-1);
 
 }
 
@@ -109,5 +113,7 @@ void printSemStatus(){
     }
 
     free(buffer);
+
+    kill(-1);
 
 }

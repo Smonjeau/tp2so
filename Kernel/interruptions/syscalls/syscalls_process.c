@@ -6,13 +6,36 @@
 
 #include <process_manager.h>
 #include <interrupts.h>
+#include <lib.h>
 
 /* ---------------------------------------------------------------------------------------------------------------------------
                                                     START_PROCESS
 --------------------------------------------------------------------------------------------------------------------------- */
 
-int sysStartProcess(void *main, int argc, char **argv, char * name, int bg){
-    return createProcessContext(argc, argv, main, name, bg);
+// typedef void (*ProcessMain)(int argc, char **argv);
+
+// void mainWrapper(int argc, char **argv){
+
+//     ProcessMain main = (ProcessMain) argv[0];
+
+// 	main(argc, argc>0 ? argv+1 : NULL);
+
+// 	killProcess(-1);
+
+// }
+
+int sysStartProcess(void *main, int argc, char **argv, char * name, int foreground){
+
+    // int wargc = argc+1;
+
+    // char *wargv[wargc];
+    // wargv[0] = main;
+    
+    // if(argv != NULL)
+    //     memcpy(wargv+1, argv, argc);
+
+    return createProcessContext(argc, argv, main, name, foreground);
+
 }
 
 void sysPS(char * buffer) {

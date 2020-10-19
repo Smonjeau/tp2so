@@ -7,6 +7,8 @@
 void printCPUTemp(void){
 	int temp = cpuTemp();
 	printf("\n Computer's Temperature: %d\n", 0, 1, temp);
+
+	kill(-1);
 }
 
 
@@ -21,6 +23,8 @@ void printCPUInfo(void){
 
 	printf("\nBrand name: %s", 1, info.brandName);
 	printf("\nBrand description: %s\n", 0, 1, info.brandDesc);
+
+	kill(-1);
 }
 
 
@@ -49,6 +53,8 @@ void printInfoReg(void){
 	printf("\n - r15 - %x\n", 0, 1, reg.r15);
 
 	printf("--- --- --- --- --- --- --- --- --- --- --- --- ---\n", 0);
+
+	kill(-1);
 }
 
 
@@ -76,4 +82,6 @@ void printStoredReg(void){
 	printf("\n - r15 - %x\n", 0, 1, reg.r15);
 
 	printf("--- --- --- --- --- --- --- --- --- --- --- --- ---\n", 0);
+
+	kill(-1);
 }

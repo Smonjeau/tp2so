@@ -9,7 +9,7 @@ void printTime(void);
 void divZeroException(void);
 void invOpcodeException(void);
 
-void displayImage(char *name, int x, int y);
+void displayImage(char *name);
 void filter(int argc, char **argv);
 void cat(int argc, char **argv);
 void wc(int argc, char **argv);
@@ -28,15 +28,15 @@ void printStoredReg(void);
 
 // MEMORY COMMANDS
 
-void printMemDump(char * start);
+void printMemDump(int argc, char **argv);
 void printMemStatus(void);
 
 
 // PROCESSES COMMANDS
 
 void printProcData();
-void killProcess(char * pid);
-void blockProcess(char * pid);
+void killProcess(int argc, char **argv);
+void blockProcess(int argc, char **argv);
 void niceProcess(char * pid, char * priority);
 
 void printPipeInfo();

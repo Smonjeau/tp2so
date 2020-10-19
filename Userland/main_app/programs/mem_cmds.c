@@ -4,7 +4,9 @@
 #include <shell_cmds.h>
 
 
-void printMemDump(char *sourceStr){
+void printMemDump(int argc, char **argv){
+
+	char *sourceStr = argv[1];
 
 	uint64_t sourceHex = 0;
 	for (int i = 2; sourceStr[i]; i++){
@@ -20,7 +22,7 @@ void printMemDump(char *sourceStr){
 
 	if (sourceHex < 0){
 		printf("Parameter not allowed\n", 0);
-		return;
+		kill(-1);
 	}
 
 	char *src = (void *) 0;
@@ -34,6 +36,8 @@ void printMemDump(char *sourceStr){
 		printf("%2x: %2x %2x %2x %2x %2x %2x %2x %2x\n", 0, 9, src + i, src[i], src[i + 1], src[i + 2], src[i + 3],
 			   src[i + 4], src[i + 5], src[i + 6], src[i + 7]);
 	}
+
+	kill(-1);
 	
 }
 
@@ -49,5 +53,7 @@ void printMemStatus(){
     printf("Total memory: %d KB\n",1,total_mem);
     printf("Free memory: %d KB\n",1,avail_mem);
     printf("Occupied memory: %d KB\n",1,occ_mem);
+
+	kill(-1);
     
 }
