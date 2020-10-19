@@ -30,9 +30,29 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
+<<<<<<< HEAD
+=======
+void testPrint2(){
+
+	printf("PRINTED\n", 0);
+
+	kill(-1);
+
+}
+
+void testPrint(){
+
+	startProcess(testPrint2, 0, NULL, "test_sync", 1);
+
+	kill(-1);
+
+}
+
+
+>>>>>>> 947f4230bd1e7f8390d7c0188b8bb341020ca4a7
 void shell(){
 
-    startProcess(dummy, 0, (void *) 0, "dummy"); //Necesario en ciertos casos
+    startProcess(dummy, 0, (void *) 0, "dummy", 1); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 	forcePipe(1); //Creamos el pipe que comunica fd 1 con salida estandar
@@ -168,10 +188,10 @@ void shell(){
         // New processes
 
 		else if(strncmp(tokens[0], "line", 5) == 0 && j==1)	
-			startProcess(line, 0, NULL, "line");
+			startProcess(line, 0, NULL, "line", 1);
 
         else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
-            startProcess(loop, 0, NULL, "loop");
+            startProcess(loop, 0, NULL, "loop", 1);
 
 
         //Sync
@@ -186,10 +206,10 @@ void shell(){
 		//Testing
 
 		else if(strncmp(tokens[0],"testmm",7) == 0 && j==1)
-			startProcess(test_mm, 0, NULL, "testmm");
+			startProcess(test_mm, 0, NULL, "testmm", 1);
 
 		else if(strncmp(tokens[0],"testproc",7) == 0)
-			startProcess(test_proc,0,NULL,"test_proc");
+			startProcess(test_proc,0,NULL,"test_proc", 1);
 
 		else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
 			printPipeInfo();
@@ -206,13 +226,13 @@ void shell(){
 		}
 
 		else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
-			startProcess(test_proc, 0, NULL, "testproc");
+			startProcess(test_proc, 0, NULL, "testproc", 1);
 
 		else if(strncmp(tokens[0],"testsync",7) == 0 && j==1)
-			startProcess(test_sync, 0, NULL, "testsync");
+			startProcess(test_sync, 0, NULL, "testsync", 1);
 
 		else if(strncmp(tokens[0],"testnosync",7) == 0 && j==1)
-			startProcess(test_no_sync, 0, NULL, "testnosync");
+			startProcess(test_no_sync, 0, NULL, "testnosync", 1);
 
 		else
 			printWarning();

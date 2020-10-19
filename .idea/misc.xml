@@ -11,7 +11,7 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="\\wsl$\Ubuntu-20.04\home\matiapa\ITBA\SO\Practicas\TPE2" />
+            <option value="$PROJECT_DIR$" />
           </set>
         </option>
         <option name="switches" value="--just-print --print-directory --keep-going" />

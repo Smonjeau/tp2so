@@ -59,9 +59,14 @@ void test_sync(){
     char *argv1[3] = {"1","1","100000"};
     startProcess(inc, 3, argv1, "inc");
 
+<<<<<<< HEAD
     char *argv2[3] = {"1","-1","100000"};
     startProcess(inc, 3, argv2, "dec");
   }
+=======
+  char *argv1[3] = {"1", "-1", "10000"};
+  startProcess(inc, 3, argv1, "inc", 1);
+>>>>>>> 947f4230bd1e7f8390d7c0188b8bb341020ca4a7
 
   kill(-1);
 

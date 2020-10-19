@@ -10,6 +10,7 @@ typedef struct PCB {
     void * contextRSP;
     void * segmentAddress;
     char * name;
+    int bg;
     unsigned char remainingTicks;
     pipe pipes [MAX_PIPES];
     struct PCB * nextPCB;
@@ -39,16 +40,12 @@ void switchProcessContext();
 
 // Creates a PCB for a new process and returns its PID
 
-int createProcessPCB(void * contextRSP, void * baseRSP, char * name);
+int createProcessPCB(void * contextRSP, void * baseRSP, char * name, int bg);
 
 // Creates a context for a new process, calls createProcessPCB and returns its PID
 
-int createProcessContext(int argc, char **argv, void *main, char * name);
+int createProcessContext(int argc, char **argv, void *main, char * name, int bg);
 
-// Creates a context for a new process from Kernel, calls createProcessPCB and returns its PID
-//It avoids setting interrupts
-
-int createProcessContextFromKernel(int argc, char **argv, void *main);
 
 
 /*Revis asi el proceso running tiene el fd indicado libre*/

@@ -140,7 +140,7 @@ void startFilter() {
 	itoa(fds[1], fd2, 10, -1);
 	char * argv_for_son[2] = {fd1, fd2}; //Argumentos para el proceso filter
 
-	startProcess(filter, 2, argv_for_son, "filter"); //Creo proceso filter. Hereda fds.
+	startProcess(filter, 2, argv_for_son, "filter", 1); //Creo proceso filter. Hereda fds.
 
 	close(fds[0]); //Shell solo escribe en un extremo
 	char c;	
