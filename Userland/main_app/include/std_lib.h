@@ -20,4 +20,4 @@ void printf(char *format, int nargs, ...);
 
 int strncmp(char *s1, char *s2, int length);
 
-void strcpy(char *src, char *dest);
+int strcpy(char *src, char *dest);

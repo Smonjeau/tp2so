@@ -249,41 +249,36 @@ void printf(char *format, int nargs, ...){
             }
 
             if (format[pos] == 'd'){
-                char str[20]={0};
-                int len = itoa(va_arg(valist,int),str,10,fixLen);
-                for(int i=0;i<len;i++)
-                    buffer[buffPos++]=str[i];
+                int len = itoa(va_arg(valist,int),buffer+buffPos,10,fixLen);
+           //     for(int i=0;i<len;i++)
+             //     buffer[buffPos++]=str[i];
+                buffPos +=len;
                 
                 formatChar = 0;
                 continue;
             }
 
             if (format[pos] == 'x'){
-                char str[20]={0};
                 buffer[buffPos++]='0';
                 buffer[buffPos++]='x';
-                int len =itoa(va_arg(valist, int), str, 16, fixLen);
-                for(int i=0;i<len;i++)
-                    buffer[buffPos++]=str[i];
+                int len =itoa(va_arg(valist, int), buffer + buffPos, 16, fixLen);
+                buffPos += len;
                 formatChar = 0;
                 continue;
             }
 
             if (format[pos] == 'f'){
-                char str[20]={0};
-                int len = dtoa(va_arg(valist, double), str);
-                for(int i=0;i<len;i++)
-                    buffer[buffPos]=str[i];
+                int len = dtoa(va_arg(valist, double), buffer + buffPos);
+                len += buffPos;
                 formatChar = 0;
                 continue;
             }
 
             if (format[pos] == 's'){
                 
-                char * str = va_arg(valist, char *);
-                for(int i=0;str[i];i++)
-                    buffer[buffPos]=str[i];
-                
+
+                int len = strcpy(va_arg(valist, char *),buffer + buffPos);
+                buffPos += len;
                 formatChar = 0;
                 continue;
             }
@@ -323,9 +318,10 @@ int strncmp(char *s1, char *s2, int n){
  Copies a string from src to dest
 -------------------------------------------------------------- */
 
-void strcpy(char *src, char *dest){
+int strcpy(char *src, char *dest){
     int i;
     for (i = 0; src[i] != 0; i++)
         dest[i] = src[i];
     dest[i] = 0;
+    return i;
 }
