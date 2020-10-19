@@ -1,8 +1,11 @@
 #ifndef PROCESS_MANAGER_H_
 #define PROCESS_MANAGER_H_
 #include <pipe_manager.h>
+
 #define NULL (void*)0
 #define MAX_PIPES 10
+
+
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3, RECENTLY_BLOCKED=4} ProcState;
 typedef struct PCB {
     int pid;

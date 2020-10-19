@@ -1,3 +1,6 @@
+#ifndef STD_LIB_H
+#define STD_LIB_H
+
 #include <inttypes.h>
 
 // MEMORY METHODS
@@ -21,3 +24,5 @@ void printf(char *format, int nargs, ...);
 int strncmp(char *s1, char *s2, int length);
 
 int strcpy(char *src, char *dest);
+
+#endif
