@@ -15,5 +15,12 @@
 - Pass synch test           X
 
 - Process piping (|)        X
-- Phylosopher command       X
+- Process background (&)    X
+
+- Phylo command             X
+- Filter command            X
 - Cat command               X
+- Wc command                X
+
+- List blocked processes on sems and pipes
+- Add named pipes
