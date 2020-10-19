@@ -171,8 +171,4 @@ void pipeRightProc(void (* main) (int, char **), char * name, int fds[2]) {
 
     //La shell se bloquea hasta que el proceso de la izquierda termina de escribir y hace exit
 }
-void pipeLeftProc(void (* main) (int, char **)) {
-    //POR AHORA SOLO FOREGRAUND    
-}
-
 int startProcess(void *main, int argc, char **argv, char * name, int bg);
