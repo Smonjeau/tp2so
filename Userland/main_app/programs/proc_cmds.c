@@ -2,6 +2,8 @@
 #include <std_lib.h>
 #include <shell_cmds.h>
 
+#define NULL (void *)0
+
 
 void printProcData(){
 
@@ -123,7 +125,7 @@ void pipeLeftProcMediator(int argc, char * * argv) {
     close(fds[0]); //Solo escribo en el pipe
     dup(fds[1]); //La escritura del pipe se pone en lugar del stdout
 
-    startProcess(main, 4, arg_vals, "left_proc_mediator", 1); //Ojo que despues hay que cambiar 0 por 1 ////////////////////////////////////
+    startProcess(main, 0, NULL, name, 1); //Ojo que despues hay que cambiar 0 por 1 ////////////////////////////////////
 
 
     kill(-1); //El kill me hace los close de todas formas
@@ -139,7 +141,7 @@ void pipeRightProcMediator(int argc, char * * argv) {
     close(fds[1]); //Solo leo del pipe
     dup(fds[0]); //La lectura del pipe se pone en lugar del stdin
 
-    startProcess(main, 4, arg_vals, "right_proc_mediator", 1); //Ojo que despues hay que cambiar 0 por 1 ////////////////////////////////////
+    startProcess(main, 0, NULL, name, 1); //Ojo que despues hay que cambiar 0 por 1 ////////////////////////////////////
 
 
     kill(-1); //El kill me hace los close de todas formas
@@ -154,7 +156,7 @@ void pipeLeftProc(void (* main) (int, char **), char * name, int fds[2]) {
     char fd2[3]; //buffer para guardar fds[1] como string
     itoa(fds[0], fd1, 10, -1);
     itoa(fds[1], fd2, 10, -1);
-    char * arg_vals[2] = {fd1, fd2, name, (char (*) (int, char **)) main};
+    char * arg_vals[4] = {fd1, fd2, name, (char *) main};
     startProcess(main, 4, arg_vals, "left_proc_mediator", 1); //Ojo que despues hay que cambiar 0 por 1 ////////////////////////////////////
 
     //La shell se bloquea hasta que el proceso de la izquierda termina de escribir y hace exit
@@ -166,7 +168,7 @@ void pipeRightProc(void (* main) (int, char **), char * name, int fds[2]) {
     char fd2[3]; //buffer para guardar fds[1] como string
     itoa(fds[0], fd1, 10, -1);
     itoa(fds[1], fd2, 10, -1);
-    char * arg_vals[2] = {fd1, fd2, name, (char (*) (int, char **)) main};
+    char * arg_vals[4] = {fd1, fd2, name, (char *) main};
     startProcess(main, 4, arg_vals, "right_proc_mediator", 1); //Ojo que despues hay que cambiar 0 por 1 ////////////////////////////////////
 
     //La shell se bloquea hasta que el proceso de la izquierda termina de escribir y hace exit
