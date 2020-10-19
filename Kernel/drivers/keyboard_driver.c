@@ -99,12 +99,18 @@ char keyCodeToChar(int keyCode){
 }
 
 
+void emergencyPrint();
+
 void handleKeyStroke() {
    
     char aux = keyCodeToChar(read());
+    
     if(aux != 0)
         pipe_write_nofd(stdinPipe, &aux, 1);
-    
+
+    if(aux == '9')
+        emergencyPrint();
+       
 }
 
 

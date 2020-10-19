@@ -28,6 +28,27 @@ ProcQueue * expireds = queue2;
 void * lastRSP = NULL;
 
 PCB runningProc=NULL;
+
+
+void emergencyPrint(){
+
+	PCB pcb = actives->first;
+	
+	while(pcb != NULL){
+		printf("(A) PID: %d - State: %d\n", 2, pcb->pid, pcb->procState);
+		pcb = pcb->nextPCB;
+	}
+
+	pcb = expireds->first;
+
+	while(pcb != NULL){
+		printf("(E) PID: %d - State: %d\n", 2, pcb->pid, pcb->procState);
+		pcb = pcb->nextPCB;
+	}
+
+}
+
+
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
     if(pcb->pid == 0) {
@@ -383,9 +404,8 @@ void blockProcess(int pid, int tick) {
 			//_sti();
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
-			/*if(tick == 1)
-				_sti(); //Cuando post semaphore desbloquea un proceso no queremos que se haga sti
-			 */
+			// if(tick == 1)
+			// 	_sti(); //Cuando post semaphore desbloquea un proceso no queremos que se haga sti
 		} else if(currentPCB->procState == RUN) {
 
 			//Tengo que actualizar mi RSP

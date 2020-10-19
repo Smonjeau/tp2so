@@ -30,29 +30,7 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-<<<<<<< HEAD
-=======
-void testPrint2(){
-
-	printf("PRINTED\n", 0);
-
-	kill(-1);
-
-}
-
-void testPrint(){
-
-	startProcess(testPrint2, 0, NULL, "test_sync", 1);
-
-	kill(-1);
-
-}
-
-
->>>>>>> 947f4230bd1e7f8390d7c0188b8bb341020ca4a7
 void shell(){
-    printf("Hola soy shell", 0);
-
     startProcess(dummy, 0, (void *) 0, "dummy", 1); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
@@ -62,8 +40,6 @@ void shell(){
 	int buffPos = 0;
 
 	printf("\f", 0);
-
-	startProcess(test_sync, 0, NULL, "test_no_sync");
 
 	char c;
 	while (1){

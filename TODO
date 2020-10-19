@@ -12,7 +12,7 @@
 
 - Implement semaphores      ✓
 - Implement pipes           ✓
-- Pass synch test           X
+- Pass synch test           ✓
 
 - Process piping (|)        X
 - Process background (&)    X

@@ -55,9 +55,6 @@ void test_sync(){
 
   printf("CREATING PROCESSES...(WITH SEM)\n", 0);
 
-
-
-
   for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
     char *argv1[3] = {"1","1","1000000"};
     startProcess(inc, 3, argv1, "inc",1);
@@ -78,6 +75,7 @@ void test_no_sync(){
     global = 0;
 
     printf("CREATING PROCESSES...(WITHOUT SEM)\n",0);
+    
     char str[3];
     for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
         itoa(i,str,10,-1);
