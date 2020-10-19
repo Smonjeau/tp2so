@@ -115,7 +115,7 @@ int postSemaphore(int id){
     semaphore->value += 1;
 
     if(semaphore->blockedPIDsSize > 0){
-        int unblockPID = semaphore->blockedPIDs[semaphore->blockedPIDsSize--];
+        int unblockPID = semaphore->blockedPIDs[--semaphore->blockedPIDsSize];
         blockProcess(unblockPID, 0);
     }
 

@@ -11,9 +11,10 @@ void invOpcodeException(void);
 
 void displayImage(char *name, int x, int y);
 void startFilter();
+void startCat();
 void line(int argc, char **argv);
 void loop(int argc, char **argv);
-void cat(int argc, char ** argv);
+
 
 
 // CPU COMMANDS

@@ -3,6 +3,7 @@
 #include <std_lib.h>
 #include <anonymous_image.h>
 #include <shell_cmds.h>
+#define NULL (void *) 0
 
 /* ------------------------------------------- SHELL UTILITIES ------------------------------------------------------ */
 
@@ -33,6 +34,7 @@ void printHelp(void){
 	printf("- nice pid priority to change priority (100 - 139)\n", 0);
 	printf("- pipe              to list all pipes\n", 0);
 	printf("- filter            filters input vowels\n", 0);
+	printf("- cat               to exec cat\n", 0);
     printf("- line              to draw a line (for testing)\n", 0);
     printf("- loop              to start loop (for testing)\n\n", 0);
 		
@@ -96,15 +98,11 @@ void line(int argc, char **argv){
 
 
 void filter(int argc, char **argv) {
-	int fds[2] = {atoi(argv[0]), atoi(argv[1])}; //Leo los parametros
-	close(fds[1]); //Filter solo lee del pipe
-	//char * bufferAux = malloc(50);
-	//bufferAux[0] = 0;
 	char bufferAux[50] = {0}; //Buffer auxiliar donde guardare las vocales
 	int idxBuffer = 0;
 	char c; //Buffer para letra por letra
 	do {
-		read(fds[0], &c, 1); //Leo un byte del pipe
+		read(0, &c, 1); //Leo un byte de stdin
 		if(c == '\r')
 			c = '\n';
 		if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
@@ -112,48 +110,40 @@ void filter(int argc, char **argv) {
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
 	} while(c != '\n');
 
-	close(fds[0]); //Cierro el extremo del pipe que tenia abierto
 
 	bufferAux[idxBuffer] = 0;
-	idxBuffer = 0;
 	//Ahora imprimo las vocales
-	while(bufferAux[idxBuffer] != 0)
-		putChar(bufferAux[idxBuffer++]);
-	//printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
-	putChar('\n');
-	//free(bufferAux);
+	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
+
+	kill(-1); //Exit
+}
+void cat(int argc, char ** argv) {
+	char bufferAux[80] = {0}; //Buffer auxiliar donde guardare las vocales
+	int idxBuffer = 0;
+	char c; //Buffer para letra por letra
+	do {
+		read(0, &c, 1); //Leo un byte de stdin
+		if(c == '\r')
+			c = '\n';
+		bufferAux[idxBuffer++] = c;
+		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
+	} while(c != '\n');
+
+
+	bufferAux[idxBuffer] = 0;
+	//Ahora imprimo las vocales
+	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
 
 	kill(-1); //Exit
 }
 
 void startFilter() {
-	//Todavia soy el proceso shell
-	int fds[2];
-	pipe(fds); //Este es el pipe con el que me comunicaré con el proceso filter
-	/* Dado que nuestra implementacion de newProcess NO es un fork. Es decir, no duplica todas
-	las variables y contexto, resulta que el proceso hijo no conoce la variable fds. (No confundir,
-	si tiene los fds heredados abiertos, pero no sabe cuales son los que necesita ahora. Por lo tanto,
-	se envian por parametro*/
-	char fd1[3]; //Buffer para guardar el fds[0] como string
-	char fd2[3]; //Buffer para guardar el fds[1] como string
-	itoa(fds[0], fd1, 10, -1);
-	itoa(fds[1], fd2, 10, -1);
-	char * argv_for_son[2] = {fd1, fd2}; //Argumentos para el proceso filter
-
-	startProcess(filter, 2, argv_for_son, "filter", 1); //Creo proceso filter. Hereda fds.
-
-	close(fds[0]); //Shell solo escribe en un extremo
-	char c;	
-	do {
-		c = getChar();
-		write(fds[1], &c, 1); //Escribo la tecla en el pipe
-	} while(c != '\r');
-
-	close(fds[1]); //Cierro el extremo del pipe que tenia abierto
-
-
+	startProcess(filter, 0, NULL, "filter", 0); //Creo proceso filter. Hereda fds.
 }
 
+void startCat() {
+	startProcess(cat, 0, NULL, "cat", 0); //Creo proceso cat. Hereda fds.
+}
 
 void nap(uint64_t limit){
     for (int i =0;i<limit;i++);

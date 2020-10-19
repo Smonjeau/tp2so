@@ -383,8 +383,9 @@ void blockProcess(int pid, int tick) {
 			//_sti();
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
-			if(tick == 1)
+			/*if(tick == 1)
 				_sti(); //Cuando post semaphore desbloquea un proceso no queremos que se haga sti
+			 */
 		} else if(currentPCB->procState == RUN) {
 
 			//Tengo que actualizar mi RSP
@@ -570,11 +571,7 @@ static int pid=0;
 
 int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int bg) {
 
-	if(bg == 0) {
-		//Se trata de un proceso foreground.
-		//Bloqueamos a la shell
-		blockProcess(0, 0);
-	}
+
 	
 
 	if(lastRSP == NULL)
@@ -605,6 +602,12 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int 
 
 	queueProc(actives + priority, new);
 	procCount++;
+    if(bg == 0) {
+        //Se trata de un proceso foreground.
+        //Bloqueamos a la shell
+        blockProcess(0, 1); //Llama al timer tick
+        //_cli();
+    }
 	return new->pid;
 
 }

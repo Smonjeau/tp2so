@@ -102,8 +102,8 @@ char keyCodeToChar(int keyCode){
 void handleKeyStroke() {
    
     char aux = keyCodeToChar(read());
-   
-    pipe_write_nofd(stdinPipe, &aux, 1);
+    if(aux != 0)
+        pipe_write_nofd(stdinPipe, &aux, 1);
     
 }
 

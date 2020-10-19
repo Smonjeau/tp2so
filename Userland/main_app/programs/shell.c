@@ -51,6 +51,7 @@ void testPrint(){
 
 >>>>>>> 947f4230bd1e7f8390d7c0188b8bb341020ca4a7
 void shell(){
+    printf("Hola soy shell", 0);
 
     startProcess(dummy, 0, (void *) 0, "dummy", 1); //Necesario en ciertos casos
 
@@ -135,14 +136,14 @@ void shell(){
         else if (strncmp(tokens[0], "time", 5) == 0 && j==1)
             printTime();
 
-	else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
-		displayImage(tokens[1], 20, 200);
+		else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
+			displayImage(tokens[1], 20, 200);
 
-	else if(strncmp(tokens[0], "filter", 7) == 0)
-		startFilter();
+		else if(strncmp(tokens[0], "filter", 7) == 0 && j == 1)
+			startFilter();
 	
-	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
-		putChar('\f');
+		else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
+			putChar('\f');
 
 
 
@@ -214,16 +215,9 @@ void shell(){
 		else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
 			printPipeInfo();
 
-		else if(strncmp(tokens[0],"filter",7) == 0 && j==1)
-			startFilter();
 
-		else if(strncmp(tokens[0],"cat",4)==0 && j==1){
-			// int fds [2];
-			// pipe(fds);
-			// //Solo escribe
-			// close(fd[0]);
-			// startProcess(cat,0,NULL,"cat");
-		}
+		else if(strncmp(tokens[0],"cat",4)==0 && j==1)
+			startCat();
 
 		else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
 			startProcess(test_proc, 0, NULL, "testproc", 1);
@@ -245,6 +239,7 @@ void shell(){
 ------------------------------------------------------------------------------------------------------------------------- */
 
 void dummy(int argc, char **argv) {
+    printf("Hola soy dummy", 0);
     while(1)
         halt();
 }

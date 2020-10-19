@@ -139,7 +139,7 @@ void free(void *address){
         occupied_bits--;
     }
 
-    for(int i=bytePos+1; k<nblocks && i<BITMAP_SIZE; i++){
+    for(int i=bytePos+1; k<nblocks && i < BITMAP_SIZE; i++){
         for(int j=0; k<nblocks && j<BYTE_SIZE; j++, k++){
             bitmap[i] &= zeroMasks[j];
             occupied_bits--;

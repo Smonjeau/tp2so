@@ -111,6 +111,9 @@ createProcessContext:
 	# Name of the process 
 	mov rdx,rcx
 
+	# Is a BG process
+	mov rcx, r8
+
 	# Create the process PCB
 	call createProcessPCB
 
