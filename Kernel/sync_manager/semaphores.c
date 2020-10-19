@@ -84,11 +84,12 @@ int waitSemaphore(int id) {
     if(semaphore->value > 0){
         semaphore->value -= 1;
     }else{
-        release(&(semaphore->lock));
-
         int currPid = getPID();
 
         semaphore->blockedPIDs[semaphore->blockedPIDsSize++] = currPid;
+        
+        release(&(semaphore->lock));
+
         blockProcess(currPid,1);
 
         acquire(&(semaphore->lock));

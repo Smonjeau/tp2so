@@ -30,23 +30,6 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-void testPrint2(){
-
-	printf("PRINTED\n", 0);
-
-	kill(-1);
-
-}
-
-void testPrint(){
-
-	startProcess(testPrint2, 0, NULL, "test_sync");
-
-	kill(-1);
-
-}
-
-
 void shell(){
 
     startProcess(dummy, 0, (void *) 0, "dummy"); //Necesario en ciertos casos
@@ -59,14 +42,7 @@ void shell(){
 
 	printf("\f", 0);
 
-	// startProcess(testPrint, 0, NULL, "testPrint");
-
-	// for(int y=0; y<999; y++){
-	// 	for(int x=0; x<999; x++){
-	// 		for(int i=0; i<9999; i++);
-	// 		draw(x,y,0xFF0000);
-	// 	}
-	// }
+	startProcess(test_sync, 0, NULL, "test_no_sync");
 
 	char c;
 	while (1){

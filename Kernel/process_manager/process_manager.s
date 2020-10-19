@@ -63,8 +63,6 @@ createProcessContext:
 	pop rsi
 	pop rdi
 
-	# Ante dudas sobre por qué restamos 4088 consultar
-	########################
 	# Calc the base of the stack
 	add rax, 4096
 	sub rax, 8
@@ -102,8 +100,6 @@ createProcessContext:
 	# Calc the segment address for future free
 	mov rsi, rax
 	sub rsi, 4096
-
-    # The freaking padding
 	add rsi, 8
 
 	# Calc the contextRSP

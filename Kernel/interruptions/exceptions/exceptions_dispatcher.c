@@ -28,9 +28,9 @@ void exceptionDispatcher(int id, void * eip) {
 
 int handleException(int id, void *eip){
 
-    backColor = 0x0000FF;
+    // backColor = 0x0000FF;
 
-	printf("\f", 0);
+	// printf("\f", 0);
     printf("Exception code: %d\n", 1, id);
 
     RegBkp bkp;

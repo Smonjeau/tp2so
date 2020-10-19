@@ -8,6 +8,7 @@
 #include <interrupts.h>
 #include <keyboard_driver.h>
 #include <pipe_manager.h>
+
 #define NULL (void *)0;
 
 pipe stdinPipe = NULL;
