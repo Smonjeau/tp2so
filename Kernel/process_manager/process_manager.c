@@ -1,3 +1,4 @@
+
 #include <process_manager.h>
 #include <lib.h>
 #include <mem_manager.h>
@@ -222,6 +223,9 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
         case DEAD:
             strcat("DEAD", buffer);
             break;
+	    case RECENTLY_BLOCKED:
+	        strcat("BLOCKED",buffer);
+	        break;
 	}
 	strcat("     Priority: ", buffer);
 	itoa(priority, buffer + strlen(buffer), 10, -1);
@@ -383,7 +387,10 @@ void blockProcess(int pid, int tick) {
 				_sti(); //Cuando post semaphore desbloquea un proceso no queremos que se haga sti
 		} else if(currentPCB->procState == RUN) {
 
-			currentPCB->procState = BLOCKED;
+			//Tengo que actualizar mi RSP
+
+
+		    currentPCB->procState = RECENTLY_BLOCKED;
 			// Renuncia al CPU
 			//Solo en este caso bloqueamos y enviamos a expirados en vez de que lo haga el scheduler
 			if(tick == 1)
@@ -407,20 +414,26 @@ void * schedule(void * currContextRSP) {
 	/* Para que sirve esta variable binaria? Resulta que cuando un proceso run se autobloquea, queda
 	 * en su misma posicion pero estado bloqueado. Por lo tanto si se encunetra un proceso bloqueado
 	 * en la primer posicion hallada entonces se trata de un proceso que se acaba de autobloquear*/
-	int primerProcEncontrado = 1;
+	//int primerProcEncontrado = 1;
 	do {
 		priorityIdx = 0;
+
 		do {
 			currentPCB = actives[priorityIdx].first;
 
 			//Debemos considerar que sucede si el currentPCB está bloqueado
-			while(currentPCB != NULL && currentPCB->procState == BLOCKED) {
+			while(currentPCB != NULL && (currentPCB->procState == BLOCKED || currentPCB->procState== RECENTLY_BLOCKED)) {
 				//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
 				//Primero lo sacamos de esta cola
-				if(primerProcEncontrado == 1) {
+		/*		if(primerProcEncontrado == 1) {
 				    primerProcEncontrado = 0;
 				    currentPCB->contextRSP = currContextRSP;
-				}
+				}*/
+                if(currentPCB->procState == RECENTLY_BLOCKED){
+                    //Le actualizamos el contexto
+                    currentPCB->contextRSP=currContextRSP;
+
+                }
 				actives[priorityIdx].first = currentPCB->nextPCB; //Pues está al comienzo de la cola
 				if(actives[priorityIdx].first == NULL)
 					actives[priorityIdx].last = NULL; //Era el unico proceso
@@ -701,11 +714,11 @@ void killProcess(int pid) {
 	}
     free(currentPCB->segmentAddress);
     free(currentPCB);
+    procCount--;
 
 	if(state == RUN) //El proceso se suicida
-		_timer_tick();
+        _timer_tick();
 
-	procCount--;
 
 	
 

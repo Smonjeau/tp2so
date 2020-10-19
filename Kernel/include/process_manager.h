@@ -3,7 +3,7 @@
 #include <pipe_manager.h>
 #define NULL (void*)0
 #define MAX_PIPES 10
-typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3} ProcState;
+typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3, RECENTLY_BLOCKED=4} ProcState;
 typedef struct PCB {
     int pid;
     ProcState procState;
@@ -96,6 +96,9 @@ void close_fd_proc(PCB pcb, int fd);
 /* Busca el pipe al cual esta coenctado el fd indicado */
 
 pipe findPipe(int fd);
+
+/*Recorre los procesos y retorna data de los pipes*/
+void get_pipes_data(void * buffer, int * qty);
 
 
 /* Copia el nombre del proceso en el buffer*/

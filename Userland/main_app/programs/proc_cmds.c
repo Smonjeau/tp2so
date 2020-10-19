@@ -19,13 +19,17 @@ void printProcData(){
 void killProcess(char * pid){
 
 	int _pid = atoi(pid);
-
+    printf("pepito\n",0 );
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
 		return;
 	}
     else if(_pid==0){
         printf("Cannot kill shell process\n", 0);
+        return;
+
+    } else if(_pid==1){
+        printf("Dont kill the dummy proccess", 0);
         return;
     }
 
@@ -45,7 +49,7 @@ void blockProcess(char * pid){
 		printf("Can not block the shell", 0);
 		return;
 	} else if(_pid==1){
-        printf("Dont kill the dummy proccess", 0);
+        printf("Dont block the dummy proccess", 0);
         return;
     }
 

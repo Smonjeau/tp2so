@@ -30,13 +30,6 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-void testKill(){
-	for(int i=0; i<999; i++);
-	kill(-1);
-	printf("Sigo vivo\n", 0);
-	while(1);
-}
-
 
 void shell(){
 
@@ -50,9 +43,7 @@ void shell(){
 
 	printf("\f", 0);
 
-	// startProcess(testKill, 0, NULL, "testKill");
-
-	// startProcess(test_proc, 0, NULL, "test_proc");
+	startProcess(test_proc, 0, NULL, "test_proc");
 
 	char c;
 	while (1){
@@ -68,10 +59,10 @@ void shell(){
 
 		putChar(c);
 
-		// Handle the CR char, parse command
 
-		if (c == '\r'){
+            // Handle the CR char, parse command
 
+		if(c=='\r'){
 			if(buffPos==0){
 				putChar('\n');
 				continue;
@@ -84,22 +75,24 @@ void shell(){
 
 			putChar('\n');
 
-			buffPos = 0;
-		}
-	}
-}
+
+                buffPos = 0;
+            }
+        }
+ }
+    
 
 
 /* --------------------------------------------------------------------------------------------------------------------------
                                 COMMAND-CHECK METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-void parseCommand(char *cmdBuff){
+    void parseCommand(char *cmdBuff) {
 
-	// Separate on tokens
+        // Separate on tokens
 
-	char *tokens[MAX_TOKENS] = {0};
-	tokens[0] = cmdBuff;
+        char *tokens[MAX_TOKENS] = {0};
+        tokens[0] = cmdBuff;
 
 	int j=1;
 	for (int i=0; cmdBuff[i]; i++){
@@ -109,19 +102,19 @@ void parseCommand(char *cmdBuff){
 		}
 	}
 
-	// Miscellaneous
+        // Miscellaneous
 
-	if(strncmp(tokens[0], "help", 5) == 0)
-		printHelp();
+        if (strncmp(tokens[0], "help", 5) == 0 && j==1)
+            printHelp();
 
-	else if(strncmp(tokens[0], "divzero", 8) == 0)
-		divZeroException();
+        else if (strncmp(tokens[0], "divzero", 8) == 0 && j==1)
+            divZeroException();
 
-	else if(strncmp(tokens[0], "invopcode", 10) == 0)
-		invOpcodeException();
+        else if (strncmp(tokens[0], "invopcode", 10) == 0 && j==1)
+            invOpcodeException();
 
-	else if(strncmp(tokens[0], "time", 5) == 0)
-		printTime();
+        else if (strncmp(tokens[0], "time", 5) == 0 && j==1)
+            printTime();
 
 	else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
 		displayImage(tokens[1], 20, 200);
@@ -129,83 +122,105 @@ void parseCommand(char *cmdBuff){
 	else if(strncmp(tokens[0], "filter", 7) == 0)
 		startFilter();
 	
-	else if(strncmp(tokens[0], "clear", 6) == 0)
+	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
 		putChar('\f');
 
 
-	// CPU management
 
-	else if(strncmp(tokens[0], "cputemp", 8) == 0)
-		printCPUTemp();
+            // CPU management
 
-	else if(strncmp(tokens[0], "cpuinfo", 8) == 0)
-		printCPUInfo();
+        else if (strncmp(tokens[0], "cputemp", 8) == 0 && j==1)
+            printCPUTemp();
 
-	else if(strncmp(tokens[0], "inforeg", 8) == 0)
-		printInfoReg();
+        else if (strncmp(tokens[0], "cpuinfo", 8) == 0 && j==1)
+            printCPUInfo();
 
-	else if(strncmp(tokens[0], "storedreg", 10) == 0)
-		printStoredReg();
-	
+        else if (strncmp(tokens[0], "inforeg", 8) == 0 && j==1)
+            printInfoReg();
 
-	// Memory management
-
-	else if(strncmp(tokens[0], "memdump", 8) == 0 && j==2)
-		printMemDump(tokens[1]);
-	
-	else if(strncmp(tokens[0], "mem", 4) == 0)
-		printMemStatus();
-
-	
-	// Process management
-	
-	else if(strncmp(tokens[0], "ps", 3) == 0)
-		printProcData();
-
-	else if(strncmp(tokens[0], "kill", 5) == 0 && j==2)
-		killProcess(tokens[1]);
-
-	else if(strncmp(tokens[0], "block", 6) == 0 && j==2)
-		blockProcess(tokens[1]);
-
-	else if(strncmp(tokens[0], "nice", 5) == 0 && j==3)
-		niceProcess(tokens[1], tokens[2]);
-	
-
-	// New processes
-
-	else if(strncmp(tokens[0], "line", 5) == 0)	
-		startProcess(line, 0, NULL, "line");
-
-	else if(strncmp(tokens[0], "loop", 5) == 0)
-		startProcess(loop, 0, NULL, "loop");
+        else if (strncmp(tokens[0], "storedreg", 10) == 0 && j==1)
+            printStoredReg();
 
 
-	//Sync
-	else if(strncmp(*tokens,"sem",4)==0)
-	    printSemStatus();
+            // Memory management
 
-	else if(strncmp(tokens[0], "pipe", 5) == 0)
-		printPipeInfo();
+        else if (strncmp(tokens[0], "memdump", 8) == 0 && j == 2)
+            printMemDump(tokens[1]);
+
+        else if (strncmp(tokens[0], "mem", 4) == 0 && j==1)
+            printMemStatus();
 
 
-	//Testing
-	else if(strncmp(tokens[0],"testmm",7) == 0)
-		startProcess(test_mm, 0, NULL, "testmm");
+        // Process management
 
-	else if(strncmp(tokens[0],"testproc",7) == 0)
-		startProcess(test_proc, 0, NULL, "testproc");
+        else if (strncmp(tokens[0], "kill", 5) == 0 && j == 2)
+            killProcess(tokens[1]);
 
-	else if(strncmp(tokens[0],"testsync",7) == 0)
-		startProcess(test_sync, 0, NULL, "testsync");
+        else if (strncmp(tokens[0], "block", 6) == 0 && j == 2)
+            blockProcess(tokens[1]);
 
-	// Command not found
-	else
-		printWarning();
+        else if (strncmp(tokens[0], "nice", 5) == 0 && j == 3)
+            niceProcess(tokens[1], tokens[2]);
+
+        else if(strncmp(tokens[0],"ps",3)==0 && j==1)
+        	printProcData();
+
+
+        // New processes
+
+		else if(strncmp(tokens[0], "line", 5) == 0 && j==1)	
+			startProcess(line, 0, NULL, "line");
+
+        else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
+            startProcess(loop, 0, NULL, "loop");
+
+
+        //Sync
+
+        else if (strncmp(*tokens, "sem", 4) == 0 && j==1)
+            printSemStatus();
+
+		else if(strncmp(tokens[0], "pipe", 5) == 0)
+			printPipeInfo();
+
+
+		//Testing
+
+		else if(strncmp(tokens[0],"testmm",7) == 0 && j==1)
+			startProcess(test_mm, 0, NULL, "testmm");
+
+		else if(strncmp(tokens[0],"testproc",7) == 0)
+			startProcess(test_proc,0,NULL,"test_proc");
+
+		else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
+			printPipeInfo();
+
+		else if(strncmp(tokens[0],"filter",7) == 0 && j==1)
+			startFilter();
+
+		else if(strncmp(tokens[0],"cat",4)==0 && j==1){
+			// int fds [2];
+			// pipe(fds);
+			// //Solo escribe
+			// close(fd[0]);
+			// startProcess(cat,0,NULL,"cat");
+		}
+
+		else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
+			startProcess(test_proc, 0, NULL, "testproc");
+
+		else if(strncmp(tokens[0],"testsync",7) == 0 && j==1)
+			startProcess(test_sync, 0, NULL, "testsync");
+
+		else if(strncmp(tokens[0],"testnosync",7) == 0 && j==1)
+			startProcess(test_no_sync, 0, NULL, "testnosync");
+
+		else
+			printWarning();
 	
 }
 
-
+    
 /* --------------------------------------------------------------------------------------------------------------------------
                                         	OTHER METHODS
 ------------------------------------------------------------------------------------------------------------------------- */

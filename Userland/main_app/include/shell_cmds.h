@@ -13,6 +13,7 @@ void displayImage(char *name, int x, int y);
 void startFilter();
 void line(int argc, char **argv);
 void loop(int argc, char **argv);
+void cat(int argc, char ** argv);
 
 
 // CPU COMMANDS
@@ -45,5 +46,6 @@ void printSemStatus();
 void test_mm(int argc, char **argv);
 void test_proc(int argc, char **argv);
 void test_sync();
+void test_no_sync();
 
 #endif
