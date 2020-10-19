@@ -19,7 +19,6 @@ void printProcData(){
 void killProcess(char * pid){
 
 	int _pid = atoi(pid);
-    printf("pepito\n",0 );
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
 		return;

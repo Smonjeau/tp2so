@@ -11,10 +11,8 @@
                                                     START_PROCESS
 --------------------------------------------------------------------------------------------------------------------------- */
 
-int sysStartProcess(void *main, int argc, char **argv, char * name){
-
-    return createProcessContext(argc, argv, main,name);
-
+int sysStartProcess(void *main, int argc, char **argv, char * name, int bg){
+    return createProcessContext(argc, argv, main, name, bg);
 }
 
 void sysPS(char * buffer) {

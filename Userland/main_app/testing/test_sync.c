@@ -76,7 +76,7 @@ void test_sync(){
   // }
 
   char *argv1[3] = {"1", "-1", "10000"};
-  startProcess(inc, 3, argv1, "inc");
+  startProcess(inc, 3, argv1, "inc", 1);
 
 }
 

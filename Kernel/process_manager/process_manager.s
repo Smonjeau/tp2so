@@ -50,6 +50,7 @@ createProcessContext:
 	push rsi
 	push rdx
 	push rcx
+	push r8
 
 	# Reserve 4kb for process stack
 	mov rdi, 4096
@@ -58,13 +59,14 @@ createProcessContext:
 	je no_space
 
 	# Restore calling args
+	pop r8
 	pop rcx
 	pop rdx
 	pop rsi
 	pop rdi
 
 	# Ante dudas sobre por qué restamos 4088 consultar
-	########################
+	
 	# Calc the base of the stack
 	add rax, 4096
 	sub rax, 8

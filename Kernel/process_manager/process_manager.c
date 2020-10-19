@@ -568,7 +568,13 @@ void * schedule(void * currContextRSP) {
 
 static int pid=0;
 
-int createProcessPCB(void * contextRSP, void * segmentAddress, char * name){
+int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int bg) {
+
+	if(bg == 0) {
+		//Se trata de un proceso foreground.
+		//Bloqueamos a la shell
+		blockProcess(0, 0);
+	}
 	
 
 	if(lastRSP == NULL)
@@ -585,6 +591,7 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name){
 	new->segmentAddress=segmentAddress;
 	new->pid = pid++;
 	new->name=name;
+	new->bg = bg;
 	new->nextPCB = NULL;
 
 	assignQuantumTime(new);
@@ -712,6 +719,12 @@ void killProcess(int pid) {
 	    if(currentPCB->pipes[pipe] != NULL)
 	        close_fd_proc(currentPCB, pipe);
 	}
+
+	//Si era un proceso foreground desbloqueo shell
+	if(currentPCB->bg == 0)
+		blockProcess(0, 0);
+
+
     free(currentPCB->segmentAddress);
     free(currentPCB);
     procCount--;

@@ -41,7 +41,11 @@ int div_ceil(int dividend, int divisor){
 }
 
 
-void * malloc(int size){
+void * malloc(int size) {
+
+    
+
+
 
     int nblocks = div_ceil(size , BLOCK_SIZE);    // Number of blocks to assing
 
@@ -96,6 +100,7 @@ void * malloc(int size){
         newAssignation.startAddress = candidateAddress;
 
         assignations[assignationCounter++] = newAssignation;
+
     
         return candidateAddress;
 
@@ -109,6 +114,7 @@ void * malloc(int size){
 
 
 void free(void *address){
+
 
     // Get the assignation record
 
