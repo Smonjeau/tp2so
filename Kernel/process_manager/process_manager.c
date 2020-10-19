@@ -646,8 +646,9 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int 
     if(bg == 0) {
         //Se trata de un proceso foreground.
         //Bloqueamos a la shell
-        blockProcess(0, 1); //Llama al timer tick
-        //_cli();
+        if(runningProc != NULL)
+        	blockProcess(runningProc->pid, 1); //Llama al timer tick.
+        
     }
 	return new->pid;
 
