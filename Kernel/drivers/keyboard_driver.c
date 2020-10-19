@@ -95,8 +95,6 @@ void handleKeyStroke() {
     if(aux != 0)
         pipe_write_nofd(stdinPipe, &aux, 1);
 
-    if(aux == '9')
-        emergencyPrint();
        
 }
 

@@ -43,13 +43,6 @@ int sysForcePipe(int fd) {
 	return create_force_pipe(fd);
 }
 
-void sysClosefd(int fd) {
-	close_port(fd);
-}
-
-int sysDup(int fd) {
-    return dup_fd(fd);
-}
 
 int sysPipeRead (int fd, char * buffer, int bytes) {
     return pipe_read (fd,buffer, bytes);

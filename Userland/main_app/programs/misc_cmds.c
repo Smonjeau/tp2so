@@ -111,7 +111,7 @@ void filter(int argc, char **argv) {
 		else if (c == '\b' && idxBuffer > 0)
 			bufferAux[--idxBuffer] = 0;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
-		if(c == '\n') {
+		if(c == '\n' || c == EOT) {
 			bufferAux[idxBuffer] = 0;
 			printf(bufferAux, 0);
 			idxBuffer = 0;
@@ -145,7 +145,7 @@ void cat(int argc, char ** argv) {
 		else
 			bufferAux[idxBuffer++] = c;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
-		if(c == '\n') {
+		if(c == '\n' || c == EOT) {
 			bufferAux[idxBuffer] = 0;
 			printf(bufferAux, 0);
 			idxBuffer = 0;
