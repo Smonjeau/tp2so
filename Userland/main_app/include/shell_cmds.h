@@ -47,7 +47,8 @@ void printSemStatus();
 
 void test_mm(int argc, char **argv);
 void test_proc(int argc, char **argv);
-void test_sync();
-void test_no_sync();
+void test_prio(int argc, char **argv);
+void test_sync(int argc, char **argv);
+void test_no_sync(int argc, char **argv);
 
 #endif

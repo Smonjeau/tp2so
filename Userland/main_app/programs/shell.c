@@ -41,6 +41,8 @@ void shell(){
 
 	printf("\f", 0);
 
+	startProcess(test_prio, 0, NULL, "testprio", 1);
+
 	char c;
 	while (1){
 		c = getChar();
@@ -207,6 +209,9 @@ void parseCommand(char *cmdBuff) {
 
 	else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
 		startProcess(test_proc, 0, NULL, "testproc", background);
+
+	else if(strncmp(tokens[0],"testprio",7) == 0 && j==1)
+		startProcess(test_prio, 0, NULL, "testprio", background);
 
 	else if(strncmp(tokens[0],"testsync",7) == 0 && j==1)
 		startProcess(test_sync, 0, NULL, "testsync", background);

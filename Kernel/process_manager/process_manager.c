@@ -30,25 +30,6 @@ void * lastRSP = NULL;
 PCB runningProc=NULL;
 
 
-void emergencyPrint(){
-
-	PCB pcb = actives->first;
-	
-	while(pcb != NULL){
-		printf("(A) PID: %d - State: %d\n", 2, pcb->pid, pcb->procState);
-		pcb = pcb->nextPCB;
-	}
-
-	pcb = expireds->first;
-
-	while(pcb != NULL){
-		printf("(E) PID: %d - State: %d\n", 2, pcb->pid, pcb->procState);
-		pcb = pcb->nextPCB;
-	}
-
-}
-
-
 // Decide el quantum de tiempo que utilizará el proceso.
 void assignQuantumTime(PCB pcb) {
     if(pcb->pid == 0) {
