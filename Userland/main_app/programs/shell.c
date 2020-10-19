@@ -36,14 +36,14 @@ void shell(){
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 	forcePipe(1); //Creamos el pipe que comunica fd 1 con salida estandar
 
-	/*
-	PARA PROBAR LO DE PIPES
-	int fds[2];
+	//PARA PROBAR LO DE PIPES
+	/*int fds[2];
 	pipe(fds);
 	pipeLeftProc(cat, "cat", fds);
 	pipeLeftProc(wc, "wc", fds);
 	close(fds[0]);
 	close(fds[1]);*/
+	
 
 	char cmdBuff[MAX_CMD_LEN] = {0};
 	int buffPos = 0;
@@ -51,7 +51,7 @@ void shell(){
 	printf("\f", 0);
 
 	char c;
-	while (1){
+	while (1) {
 		c = getChar();
 
 		// Handle the chars that are not CR
@@ -84,6 +84,7 @@ void shell(){
                 buffPos = 0;
             }
         }
+
  }
     
 
