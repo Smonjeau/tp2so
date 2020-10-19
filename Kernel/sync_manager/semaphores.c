@@ -8,19 +8,21 @@ Semaphore * semaphores = NULL;
 
 
 void semStatus(void * buffer, int * sem_count){
-    //Recorremos todos los semáforos y pasamamos el struct
+
     Semaphore * semaphore = semaphores;
 
     int count=0;
     int size= sizeof(Semaphore);
+
     while (semaphore!=NULL) {
         memcpy(buffer + size * count++, semaphore, size);
         semaphore = semaphore->next;
     }
+
     *sem_count=count;
 
-
 }
+
 
 Semaphore * findSemaphore(int id, int prev){
     
@@ -110,18 +112,12 @@ int postSemaphore(int id){
     acquire(&(semaphore->lock));
 
     semaphore->value += 1;
-    int aux = semaphore->blockedPIDsSize;
-    int unblocked=0;
 
-    for(int i=0; i< aux; i++) {
-
-        blockProcess(semaphore->blockedPIDs[i],0);
-        semaphore->blockedPIDs[i]=0;
-        unblocked++;
-
+    if(semaphore->blockedPIDsSize > 0){
+        int unblockPID = semaphore->blockedPIDs[semaphore->blockedPIDsSize--];
+        blockProcess(unblockPID, 0);
     }
 
-    semaphore->blockedPIDsSize = 0;
     release(&(semaphore->lock));
 
     return 0;

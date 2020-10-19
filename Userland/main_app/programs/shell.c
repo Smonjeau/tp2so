@@ -30,7 +30,7 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-void puto(){
+void testKill(){
 	for(int i=0; i<999; i++);
 	kill(-1);
 	printf("Sigo vivo\n", 0);
@@ -50,7 +50,7 @@ void shell(){
 
 	printf("\f", 0);
 
-	// startProcess(puto, 0, NULL, "puto");
+	// startProcess(testKill, 0, NULL, "testKill");
 
 	// startProcess(test_proc, 0, NULL, "test_proc");
 
