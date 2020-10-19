@@ -1,3 +1,6 @@
+#ifndef STD_IO_H
+#define STD_IO_H
+
 // The following keys are represented with non used ASCII codes
 
 #define EOT 4
@@ -12,3 +15,5 @@
 char getChar();
 
 int putChar(char c);
+
+#endif

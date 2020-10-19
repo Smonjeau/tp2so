@@ -1,8 +1,10 @@
 #ifndef PIPE__MANAGER__H
 #define PIPE__MANAGER__H
-#define PIPE_SIZE 255
 
 #include <semaphores.h>
+
+#define PIPE_SIZE 255
+#define EOT 4
 
 #define STDIN 0
 #define STDOUT 1

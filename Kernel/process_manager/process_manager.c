@@ -206,10 +206,16 @@ int assign_pipe_to_pcb_forced(int fd, pipe new) {
 
 void close_fd_proc(PCB pcb, int fd) {
     if(pcb != NULL && fd >= 0 && fd < MAX_PIPES) {
-        pipe aux = pcb->pipes[fd];
+
+    	pipe aux = pcb->pipes[fd];
         pcb->pipes[fd] = NULL;
         aux->open_ports--;
-        free_pipe_if_empty(aux);
+
+        char c = EOT;
+    	if(aux->open_ports == 1)
+    		pipe_write(fd, &c, 1); //Si queda una unica boca abierta, escribo EOT
+    	else
+        	free_pipe_if_empty(aux);
     }
 }
 
@@ -361,7 +367,7 @@ void niceProcess(int pid, int priority) {
 		idxPriority--; //Compenso el ultimo ++
 		if(idxPriority != priority) {
 			//Primero lo quitamos de esta cola
-			if(inActives)
+			if(inActives == 1)
 				removeFromQueue(actives + idxPriority, pid);
 			else
 				removeFromQueue(expireds + idxPriority, pid);
@@ -489,11 +495,11 @@ void * schedule(void * currContextRSP) {
 			priorityIdx++;
 
 		} while(priorityIdx < 40 && currentPCB == NULL);
-		if(priorityIdx == 40) {
+		if(priorityIdx == 40 && currentPCB == NULL) {
 			//drawLine();
 			swapQueues(); //Es necesario cuando un proceso se autobloquea y no quedan activos en estado READY
 		}
-	} while(priorityIdx == 40);
+	} while(priorityIdx == 40 && currentPCB == NULL);
 
 
 
@@ -559,7 +565,7 @@ void * schedule(void * currContextRSP) {
 
 	
 
-	if(idx == 40) {
+	if(idx == 40 && currentPCB == NULL) {
 		//No quedan mas procesos activos. Intercambiamos por los expirados.
 		swapQueues();
 
