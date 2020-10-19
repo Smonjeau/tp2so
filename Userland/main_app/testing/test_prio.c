@@ -31,7 +31,7 @@ void test_prio(){
   printf("Creating processes...\n\n", 0);
 
   for(i = 0; i < TOTAL_PROCESSES; i++)
-    pids[i] = startProcess(endless_loop_prio, 0, (void *) 0, "endless_loop", 1);
+    pids[i] = startProcess(endless_loop_prio, 0, (void *) 0, "endless_loop", 0);
 
   bussy_wait(WAIT);
 

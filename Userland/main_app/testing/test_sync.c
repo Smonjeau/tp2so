@@ -57,10 +57,10 @@ void test_sync(){
 
   for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
     char *argv1[3] = {"1","1","1000000"};
-    startProcess(inc, 3, argv1, "inc",1);
+    startProcess(inc, 3, argv1, "inc", 0);
 
     char *argv2[3] = {"1","-1","1000000"};
-    startProcess(inc, 3, argv2, "dec",1);
+    startProcess(inc, 3, argv2, "dec", 0);
   }
 
   kill(-1);
@@ -80,10 +80,10 @@ void test_no_sync(){
     for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
         itoa(i,str,10,-1);
         char *argv1[3] = {"0","1","1000000"};
-        startProcess(inc, 3, argv1, "inc_nosync",1);
+        startProcess(inc, 3, argv1, "inc_nosync", 0);
 
         char *argv2[3] = {"0","-1","1000000"};
-        startProcess(inc, 3, argv2, "dec_nosync",1);
+        startProcess(inc, 3, argv2, "dec_nosync", 0);
     }
 
     kill(-1);

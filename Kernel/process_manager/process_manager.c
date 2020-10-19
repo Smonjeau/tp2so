@@ -756,7 +756,8 @@ void killProcess(int pid) {
 	        close_fd_proc(currentPCB, pipe);
 	}
 
-	setForeground(currentPCB->parent);
+	if(hasForeground())
+		setForeground(currentPCB->parent);
 
     free(currentPCB->segmentAddress);
     free(currentPCB);
