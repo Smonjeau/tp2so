@@ -2,7 +2,7 @@
 #include <std_lib.h>
 
 #define TOTAL_PAIR_PROCESSES 2
-#define SEM_ID 5
+#define SEM_ID 10
 
 
 int global;  //shared memory
@@ -13,7 +13,12 @@ void inc(int argc, char **argv){
     int sem = atoi(argv[0]);
     int value = atoi(argv[1]);
     int limit = atoi(argv[2]);
-    
+
+    if(openSem(SEM_ID, 1) == -1){
+        printf("Error opening sem\n", 0);
+        kill(-1);
+    }
+
     for (int i = 0; i < limit; i++){
       
       if(sem && waitSem(SEM_ID) == -1){
@@ -30,10 +35,10 @@ void inc(int argc, char **argv){
 
     }
 
-    // if(sem && closeSem(SEM_ID) == -1){
-    //   printf("Error closing sem\n", 0);
-    //   return;
-    // }
+     if(sem && closeSem(SEM_ID) == -1){
+       printf("Error closing sem\n", 0);
+       return;
+     }
 
     printf("Final value: %d\n", 1, global);
 
@@ -50,23 +55,16 @@ void test_sync(){
 
   printf("CREATING PROCESSES...(WITH SEM)\n", 0);
 
-  if(openSem(SEM_ID, 1) == -1){
-    printf("Error opening sem\n", 0);
-    kill(-1);
-  }
 
-  for(i = 0; i < 1; i++){
-    char *argv1[3] = {"1","1","100000"};
-    startProcess(inc, 3, argv1, "inc");
 
-<<<<<<< HEAD
-    char *argv2[3] = {"1","-1","100000"};
-    startProcess(inc, 3, argv2, "dec");
+
+  for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
+    char *argv1[3] = {"1","1","1000000"};
+    startProcess(inc, 3, argv1, "inc",1);
+
+    char *argv2[3] = {"1","-1","1000000"};
+    startProcess(inc, 3, argv2, "dec",1);
   }
-=======
-  char *argv1[3] = {"1", "-1", "10000"};
-  startProcess(inc, 3, argv1, "inc", 1);
->>>>>>> 947f4230bd1e7f8390d7c0188b8bb341020ca4a7
 
   kill(-1);
 
@@ -80,13 +78,14 @@ void test_no_sync(){
     global = 0;
 
     printf("CREATING PROCESSES...(WITHOUT SEM)\n",0);
-
+    char str[3];
     for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
-        char *argv1[3] = {"0","1","100000"};
-        startProcess(inc, 3, argv1, "inc_nosync");
+        itoa(i,str,10,-1);
+        char *argv1[3] = {"0","1","1000000"};
+        startProcess(inc, 3, argv1, "inc_nosync",1);
 
-        char *argv2[3] = {"0","-1","100000"};
-        startProcess(inc, 3, argv2, "dec_nosync");
+        char *argv2[3] = {"0","-1","1000000"};
+        startProcess(inc, 3, argv2, "dec_nosync",1);
     }
 
     kill(-1);
