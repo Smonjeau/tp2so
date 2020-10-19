@@ -10,8 +10,9 @@ void divZeroException(void);
 void invOpcodeException(void);
 
 void displayImage(char *name, int x, int y);
-void startFilter();
-void startCat();
+void filter(int argc, char **argv);
+void cat(int argc, char **argv);
+void wc(int argc, char **argv);
 void line(int argc, char **argv);
 void loop(int argc, char **argv);
 

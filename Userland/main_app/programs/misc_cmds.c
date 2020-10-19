@@ -100,6 +100,7 @@ void line(int argc, char **argv){
 void filter(int argc, char **argv) {
 	char bufferAux[50] = {0}; //Buffer auxiliar donde guardare las vocales
 	int idxBuffer = 0;
+
 	char c; //Buffer para letra por letra
 	do {
 		read(0, &c, 1); //Leo un byte de stdin
@@ -112,14 +113,19 @@ void filter(int argc, char **argv) {
 
 
 	bufferAux[idxBuffer] = 0;
+	
 	//Ahora imprimo las vocales
+	printf("\n", 0);
 	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
 
 	kill(-1); //Exit
 }
+
+
 void cat(int argc, char ** argv) {
-	char bufferAux[80] = {0}; //Buffer auxiliar donde guardare las vocales
+	char bufferAux[80] = {0};
 	int idxBuffer = 0;
+
 	char c; //Buffer para letra por letra
 	do {
 		read(0, &c, 1); //Leo un byte de stdin
@@ -131,19 +137,37 @@ void cat(int argc, char ** argv) {
 
 
 	bufferAux[idxBuffer] = 0;
-	//Ahora imprimo las vocales
+
+	printf("\n", 0);
 	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
 
 	kill(-1); //Exit
 }
 
-void startFilter() {
-	startProcess(filter, 0, NULL, "filter", 0); //Creo proceso filter. Hereda fds.
+
+void wc(int argc, char ** argv) {
+
+	int lines = 1;
+
+	char c;
+	do{
+		read(0, &c, 1);
+
+		if(c == '\r'){
+			lines += 1;
+			c = '\n';
+		}
+
+		putChar(c);
+	} while(c != EOT);
+
+
+	printf("\nLines: %d", 1, lines);
+
+	kill(-1);
+
 }
 
-void startCat() {
-	startProcess(cat, 0, NULL, "cat", 0); //Creo proceso cat. Hereda fds.
-}
 
 void nap(uint64_t limit){
     for (int i =0;i<limit;i++);

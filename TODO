@@ -17,9 +17,9 @@
 - Process background (&)    ✓
 - Process piping (|)        X
 
-- Phylo command             X
 - Filter command            ✓
 - Cat command               ✓
-- Wc command                X
+- Wc command                ✓
+- Phylo command             X
 
 - Add named pipes

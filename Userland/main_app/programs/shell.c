@@ -122,8 +122,15 @@ void parseCommand(char *cmdBuff) {
 	else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
 		displayImage(tokens[1], 20, 200);
 
+
 	else if(strncmp(tokens[0], "filter", 7) == 0 && j == 1)
-		startFilter();
+		startProcess(filter, 0, NULL, "filter", 0);
+
+	else if(strncmp(tokens[0], "cat", 4) == 0 && j==1)
+		startProcess(cat, 0, NULL, "cat", 0);
+	
+	else if(strncmp(tokens[0], "wc", 3) == 0 && j==1)
+		startProcess(wc, 0, NULL, "wc", 0);
 
 	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
 		putChar('\f');
@@ -170,9 +177,8 @@ void parseCommand(char *cmdBuff) {
 
 	// New processes
 
-	else if(strncmp(tokens[0], "line", 5) == 0 && j==1){	
+	else if(strncmp(tokens[0], "line", 5) == 0 && j==1)	
 		startProcess(line, 0, NULL, "line", background);
-	}
 
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
 		startProcess(loop, 0, NULL, "loop", background);
@@ -198,9 +204,6 @@ void parseCommand(char *cmdBuff) {
 	else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
 		printPipeInfo();
 
-
-	else if(strncmp(tokens[0],"cat",4)==0 && j==1)
-		startCat();
 
 	else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
 		startProcess(test_proc, 0, NULL, "testproc", background);
