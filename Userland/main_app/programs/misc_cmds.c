@@ -106,9 +106,18 @@ void filter(int argc, char **argv) {
 		read(0, &c, 1); //Leo un byte de stdin
 		if(c == '\r')
 			c = '\n';
-		if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
+		else if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
 			bufferAux[idxBuffer++] = c;
+		else if (c == '\b' && idxBuffer > 0)
+			bufferAux[--idxBuffer] = 0;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
+		if(c == '\n' || c == EOT) {
+			bufferAux[idxBuffer] = 0;
+			printf(bufferAux, 0);
+			idxBuffer = 0;
+			bufferAux[0] = 0;
+			putChar('\n');
+		}
 	} while(c != EOT);
 
 
@@ -131,8 +140,18 @@ void cat(int argc, char ** argv) {
 		read(0, &c, 1); //Leo un byte de stdin
 		if(c == '\r')
 			c = '\n';
-		bufferAux[idxBuffer++] = c;
+		else if (c == '\b' && idxBuffer > 0)
+			bufferAux[--idxBuffer] = 0;
+		else
+			bufferAux[idxBuffer++] = c;
 		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
+		if(c == '\n' || c == EOT) {
+			bufferAux[idxBuffer] = 0;
+			printf(bufferAux, 0);
+			idxBuffer = 0;
+			bufferAux[0] = 0;
+			putChar('\n');
+		}
 	} while(c != EOT);
 
 
@@ -140,6 +159,7 @@ void cat(int argc, char ** argv) {
 
 	printf("\n", 0);
 	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
+	putChar(EOT);
 
 	kill(-1); //Exit
 }

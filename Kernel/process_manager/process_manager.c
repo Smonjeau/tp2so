@@ -27,7 +27,24 @@ ProcQueue * expireds = queue2;
 
 void * lastRSP = NULL;
 
-PCB runningProc=NULL;
+PCB runningProc = NULL;
+PCB foregroundProc = NULL;
+
+
+void setForeground(PCB proc){
+
+	if(proc->procState == BLOCKED)
+		blockProcess(proc->pid, 1);
+
+	foregroundProc = proc;
+
+}
+
+int hasForeground(){
+
+	return runningProc == foregroundProc;
+
+}
 
 
 // Decide el quantum de tiempo que utilizará el proceso.
@@ -188,7 +205,7 @@ int assign_pipe_to_pcb_forced(int fd, pipe new) {
 }
 
 void close_fd_proc(PCB pcb, int fd) {
-    if(pcb != NULL) {
+    if(pcb != NULL && fd >= 0 && fd < MAX_PIPES) {
         pipe aux = pcb->pipes[fd];
         pcb->pipes[fd] = NULL;
         aux->open_ports--;
@@ -200,15 +217,32 @@ void close_fd(int fd) {
 	close_fd_proc(runningProc, fd);
 }
 
+int dup_fd(int fd) {
+	if(runningProc == NULL || fd < 0 || fd >= MAX_PIPES)
+		return -1;
 
+	int i = 0;
+	while(runningProc->pipes[i++] != NULL);
+	i--; //Compenso
+
+	if(i > fd)
+		return -1; //Fue a parar a un fd incluso mas grande
+
+	pipe aux = runningProc->pipes[fd];
+	runningProc->pipes[fd] = NULL;
+	runningProc->pipes[i] = aux;
+	return 0;
+
+
+}
 
 
 void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	strcat("Name: ", buffer);
 	strcat(pcb->name, buffer);
-	strcat("     Pid: ", buffer);
+	strcat("   Pid: ", buffer);
 	itoa(pcb->pid, buffer + strlen(buffer), 10, -1);
-	strcat("     State: ", buffer);
+	strcat("   State: ", buffer);
 	switch (pcb->procState){
         case READY:
             strcat("READY", buffer);
@@ -229,13 +263,17 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	        strcat("BLOCKED",buffer);
 	        break;
 	}
-	strcat("     Priority: ", buffer);
+	if(foregroundProc == pcb)
+		strcat("   FG", buffer);
+	else
+		strcat("   BG", buffer);
+	strcat("   Priority: ", buffer);
 	itoa(priority, buffer + strlen(buffer), 10, -1);
-	strcat("     Context RSP: ", buffer);
+	strcat("   Context RSP: ", buffer);
 	strcat("0x", buffer);
 	itoa((uint64_t)pcb->contextRSP, buffer + strlen(buffer), 16, -1);
 
-	strcat("     Base RSP: ", buffer);
+	strcat("   Base RSP: ", buffer);
 	strcat("0x", buffer);
 	itoa((uint_fast64_t)pcb->segmentAddress, buffer + strlen(buffer), 16, -1);
 	strcat("\n", buffer);
@@ -570,10 +608,7 @@ void * schedule(void * currContextRSP) {
 
 static int pid=0;
 
-int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int bg) {
-
-
-	
+int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int foreground) {
 
 	if(lastRSP == NULL)
 		lastRSP = contextRSP;
@@ -587,10 +622,13 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int 
 	
     new->contextRSP = contextRSP;
 	new->segmentAddress=segmentAddress;
+	new->parent = runningProc;
 	new->pid = pid++;
 	new->name=name;
-	new->bg = bg;
 	new->nextPCB = NULL;
+
+	if(foreground)
+		setForeground(new);
 
 	assignQuantumTime(new);
 
@@ -598,17 +636,11 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int 
 
 	int priority = getPriorityLevel(new) - 100;
 
-	
 	new->procState = READY;
 
 	queueProc(actives + priority, new);
 	procCount++;
-    if(bg == 0) {
-        //Se trata de un proceso foreground.
-        //Bloqueamos a la shell
-        blockProcess(0, 1); //Llama al timer tick
-        //_cli();
-    }
+    
 	return new->pid;
 
 }
@@ -724,10 +756,7 @@ void killProcess(int pid) {
 	        close_fd_proc(currentPCB, pipe);
 	}
 
-	//Si era un proceso foreground desbloqueo shell
-	if(currentPCB->bg == 0)
-		blockProcess(0, 0);
-
+	setForeground(currentPCB->parent);
 
     free(currentPCB->segmentAddress);
     free(currentPCB);

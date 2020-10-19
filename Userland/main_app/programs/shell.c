@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------------
 |   SHELL.C    |                                                                             	    |
-|----------------------                                                                             |
+|---------------                                                                                    |
 | This windows will display the shell program.														|
 | Press ENTER to execute a command.																	|
 ---------------------------------------------------------------------------------------------------*/
@@ -31,7 +31,7 @@ void dummy(int argc, char **argv);
 ------------------------------------------------------------------------------------------------------------------------- */
 
 void shell(){
-    startProcess(dummy, 0, (void *) 0, "dummy", 1); //Necesario en ciertos casos
+    startProcess(dummy, 0, (void *) 0, "dummy", 0); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 	forcePipe(1); //Creamos el pipe que comunica fd 1 con salida estandar
@@ -40,8 +40,6 @@ void shell(){
 	int buffPos = 0;
 
 	printf("\f", 0);
-
-	startProcess(test_prio, 0, NULL, "testprio", 1);
 
 	char c;
 	while (1){
@@ -100,12 +98,11 @@ void parseCommand(char *cmdBuff) {
 		}
 	}
 
-	int background = 0;
+	int foreground = 1;
 	if(strncmp(tokens[j-1], "&", 2) == 0){
-		background = 1;
+		foreground = 0;
 		j -= 1;
 	}
-
 
 	// Miscellaneous
 
@@ -126,13 +123,13 @@ void parseCommand(char *cmdBuff) {
 
 
 	else if(strncmp(tokens[0], "filter", 7) == 0 && j == 1)
-		startProcess(filter, 0, NULL, "filter", 0);
+		startProcess(filter, 0, NULL, "filter", foreground);
 
 	else if(strncmp(tokens[0], "cat", 4) == 0 && j==1)
-		startProcess(cat, 0, NULL, "cat", 0);
+		startProcess(cat, 0, NULL, "cat", foreground);
 	
 	else if(strncmp(tokens[0], "wc", 3) == 0 && j==1)
-		startProcess(wc, 0, NULL, "wc", 0);
+		startProcess(wc, 0, NULL, "wc", foreground);
 
 	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
 		putChar('\f');
@@ -180,10 +177,10 @@ void parseCommand(char *cmdBuff) {
 	// New processes
 
 	else if(strncmp(tokens[0], "line", 5) == 0 && j==1)	
-		startProcess(line, 0, NULL, "line", background);
+		startProcess(line, 0, NULL, "line", foreground);
 
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
-		startProcess(loop, 0, NULL, "loop", background);
+		startProcess(loop, 0, NULL, "loop", foreground);
 
 
 	//Sync
@@ -198,26 +195,26 @@ void parseCommand(char *cmdBuff) {
 	//Testing
 
 	else if(strncmp(tokens[0],"testmm",7) == 0 && j==1)
-		startProcess(test_mm, 0, NULL, "testmm", background);
+		startProcess(test_mm, 0, NULL, "testmm", foreground);
 
 	else if(strncmp(tokens[0],"testproc",7) == 0)
-		startProcess(test_proc, 0, NULL, "test_proc", background);
+		startProcess(test_proc, 0, NULL, "test_proc", foreground);
 
 	else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
 		printPipeInfo();
 
 
 	else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
-		startProcess(test_proc, 0, NULL, "testproc", background);
+		startProcess(test_proc, 0, NULL, "testproc", foreground);
 
 	else if(strncmp(tokens[0],"testprio",7) == 0 && j==1)
-		startProcess(test_prio, 0, NULL, "testprio", background);
+		startProcess(test_prio, 0, NULL, "testprio", foreground);
 
 	else if(strncmp(tokens[0],"testsync",7) == 0 && j==1)
-		startProcess(test_sync, 0, NULL, "testsync", background);
+		startProcess(test_sync, 0, NULL, "testsync", foreground);
 
 	else if(strncmp(tokens[0],"testnosync",7) == 0 && j==1)
-		startProcess(test_no_sync, 0, NULL, "testnosync", background);
+		startProcess(test_no_sync, 0, NULL, "testnosync", foreground);
 
 	else
 		printWarning();

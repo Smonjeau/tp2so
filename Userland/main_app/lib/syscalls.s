@@ -48,3 +48,4 @@ syscall forcePipe, 24
 syscall pipeRead, 25
 syscall semStatus,26
 syscall pipeInfo, 27
+syscall dup, 28

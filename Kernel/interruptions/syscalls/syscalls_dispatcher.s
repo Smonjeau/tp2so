@@ -37,6 +37,7 @@
 .extern sysPipeInfo
 .extern sysForcePipe
 .extern sysClosefd
+.extern sysDup
 .extern sysPipeWrite
 .extern sysPipeRead
 .extern sysSemStatus
@@ -137,6 +138,9 @@ _syscallDispatcher:
 
     cmp rax, 27
     je _pipeInfo
+
+    cmp rax, 28
+    je _dup
 
     jmp endOfInt
 
@@ -260,6 +264,10 @@ _forcepipe:
 
 _closefd:
     call sysClosefd
+    jmp endOfInt
+
+_dup:
+    call sysDup
     jmp endOfInt
 
 _pipe_read:

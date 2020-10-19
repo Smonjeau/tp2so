@@ -96,10 +96,3 @@ void handleKeyStroke() {
         pipe_write_nofd(stdinPipe, &aux, 1);
 
 }
-
-
-void assignKeyboardPipe(pipe new) {
-
-    stdinPipe = new;
-
-}

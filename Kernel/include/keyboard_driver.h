@@ -8,5 +8,4 @@ char getChar();
 
 int readStdin (char * buff, int dim);
 
-void assignKeyboardPipe(pipe new);
 #endif

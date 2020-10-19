@@ -34,3 +34,11 @@ void sysBlock(int pid) {
 void sysNice(int pid, int priority) {
 	niceProcess(pid, priority);
 }
+
+int sysDup(int fd) {
+    return dup_fd(fd);
+}
+
+void sysClosefd(int fd) {
+	close_port(fd);
+}

@@ -13,6 +13,8 @@ static int semaphore_id = 0;
 
 pipe pipeList = NULL;
 
+extern pipe stdinPipe;
+
 void addToPipeList(pipe new) {
 
     if(new == NULL)
@@ -98,8 +100,7 @@ int create_force_pipe(int fd) {
 
         // If STDIN assign other end to keyboard
         if(fd == 0)
-            assignKeyboardPipe(new);
-        
+            stdinPipe = new;
 
         // If STOUD it wont have another end, the pipe will be unbuffered
         // and as soon as data arrives it will be printed to the screen
@@ -113,10 +114,9 @@ int create_force_pipe(int fd) {
 
 
 void close_port(int fd) {
-
     close_fd(fd);
-
 }
+
 
 
 void copyPipeInfoToBuffer(char * buffer, pipe aux) {
@@ -192,6 +192,11 @@ int pipe_write_nofd(pipe pipe, char * buffer, int bytes) {
     // STDOUT will behave unbuffered, writing directly to screen, without a consumer process
     if(pipe->isStdio == STDOUT){
         print(buffer);
+
+        // Update indexes for information purposes
+        pipe->index_w += bytes;
+        pipe->index_r += bytes;
+
         return bytes;
     }
 
@@ -236,6 +241,11 @@ int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
     if(pipe == NULL)
         return -1;
 
+    if(pipe == stdinPipe && ! hasForeground()){
+        blockProcess(getPID(), 1);
+        return -1;
+    }
+
     int i;
     for(i = 0; i < bytes; i++) {
         waitSemaphore(pipe->read_bytes_sem);
@@ -245,6 +255,6 @@ int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
             break;
     }
 
-    return i;
+    return 0;
 
 }
