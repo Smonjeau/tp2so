@@ -230,7 +230,7 @@ int dup_fd(int fd) {
 	if(i > fd)
 		return -1; //Fue a parar a un fd incluso mas grande
 
-	pipe * aux = runningProc->pipes[fd];
+	pipe aux = runningProc->pipes[fd];
 	runningProc->pipes[fd] = NULL;
 	runningProc->pipes[i] = aux;
 	return 0;
