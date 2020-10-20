@@ -49,16 +49,14 @@ void shell(){
 
 	printf("\f", 0);
 
-	int fds[2];
-	pipe(fds);
+	// int fds[2];
+	// pipe(fds);
 
-	// printf("SH: %d -> %d\n", 2, fds[0], fds[1]);
+	// // pipeLeftProc(wc, "wc", fds);
+	// pipeRightProc(filter, "filter", fds);
 
-	pipeLeftProc(wc, "wc", fds);
-	pipeRightProc(filter, "filter", fds);
-
-	close(fds[0]);
-	close(fds[1]);
+	// close(fds[0]);
+	// close(fds[1]);
 
 	char c;
 	while (1) {

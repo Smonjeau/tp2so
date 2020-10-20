@@ -124,48 +124,49 @@ void printSemStatus(int argc, char **argv){
 typedef void (*ProcMain)(int,char**);
 
 
+char largv[3][20];
+ProcMain laddr;
+
 void pipeLeftProcMediator(int argc, char **argv) {
     int fds[2];
 
-    printf(argv[0],0);
-    printf(argv[1],0);
+    fds[0] = atoi(largv[0]);
+    fds[1] = atoi(largv[1]);
 
-    fds[0] = atoi(argv[0]);
-    fds[1] = atoi(argv[1]);
+    // printf("LP: %d -> %d\n", 2, fds[0], fds[1]);
 
-    // printf("LPM: %d -> %d\n", 2, fds[0], fds[1]);
+    char * name = largv[2];
 
-    // char * name = argv[2];
-    // ProcMain main = (ProcMain) argv[3];
+    close(1);
+    dup(fds[0]);
 
-    // close(1);
-    // dup(fds[0]);
+    close(fds[1]);
 
-    // close(fds[1]);
-
-    // startProcess(main, 0, NULL, name, 1);
+    startProcess(laddr, 0, NULL, name, 1);
 
     kill(-1);
 }
 
 
-void pipeRightProcMediator(int argc, char * * argv) {
+char rargv[4][20];
+ProcMain raddr;
+
+void pipeRightProcMediator(int argc, char ** argv) {
     int fds[2];
 
-    fds[0] = atoi(argv[0]);
-    fds[1] = atoi(argv[1]);
+    fds[0] = atoi(rargv[0]);
+    fds[1] = atoi(rargv[1]);
 
     // printf("RP: %d -> %d\n", 2, fds[0], fds[1]);
 
-    char * name = argv[2];
-    ProcMain main = (ProcMain) argv[3];
+    char * name = rargv[2];
 
     close(0);
     dup(fds[1]);
 
     close(fds[0]);
 
-    startProcess(main, 0, NULL, name, 1);
+    startProcess(raddr, 0, NULL, name, 0);
 
     kill(-1);
 }
@@ -179,8 +180,12 @@ void pipeLeftProc(ProcMain main, char * name, int fds[2]) {
     itoa(fds[0], fd1, 10, -1);
     itoa(fds[1], fd2, 10, -1);
 
-    char * argv[4] = {fd1, fd2, name, (char *) main};
-    startProcess(pipeLeftProcMediator, 4, argv, "left_proc_mediator", 1);
+    strcpy(fd1, largv[0]);
+    strcpy(fd2, largv[1]);
+    strcpy(name, largv[2]);
+    laddr = main;
+    
+    startProcess(pipeLeftProcMediator, 4, (char **) largv, "left_proc_mediator", 1);
 
 }
 
@@ -193,7 +198,11 @@ void pipeRightProc(ProcMain main, char * name, int fds[2]) {
     itoa(fds[0], fd1, 10, -1);
     itoa(fds[1], fd2, 10, -1);
 
-    char * argv[4] = {fd1, fd2, name, (char *) main};
-    startProcess(pipeRightProcMediator, 4, argv, "right_proc_mediator", 1);
+    strcpy(fd1, rargv[0]);
+    strcpy(fd2, rargv[1]);
+    strcpy(name, rargv[2]);
+    raddr = main;
+
+    startProcess(pipeRightProcMediator, 4, (char **) rargv, "right_proc_mediator", 0);
 
 }
