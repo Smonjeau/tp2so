@@ -7,7 +7,7 @@
 
 /* ------------------------------------------- SHELL UTILITIES ------------------------------------------------------ */
 
-void printHelp(void){
+void printHelp(int argc, char **argv){
 	printf("---------------------------------------------------\n", 0);
 
 	printf("- help              to go to the Help Manual\n", 0);
@@ -48,12 +48,10 @@ void printWarning(){
 	printf(">> Error:\n", 0, 0);
 	printf("Command not found\n", 0);
 	printf("If you want to see the command manual type 'help'.\n", 0);
-
-	kill(-1);
 }
 
 
-void printTime(void){
+void printTime(int argc, char **argv){
 	Time t;
 	getTime(&t);
 
@@ -66,7 +64,7 @@ void printTime(void){
 /* ------------------------------------------- EXCEPTION TESTING ------------------------------------------------------ */
 
 
-void divZeroException(void){
+void divZeroException(int argc, char **argv){
 	int a;
 	a = 2 / 0;
 
@@ -76,7 +74,7 @@ void divZeroException(void){
 
 void invalidOpcode();
 
-void invOpcodeException(void){
+void invOpcodeException(int argc, char **argv){
 	invalidOpcode();
 
 	kill(-1);
@@ -85,7 +83,7 @@ void invOpcodeException(void){
 
 /* ------------------------------------------- USER APPS ------------------------------------------------------ */
 
-void displayImage(char *name){
+void displayImage(int argc, char **argv){
 
     // drawImage(20, 200, anon_img, anon_width, anon_height);
     
@@ -220,7 +218,7 @@ void loop(int argc, char **argv){
 }
 
 
-void phylo(){
+void phylo(int argc, char **argv){
 
 }
 

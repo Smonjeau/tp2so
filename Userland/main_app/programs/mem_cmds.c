@@ -42,7 +42,7 @@ void printMemDump(int argc, char **argv){
 }
 
 
-void printMemStatus(){
+void printMemStatus(int argc, char **argv){
 
 	int total_mem=0;
     int  avail_mem=0;

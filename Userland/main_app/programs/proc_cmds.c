@@ -3,7 +3,7 @@
 #include <shell_cmds.h>
 
 
-void printProcData(){
+void printProcData(int argc, char **argv){
 
 	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
@@ -57,7 +57,7 @@ void blockProcess(int argc, char **argv){
 }
 
 
-void printPipeInfo() {
+void printPipeInfo(int argc, char **argv) {
 
 	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
@@ -72,10 +72,10 @@ void printPipeInfo() {
 }
 
 
-void niceProcess(char * pid, char * priority) {
+void niceProcess(int argc, char **argv) {
 
-	int _pid = atoi(pid);
-	int _prio = atoi(priority);
+	int _pid = atoi(argv[1]);
+	int _prio = atoi(argv[2]);
 
 	if(_pid==-1){
 		printf("Argument must be a pid. Use ps to see processes\n", 0);
@@ -89,7 +89,7 @@ void niceProcess(char * pid, char * priority) {
 }
 
 
-void printSemStatus(){
+void printSemStatus(int argc, char **argv){
 
     Semaphore * buffer = malloc(20*sizeof(struct Semaphore));
 

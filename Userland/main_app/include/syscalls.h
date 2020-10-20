@@ -55,7 +55,7 @@ void free(void * ptr);
 
 // ------------------------------------ PROCESS MANAGEMENT ------------------------------------
 
-int startProcess(void *main, int argc, char **argv, char * name, int bg);
+int startProcess(void *main, int argc, char **argv, char * name, int foreground);
 
 int getPid ();
 

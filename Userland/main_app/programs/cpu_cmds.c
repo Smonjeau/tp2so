@@ -4,7 +4,7 @@
 #include <shell_cmds.h>
 
 
-void printCPUTemp(void){
+void printCPUTemp(int argc, char **argv){
 	int temp = cpuTemp();
 	printf("\n Computer's Temperature: %d\n", 0, 1, temp);
 
@@ -12,7 +12,7 @@ void printCPUTemp(void){
 }
 
 
-void printCPUInfo(void){
+void printCPUInfo(int argc, char **argv){
 	CPUInfo info;
 
 	char brandName[50], brandDesc[70];
@@ -28,7 +28,7 @@ void printCPUInfo(void){
 }
 
 
-void printInfoReg(void){
+void printInfoReg(int argc, char **argv){
 	RegDump reg;
 	regDump(&reg);
 
@@ -58,7 +58,7 @@ void printInfoReg(void){
 }
 
 
-void printStoredReg(void){
+void printStoredReg(int argc, char **argv){
 	RegBkp reg;
 	getRegBkp(&reg);
 

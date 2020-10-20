@@ -159,9 +159,10 @@ void printChar(char c){
             break;
 
         default:
-            drawChar(curX, curY, c);
-            nextChar();
-
+            if(c > 31 && c < 127){
+                drawChar(curX, curY, c);
+                nextChar();
+            }
     }    
 
     printing=0;
