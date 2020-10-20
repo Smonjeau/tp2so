@@ -10,6 +10,7 @@
 #define STDOUT 1
 
 typedef struct pipe {
+    int id;
     char buffer [PIPE_SIZE];
     int index_w, index_r;
     int write_bytes_sem, read_bytes_sem;

@@ -51,9 +51,12 @@ void removeFromPipeList(pipe pipe_rem) {
 
 int initializePipe(pipe new, int isStdio) {
 
+    static int pipeId = 0;
+
     if(new == NULL)
         return 0;
 
+    new->id = pipeId++;
     new->index_w = 0;
     new->index_r = 0;
     new->open_ports = 2;
@@ -121,25 +124,29 @@ void close_port(int fd) {
 
 void copyPipeInfoToBuffer(char * buffer, pipe aux) {
 
-    strcat("Bocas abiertas: ", buffer);
-  
-    //strcat(pcb->name, buffer);
+    strcat("ID: ", buffer);
+    itoa(aux->id, buffer + strlen(buffer), 10, -1);
+
+    strcat("\nOpen ends: ", buffer);
     itoa(aux->open_ports, buffer + strlen(buffer), 10, -1);
-    strcat("  Bytes escritos: ", buffer);
+  
+    strcat("\nWritten bytes: ", buffer);
     itoa(aux->index_w, buffer + strlen(buffer), 10, -1);
-    strcat("  Bytes leidos: ", buffer);
+    strcat(" - Read bytes: ", buffer);
     itoa(aux->index_r, buffer + strlen(buffer), 10, -1);
-    strcat("  Id sem write: ", buffer);
+
+    strcat("\nSem write ID: ", buffer);
     itoa(aux->write_bytes_sem, buffer + strlen(buffer), 10, -1);
-    strcat("  Id sem read: ", buffer);
+    strcat(" - Sem read ID: ", buffer);
     itoa(aux->read_bytes_sem, buffer + strlen(buffer), 10, -1);
-    strcat("  Proc bloqueados: ", buffer);
+
+    strcat("\nProc bloqueados: ", buffer);
     
     //Primero reviso el sem write
     char buff[20];
     getBlockedProc(buff, aux->write_bytes_sem);
 
-    strcat("\n", buffer);
+    strcat("\n\n", buffer);
 
 }
 

@@ -11,9 +11,13 @@ void printProcData(int argc, char **argv){
     if(buffer == (void *) 0)
 		return;
 
+    printf("----------------------------------------------------------\n", 0);
+
     ps(buffer);    
     printf(buffer, 0);
     free(buffer);
+
+    printf("----------------------------------------------------------\n", 0);
 
     kill(-1);
 
@@ -61,6 +65,8 @@ void blockProcess(int argc, char **argv){
 
 void printPipeInfo(int argc, char **argv) {
 
+    printf("----------------------------------------------------------\n", 0);
+
 	char * buffer = malloc(90 * 40);
     if(buffer == (void *) 0)
 		kill(-1);
@@ -68,6 +74,8 @@ void printPipeInfo(int argc, char **argv) {
     pipeInfo(buffer);    
     printf(buffer, 0);
     free(buffer);
+
+    printf("\n----------------------------------------------------------", 0);
 
     kill(-1);
 	
@@ -101,18 +109,23 @@ void printSemStatus(int argc, char **argv){
     Semaphore sem;
     int i=0;
 
-    printf("Semaphores status\n",0);
+    printf("----------------------------------------------------------\n", 0);
 
     while(i<qty){
         sem=*(buffer + i++);
-        printf("ID:%d  Value:%d   There are %d processes blocked in this semaphore.\n",3,sem.id,sem.value,sem.blockedPIDsSize);
+        printf("ID: %d\n", 1, sem.id);
+        printf("Value: %d\n", 1, sem.value);
+        printf("Blocked processes: %d\n", 1, sem.blockedPIDsSize);
         
        	if(sem.blockedPIDsSize>0)
             printf("The blocked processes are:",0);
         for(int j=0;j<sem.blockedPIDsSize;j++)
             printf(" %d ",1,sem.blockedPIDs[j]);
 
+        printf("\n", 0);
     }
+
+    printf("\n----------------------------------------------------------", 0);
 
     free(buffer);
 
