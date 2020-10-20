@@ -210,7 +210,7 @@ void close_fd_proc(PCB pcb, int fd) {
     	pipe aux = pcb->pipes[fd];
         pcb->pipes[fd] = NULL;
         aux->open_ports--;
-
+		
         char c = EOT;
     	if(aux->open_ports == 1)
     		pipe_write(fd, &c, 1); //Si queda una unica boca abierta, escribo EOT
@@ -671,25 +671,18 @@ void killProcess(int pid) {
 	int priorityIdx;
 	if(pid == -1) { //	PID=-1 se referirá al proceso ejecutándose actualmente (para usarlo como exit)
 
-
         for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
             currentPCB = actives[priorityIdx].first;
             if(currentPCB->pid == runningProc->pid)
                 break;
         }
 
-
 		actives[priorityIdx].first = runningProc->nextPCB;
-
-
-
-
 
 		if(actives[priorityIdx].first == NULL) {
 			actives[priorityIdx].last = NULL;
 			swapIfNeeded();
 		}
-
 
 	} else {
 		//Buscamos proceso con el mismo pid
@@ -756,11 +749,15 @@ void killProcess(int pid) {
 
 
 		}
+		
 
 		swapIfNeeded();
 
 				
 	}
+
+
+	// Close file descriptors
 
 	ProcState state = currentPCB->procState;
 	for(int pipe=0;pipe<MAX_PIPES;pipe++){
@@ -768,8 +765,36 @@ void killProcess(int pid) {
 	        close_fd_proc(currentPCB, pipe);
 	}
 
+
+	// Set children's parent to own parent
+
+	for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
+		PCB pcb = actives[priorityIdx].first;
+		while(pcb != NULL){
+			if(pcb->parent == currentPCB)
+				pcb->parent = currentPCB->parent;
+
+			pcb = pcb->nextPCB;
+		}
+	}
+
+	for(priorityIdx = 0; priorityIdx < 40; priorityIdx++) {
+		PCB pcb = expireds[priorityIdx].first;
+		while(pcb != NULL){
+			if(pcb->parent == currentPCB)
+				pcb->parent = currentPCB->parent;
+
+			pcb = pcb->nextPCB;
+		}
+	}
+
+	// Return foreground to parent
+
 	if(hasForeground())
 		setForeground(currentPCB->parent);
+
+
+	// Free the memory
 
     free(currentPCB->segmentAddress);
     free(currentPCB);
@@ -777,9 +802,5 @@ void killProcess(int pid) {
 
 	if(state == RUN) //El proceso se suicida
         _timer_tick();
-
-
-	
-
 	
 }

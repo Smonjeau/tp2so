@@ -12,11 +12,11 @@ void printHelp(int argc, char **argv){
 
 	printf("- help              to go to the Help Manual\n", 0);
 	printf("- clear             to clear the screen\n\n", 0);
-	
+
 	printf("- time              to get the system time\n", 0);
 	printf("- divzero           to execute a Div by Zero\n", 0);
 	printf("- invopcode         to exectue an invalid opcode\n\n", 0);
-	
+
 	printf("- display anon      to show an image of Anonymous\n", 0);
 	printf("- display matrix    to show an image of Matrix\n\n", 0);
 
@@ -24,7 +24,7 @@ void printHelp(int argc, char **argv){
 	printf("- cpuinfo           to get the CPU Brand Data\n", 0);
 	printf("- inforeg           to get the Register's Values\n", 0);
 	printf("- storedreg         to get the Stored Register's Values\n\n", 0);
-	
+
 	printf("- memdump n         to print memory starting at n\n", 0);
 	printf("- mem               to print heap status\n\n", 0);
 
@@ -37,8 +37,10 @@ void printHelp(int argc, char **argv){
 	printf("- cat               to exec cat\n", 0);
     printf("- line              to draw a line (for testing)\n", 0);
     printf("- loop              to start loop (for testing)\n\n", 0);
-		
+
 	printf("---------------------------------------------------", 0);
+
+	printf("\4", 0);
 
 	kill(-1);
 }

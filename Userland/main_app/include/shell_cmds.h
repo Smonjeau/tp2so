@@ -18,7 +18,6 @@ void line(int argc, char **argv);
 void loop(int argc, char **argv);
 
 
-
 // CPU COMMANDS
 
 void printCPUTemp(int argc, char **argv);
@@ -42,6 +41,11 @@ void niceProcess(int argc, char **argv);
 
 void printPipeInfo(int argc, char **argv);
 void printSemStatus(int argc, char **argv);
+
+typedef void (*ProcMain)(int,char**);
+
+void pipeLeftProc(ProcMain main, char * name, int fds[2]);
+void pipeRightProc(ProcMain main, char * name, int fds[2]);
 
 
 // TEST COMMANDS

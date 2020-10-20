@@ -134,9 +134,6 @@ void printSemStatus(int argc, char **argv){
 }
 
 
-typedef void (*ProcMain)(int,char**);
-
-
 char largv[3][20];
 ProcMain laddr;
 
