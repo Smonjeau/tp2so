@@ -113,7 +113,7 @@ typedef struct ProcessExec{
 	int foreground;
 } ProcessExec;
 
-ProcessExec processExecs[MAX_SIMPLE_COMMANDS];
+ProcessExec processExecs[MAX_SIMPLE_COMMANDS] = {0};
 
 
 int parseSimpleCommand(char *cmdBuff, int n);
@@ -145,7 +145,8 @@ void parseCommand(char *cmdBuff) {
 	// }
 
 	ProcessExec p = processExecs[0];
-	startProcess(p.main, p.argc, (char **) p.argv, p.name, p.foreground);
+	if(p.main != NULL)
+		startProcess(p.main, p.argc, (char **) p.argv, p.name, p.foreground);
 
 }
 
