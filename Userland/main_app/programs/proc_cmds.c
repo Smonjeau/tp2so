@@ -2,6 +2,8 @@
 #include <std_lib.h>
 #include <shell_cmds.h>
 
+#define NULL (void *)0
+
 
 void printProcData(int argc, char **argv){
 
@@ -115,5 +117,83 @@ void printSemStatus(int argc, char **argv){
     free(buffer);
 
     kill(-1);
+
+}
+
+
+typedef void (*ProcMain)(int,char**);
+
+
+void pipeLeftProcMediator(int argc, char **argv) {
+    int fds[2];
+
+    printf(argv[0],0);
+    printf(argv[1],0);
+
+    fds[0] = atoi(argv[0]);
+    fds[1] = atoi(argv[1]);
+
+    // printf("LPM: %d -> %d\n", 2, fds[0], fds[1]);
+
+    // char * name = argv[2];
+    // ProcMain main = (ProcMain) argv[3];
+
+    // close(1);
+    // dup(fds[0]);
+
+    // close(fds[1]);
+
+    // startProcess(main, 0, NULL, name, 1);
+
+    kill(-1);
+}
+
+
+void pipeRightProcMediator(int argc, char * * argv) {
+    int fds[2];
+
+    fds[0] = atoi(argv[0]);
+    fds[1] = atoi(argv[1]);
+
+    // printf("RP: %d -> %d\n", 2, fds[0], fds[1]);
+
+    char * name = argv[2];
+    ProcMain main = (ProcMain) argv[3];
+
+    close(0);
+    dup(fds[1]);
+
+    close(fds[0]);
+
+    startProcess(main, 0, NULL, name, 1);
+
+    kill(-1);
+}
+
+
+void pipeLeftProc(ProcMain main, char * name, int fds[2]) {
+
+    char fd1[3];
+    char fd2[3];
+
+    itoa(fds[0], fd1, 10, -1);
+    itoa(fds[1], fd2, 10, -1);
+
+    char * argv[4] = {fd1, fd2, name, (char *) main};
+    startProcess(pipeLeftProcMediator, 4, argv, "left_proc_mediator", 1);
+
+}
+
+
+void pipeRightProc(ProcMain main, char * name, int fds[2]) {
+
+    char fd1[3];
+    char fd2[3];
+
+    itoa(fds[0], fd1, 10, -1);
+    itoa(fds[1], fd2, 10, -1);
+
+    char * argv[4] = {fd1, fd2, name, (char *) main};
+    startProcess(pipeRightProcMediator, 4, argv, "right_proc_mediator", 1);
 
 }

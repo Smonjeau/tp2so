@@ -376,9 +376,10 @@ void niceProcess(int pid, int priority) {
 
 			//Ahora lo añadimos a la nueva cola
 			if(inActives)
-				queueProc(actives + priority, currentPCB);
+                queueProc(actives + priority, currentPCB);
 			else
-				queueProc(expireds + priority, currentPCB);
+                queueProc(expireds + priority, currentPCB);
+
 		}
 		
 	}

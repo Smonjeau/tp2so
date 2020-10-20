@@ -30,6 +30,14 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
+// void testDup(int argc, char **argv){
+
+
+
+
+// }
+
+
 void shell(){
     startProcess(dummy, 0, (void *) 0, "dummy", 0); //Necesario en ciertos casos
 
@@ -41,8 +49,19 @@ void shell(){
 
 	printf("\f", 0);
 
+	int fds[2];
+	pipe(fds);
+
+	// printf("SH: %d -> %d\n", 2, fds[0], fds[1]);
+
+	pipeLeftProc(wc, "wc", fds);
+	pipeRightProc(filter, "filter", fds);
+
+	close(fds[0]);
+	close(fds[1]);
+
 	char c;
-	while (1){
+	while (1) {
 		c = getChar();
 
 		// Handle the chars that are not CR
@@ -76,6 +95,7 @@ void shell(){
             buffPos = 0;
         }
     }
+
  }
     
 

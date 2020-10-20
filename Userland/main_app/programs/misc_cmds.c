@@ -192,7 +192,7 @@ void wc(int argc, char ** argv) {
 	} while(c != EOT);
 
 
-	printf("\nLines: %d", 1, lines);
+	printf("\nLines: %d\n", 1, lines);
 
 	kill(-1);
 
