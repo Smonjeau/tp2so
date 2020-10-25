@@ -44,33 +44,10 @@ void shell(){
 
 	printf("\f", 0);
 
-	int fds[2];
-	pipe(fds);
-
-	// Las siguientes pruebas funcionan por separado pero porque se envia EOT a mano, para el envio automatico de EOT
-	// va a ser necesario distinguir FDs de lectura/escritura, ya que si no no hay manera de saber si quedan productores.
-	// No sirve preguntar si queda una sola boca, ya que podrian haber bocas de multiples lectores, como hijos de procesos
-	// que aun no la cerraron.
-	
-
+	// int fds[2];
+	// pipe(fds);
 	// pipeLeftProc(printHelp, "help", fds);
-	// char cc;
-	// do{
-	// 	read(fds[1], &cc, 1);
-	// 	putChar(cc);
-	// }while(cc!= 4);
-	// close(fds[1]);
-
 	// pipeRightProc(filter, "filter", fds);
-	// write(fds[0], "Hola\4", 5);
-	// close(fds[0]);
-
-
-	// La conexion entre los dos procesos no va a funcionar no solo porque falla el envio de EOT, si no por que ademas hay
-	// condicion de carrera, ya que si el right process llega antes que el left process, va a querer leer de un pipe que
-	// no tiene escritor y por tanto deberia recibir EOT. Notar que para cuando llegue right process, la shell ya va a haber
-	// cerrado su boca como escritora, ya que no le compete.
-
 
 	char c;
 	while (1) {
@@ -146,9 +123,7 @@ void parseCommand(char *cmdBuff) {
 		}
 	}
 
-	
 	int processes = 0;
-
 	for(int i=0; i<simpleCommandsSize; i++)
 		processes += parseSimpleCommand(simpleCommands[i], processes);
 
@@ -157,10 +132,18 @@ void parseCommand(char *cmdBuff) {
 	// 	startProcess(p.main, p.argc, p.argv, p.name, 1);
 	// }
 
-	ProcessExec p = processExecs[0];
-	if(p.main != NULL)
-		startProcess(p.main, p.argc, (char **) p.argv, p.name, p.foreground);
+	if(processes > 1){
+		int fds[2];
+		pipe(fds);
 
+		pipeLeftProc(processExecs[0].main, processExecs[0].name, fds);
+		pipeRightProc(processExecs[1].main, processExecs[1].name, fds);
+	}else{
+		ProcessExec p = processExecs[0];
+		if(p.main != NULL)
+			startProcess(p.main, p.argc, (char **) p.argv, p.name, p.foreground);
+	}
+	
 }
 
 
