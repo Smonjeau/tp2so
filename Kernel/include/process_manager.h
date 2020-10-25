@@ -6,6 +6,9 @@
 #define NULL (void*)0
 #define MAX_PIPES 10
 
+#define ESCRITURA 1
+#define LECTURA 0
+
 typedef enum ProcState{READY=0, RUN=1, BLOCKED=2, DEAD=3, RECENTLY_BLOCKED=4} ProcState;
 
 typedef struct PCB {
@@ -15,10 +18,10 @@ typedef struct PCB {
     void * segmentAddress;
     char * name;
     unsigned char remainingTicks;
+    int tipoBocas[MAX_PIPES];
     pipe pipes [MAX_PIPES];
     struct PCB * parent;
     struct PCB * nextPCB;
-
 } * PCB;
 
 typedef struct ProcQueue {

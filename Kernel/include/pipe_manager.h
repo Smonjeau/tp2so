@@ -16,6 +16,8 @@ typedef struct pipe {
     int write_bytes_sem, read_bytes_sem;
     int open_ports; //Esto es para que el pipe sepa que puede liberar la memoria pedida si no hay más procesos usandolo.
     int isStdio;    // System standard i/o pipes have a special behaviour
+    int open_read_ports;
+    int open_write_ports;
     struct pipe * nextPipe;
 } * pipe;
 

@@ -131,6 +131,18 @@ void copyFileDescriptorsFromParent(PCB pcb) {
 	if(runningProc != NULL) {
 		for(int i = 0; i < MAX_PIPES; i++) {
 			pcb->pipes[i] = runningProc->pipes[i];
+			pcb->tipoBocas[i] = runningProc->tipoBocas[i];
+
+			if(pcb->pipes[i] != NULL) {
+				if(pcb->tipoBocas[i] == LECTURA)
+					pcb->pipes[i]->open_read_ports++;
+				else
+					pcb->pipes[i]->open_write_ports++;
+			}
+			
+
+			
+
 			if(pcb->pipes[i] != NULL)
 				(pcb->pipes[i])->open_ports++;
 		}
@@ -189,10 +201,16 @@ void getProcName(int pid, char * buffer) {
 int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 	int i, j;
 	pipe * aux = runningProc->pipes;
+	int * tipoBocas = runningProc->tipoBocas;
 	for(i = 0, j = 0; i < 2 && j < MAX_PIPES; j++) {
 		if(aux[j] == NULL) {
 			fds[i++] = j;
 			aux[j] = pipe_to_assign;
+			tipoBocas[j] = i - 1;
+			if((i-1) == LECTURA)
+				pipe_to_assign->open_read_ports++;
+			else
+				pipe_to_assign->open_write_ports++;
 		}
 	}
 	return i == 2;
@@ -210,6 +228,10 @@ void close_fd_proc(PCB pcb, int fd) {
     	pipe aux = pcb->pipes[fd];
         pcb->pipes[fd] = NULL;
         aux->open_ports--;
+        if(pcb->tipoBocas[fd] == LECTURA)
+        	aux->open_read_ports--;
+        else
+        	aux->open_write_ports--;
 		
         char c = EOT;
     	if(aux->open_ports == 1)

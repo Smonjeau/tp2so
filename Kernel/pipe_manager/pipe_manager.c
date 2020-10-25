@@ -64,6 +64,8 @@ int initializePipe(pipe new, int isStdio) {
     new->read_bytes_sem = semaphore_id++;
     new->nextPipe = NULL;
     new->isStdio = isStdio;
+    new->open_read_ports = 1;
+    new->open_write_ports = 1;
     
     addToPipeList(new);
 
@@ -251,6 +253,11 @@ int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
     if(pipe == stdinPipe && ! hasForeground()){
         blockProcess(getPID(), 1);
         return -1;
+    }
+
+    if(pipe->open_write_ports == 0 && bytes > 0) {
+        buffer[0] = EOT;
+        return 0;
     }
 
     int i;
