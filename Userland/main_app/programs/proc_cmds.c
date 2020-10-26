@@ -135,10 +135,7 @@ void printSemStatus(int argc, char **argv){
 }
 
 
-ProcMain laddr;
-
-void pipeLeftProcMediator(int argc, char **argv) {
-
+void pipeLeftProc(int argc, char **argv){
     int fds[2];
 
     fds[0] = atoi(argv[argc]);
@@ -149,15 +146,13 @@ void pipeLeftProcMediator(int argc, char **argv) {
 
     close(fds[1]);
 
-    startProcess(laddr, argc, argv, argv[0], 1);
+    startProcess(argv[argc+2], argc, argv, argv[0], 1);
 
     kill(-1);
 }
 
 
-ProcMain raddr;
-
-void pipeRightProcMediator(int argc, char ** argv) {
+void pipeRightProc(int argc, char ** argv){
     int fds[2];
 
     fds[0] = atoi(argv[argc]);
@@ -168,25 +163,7 @@ void pipeRightProcMediator(int argc, char ** argv) {
 
     close(fds[0]);
 
-    startProcess(raddr, argc, argv, argv[0], 0);
+    startProcess(argv[argc+2], argc, argv, argv[0], 0);
 
     kill(-1);
-}
-
-
-void pipeLeftProc(ProcMain main, int argc, char **argv, char *name, int fds[2]) {
-
-    laddr = main;
-    
-    startProcess(pipeLeftProcMediator, argc, argv, "left_proc_mediator", 1);
-
-}
-
-
-void pipeRightProc(ProcMain main, int argc, char **argv, char * name, int fds[2]) {
-
-    raddr = main;
-
-    startProcess(pipeRightProcMediator, argc, argv, "right_proc_mediator", 0);
-
 }

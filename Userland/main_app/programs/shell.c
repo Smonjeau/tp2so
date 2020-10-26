@@ -132,12 +132,14 @@ void parseCommand(char *cmdBuff) {
 
 		itoa(fds[0], lp.argv[lp.argc], 10, -1);
     	itoa(fds[1], lp.argv[lp.argc+1], 10, -1);
+		lp.argv[lp.argc+2] = (char *) lp.main;
 
 		itoa(fds[0], rp.argv[rp.argc], 10, -1);
     	itoa(fds[1], rp.argv[rp.argc+1], 10, -1);
+		rp.argv[rp.argc+2] = (char *) rp.main;
 
-		pipeLeftProc(lp.main, lp.argc, lp.argv, lp.argv[0], fds);
-		pipeRightProc(rp.main, lp.argc, lp.argv, lp.argv[0], fds);
+		startProcess(pipeLeftProc, lp.argc, lp.argv, "left_proc", 1);
+		startProcess(pipeRightProc, rp.argc, rp.argv, "right_proc", 0);
 
 	}
 	

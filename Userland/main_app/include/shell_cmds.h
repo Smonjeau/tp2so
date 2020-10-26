@@ -45,8 +45,8 @@ void printSemStatus(int argc, char **argv);
 
 typedef void (*ProcMain)(int,char**);
 
-void pipeLeftProc(ProcMain main, int argc, char **argv, char *name, int fds[2]);
-void pipeRightProc(ProcMain main, int argc, char **argv, char *name, int fds[2]);
+void pipeLeftProc(int argc, char **argv);
+void pipeRightProc(int argc, char **argv);
 
 
 // TEST COMMANDS
