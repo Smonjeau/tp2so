@@ -30,24 +30,16 @@ void dummy(int argc, char **argv);
                                         	SHELL METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-
-
 void shell(){
     startProcess(dummy, 0, (void *) 0, "dummy", 0); //Necesario en ciertos casos
 
 	forcePipe(0); //Creamos el pipe que comunica fd 0 con teclado
 	forcePipe(1); //Creamos el pipe que comunica fd 1 con salida estandar
-	
 
 	char cmdBuff[MAX_CMD_LEN] = {0};
 	int buffPos = 0;
 
 	printf("\f", 0);
-
-	// int fds[2];
-	// pipe(fds);
-	// pipeLeftProc(printHelp, "help", fds);
-	// pipeRightProc(filter, "filter", fds);
 
 	char c;
 	while (1) {
@@ -63,8 +55,7 @@ void shell(){
 
 		putChar(c);
 
-
-            // Handle the CR char, parse command
+        // Handle the CR char, parse command
 
 		if(c=='\r'){
 			if(buffPos==0){
@@ -93,75 +84,78 @@ void shell(){
                                 COMMAND-CHECK METHODS
 ------------------------------------------------------------------------------------------------------------------------- */
 
-#define MAX_SIMPLE_COMMANDS 2
-
 typedef struct ProcessExec{
 	void (*main)(int,char**);
 	int argc;
-	char argv[MAX_TOKENS][MAX_TOKEN_LEN];
-	char name[MAX_TOKEN_LEN];
+	char *argv[MAX_TOKENS];
 	int foreground;
 } ProcessExec;
 
-ProcessExec processExecs[MAX_SIMPLE_COMMANDS] = {{0}};
+int init=0;
+ProcessExec lp, rp;
 
 
-int parseSimpleCommand(char *cmdBuff, int n);
-
+void parseSimpleCommand(char *cmdBuff, ProcessExec *exec);
 
 void parseCommand(char *cmdBuff) {
 
-	char *simpleCommands[MAX_SIMPLE_COMMANDS] = {0};
+	if(!init){
+		for(int i=0; i<MAX_TOKENS; i++){
+			lp.argv[i] = malloc(MAX_TOKEN_LEN);
+			rp.argv[i] = malloc(MAX_TOKEN_LEN);
+		}
+		init = 1;
+	}
 
-	simpleCommands[0] = cmdBuff;
+	char *leftCommand = cmdBuff;
+	char *rightCommand = NULL;
 
-	int simpleCommandsSize=1;
-	for (int i=0; cmdBuff[i]; i++){
+	for(int i=0; cmdBuff[i]; i++){
 		if (cmdBuff[i] == '|'){
 			cmdBuff[i-1] = 0;	// Trim previous space
-			simpleCommands[simpleCommandsSize++] = cmdBuff+i+2; // Skip next space
+			rightCommand = cmdBuff+i+2; // Skip next space
 		}
 	}
 
-	int processes = 0;
-	for(int i=0; i<simpleCommandsSize; i++)
-		processes += parseSimpleCommand(simpleCommands[i], processes);
+	parseSimpleCommand(leftCommand, &lp);
 
-	// for(int i=0; i<processes; i++){
-	// 	ProcessExec p = processExecs[i];
-	// 	startProcess(p.main, p.argc, p.argv, p.name, 1);
-	// }
+	if(rightCommand == NULL){
 
-	if(processes > 1){
+		startProcess(lp.main, lp.argc, lp.argv, lp.argv[0], lp.foreground);
+
+	}else{	
+		
+		parseSimpleCommand(rightCommand, &rp);
+
 		int fds[2];
 		pipe(fds);
 
-		pipeLeftProc(processExecs[0].main, processExecs[0].name, fds);
-		pipeRightProc(processExecs[1].main, processExecs[1].name, fds);
-	}else{
-		ProcessExec p = processExecs[0];
-		if(p.main != NULL)
-			startProcess(p.main, p.argc, (char **) p.argv, p.name, p.foreground);
+		itoa(fds[0], lp.argv[lp.argc], 10, -1);
+    	itoa(fds[1], lp.argv[lp.argc+1], 10, -1);
+
+		itoa(fds[0], rp.argv[rp.argc], 10, -1);
+    	itoa(fds[1], rp.argv[rp.argc+1], 10, -1);
+
+		pipeLeftProc(lp.main, lp.argc, lp.argv, lp.argv[0], fds);
+		pipeRightProc(rp.main, lp.argc, lp.argv, lp.argv[0], fds);
+
 	}
 	
 }
 
 
-int createProcessExec(void (*main)(int,char**), int argc, char **argv, char *name, int fg, int n){
-	processExecs[n].main = main;
-	processExecs[n].argc = argc;
-	processExecs[n].foreground = fg;
-	
+void createProcessExec(void (*main)(int,char**), int argc, char **argv, int fg, ProcessExec *p){
+	p->main = main;
+	p->argc = argc;
+	p->foreground = fg;
+
 	for(int i=0; i<argc; i++)
-		memcpy(processExecs[n].argv[i], argv[i], MAX_TOKEN_LEN);
+		memcpy(p->argv[i], argv[i], MAX_TOKEN_LEN);
 
-	memcpy(processExecs[n].name, name, MAX_TOKEN_LEN);
-
-	return 1;
 }
 
 
-int parseSimpleCommand(char *cmdBuff, int n){
+void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 
 	// Separate on tokens
 
@@ -187,119 +181,110 @@ int parseSimpleCommand(char *cmdBuff, int n){
 	// Miscellaneous
 
 	if (strncmp(tokens[0], "help", 5) == 0 && j==1)
-		createProcessExec(printHelp, 0, NULL, "help", fg , n);
+		createProcessExec(printHelp, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "divzero", 8) == 0 && j==1)
-		createProcessExec(divZeroException, 0, NULL, "testnosync", fg , n);
+		createProcessExec(divZeroException, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "invopcode", 10) == 0 && j==1)
-		createProcessExec(invOpcodeException, 0, NULL, "testnosync", fg , n);
+		createProcessExec(invOpcodeException, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "time", 5) == 0 && j==1)
-		createProcessExec(printTime, 0, NULL, "testnosync", fg , n);
+		createProcessExec(printTime, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0], "display", 8) == 0 && j==2)
-		createProcessExec(displayImage, 1, tokens, "display", fg , n);
+		createProcessExec(displayImage, 2, tokens, fg, processExec);
 
 
 	else if(strncmp(tokens[0], "filter", 7) == 0 && j == 1)
-		createProcessExec(filter, 0, NULL, "filter", fg , n);
+		createProcessExec(filter, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0], "cat", 4) == 0 && j==1)
-		createProcessExec(cat, 0, NULL, "cat", fg , n);
+		createProcessExec(cat, 1, tokens, fg, processExec);
 	
 	else if(strncmp(tokens[0], "wc", 3) == 0 && j==1)
-		createProcessExec(wc, 0, NULL, "wc", fg , n);
+		createProcessExec(wc, 1, tokens, fg, processExec);
 
 
 	// CPU management
 
 	else if (strncmp(tokens[0], "cputemp", 8) == 0 && j==1)
-		createProcessExec(printCPUTemp, 0, NULL, "cputemp", fg , n);
+		createProcessExec(printCPUTemp, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "cpuinfo", 8) == 0 && j==1)
-		createProcessExec(printCPUInfo, 0, NULL, "cpuinfo", fg , n);
+		createProcessExec(printCPUInfo, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "inforeg", 8) == 0 && j==1)
-		createProcessExec(printInfoReg, 0, NULL, "inforeg", fg , n);
+		createProcessExec(printInfoReg, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "storedreg", 10) == 0 && j==1)
-		createProcessExec(printStoredReg, 0, NULL, "storedreg", fg , n);
+		createProcessExec(printStoredReg, 1, tokens, fg, processExec);
 
 
 	// Memory management
 
 	else if (strncmp(tokens[0], "memdump", 8) == 0 && j == 2)
-		createProcessExec(printMemDump, 1, tokens, "memdump", fg , n);
+		createProcessExec(printMemDump, 2, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "mem", 4) == 0 && j==1)
-		createProcessExec(printMemStatus, 0, NULL, "mem", fg , n);
+		createProcessExec(printMemStatus, 1, tokens, fg, processExec);
 
 
 	// Process management
 
 	else if (strncmp(tokens[0], "kill", 5) == 0 && j == 2)
-		createProcessExec(killProcess, 1, tokens, "kill", fg , n);
+		createProcessExec(killProcess, 2, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "block", 6) == 0 && j == 2)
-		createProcessExec(blockProcess, 1, tokens, "block", fg , n);
+		createProcessExec(blockProcess, 2, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "nice", 5) == 0 && j == 3)
-		createProcessExec(niceProcess, 2, tokens+1, "ps", fg , n);
+		createProcessExec(niceProcess, 3, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0],"ps",3)==0 && j==1)
-		createProcessExec(printProcData, 0, NULL, "ps", fg , n);
+		createProcessExec(printProcData, 2, tokens, fg, processExec);
 
 
 	// New processes
 
 	else if(strncmp(tokens[0], "line", 5) == 0 && j==1)	
-		createProcessExec(line, 0, NULL, "line", fg , n);
+		createProcessExec(line, 1, tokens, fg, processExec);
 
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
-		createProcessExec(loop, 0, NULL, "loop", fg , n);
+		createProcessExec(loop, 1, tokens, fg, processExec);
 
 
 	//Sync
 
 	else if (strncmp(*tokens, "sem", 4) == 0 && j==1)
-		createProcessExec(printSemStatus, 0, NULL, "sem", fg , n);
+		createProcessExec(printSemStatus, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0], "pipe", 5) == 0 && j==1)
-		createProcessExec(printPipeInfo, 0, NULL, "pipe", fg , n);
+		createProcessExec(printPipeInfo, 1, tokens, fg, processExec);
 
 
 	//Testing
 
 	else if(strncmp(tokens[0],"testmm",7) == 0 && j==1)
-		createProcessExec(test_mm, 0, NULL, "testmm", fg , n);
+		createProcessExec(test_mm, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0],"testproc",7) == 0)
-		createProcessExec(test_proc, 0, NULL, "testproc", fg , n);
-
-	else if(strncmp(tokens[0],"testproc",7) == 0 && j==1)
-		createProcessExec(test_proc, 0, NULL, "testproc", fg , n);
+		createProcessExec(test_proc, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0],"testprio",7) == 0 && j==1)
-		createProcessExec(test_prio, 0, NULL, "testprio", fg , n);
+		createProcessExec(test_prio, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0],"testsync",7) == 0 && j==1)
-		createProcessExec(test_sync, 0, NULL, "testsync", fg , n);
+		createProcessExec(test_sync, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0],"testnosync",7) == 0 && j==1)
-		createProcessExec(test_no_sync, 0, NULL, "testnosync", fg , n);
+		createProcessExec(test_no_sync, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1){
-		putChar('\f');
-		return 0;
-	}
+	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
+		createProcessExec(clearScreen, 1, tokens, fg, processExec);
 
-	else{
-		printWarning();
-		return 0;
-	}
-
-	return 1;
+	else
+		createProcessExec(printWarning, 1, tokens, fg, processExec);
 	
 }
 

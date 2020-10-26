@@ -46,10 +46,19 @@ void printHelp(int argc, char **argv){
 }
 
 
-void printWarning(){
+void clearScreen(int argc, char **argv){
+	putChar('\f');
+
+	kill(-1);
+}
+
+
+void printWarning(int argc, char **argv){
 	printf(">> Error:\n", 0, 0);
 	printf("Command not found\n", 0);
 	printf("If you want to see the command manual type 'help'.\n", 0);
+
+	kill(-1);
 }
 
 

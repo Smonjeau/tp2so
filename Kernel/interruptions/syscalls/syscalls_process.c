@@ -34,6 +34,10 @@ int sysStartProcess(void *main, int argc, char **argv, char * name, int foregrou
     // if(argv != NULL)
     //     memcpy(wargv+1, argv, argc);
 
+    // if(argc == 2){
+    //     printf(argv[0], 0);
+    // }
+
     return createProcessContext(argc, argv, main, name, foreground);
 
 }

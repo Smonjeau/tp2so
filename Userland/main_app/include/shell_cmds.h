@@ -3,9 +3,10 @@
 
 // MISCELANEOUS COMMANDS
 
-void printWarning(void);
-
+void clearScreen(int argc, char **argv);
+void printWarning(int argc, char **argv);
 void printHelp(int argc, char **argv);
+
 void printTime(int argc, char **argv);
 void divZeroException(int argc, char **argv);
 void invOpcodeException(int argc, char **argv);
@@ -44,8 +45,8 @@ void printSemStatus(int argc, char **argv);
 
 typedef void (*ProcMain)(int,char**);
 
-void pipeLeftProc(ProcMain main, char * name, int fds[2]);
-void pipeRightProc(ProcMain main, char * name, int fds[2]);
+void pipeLeftProc(ProcMain main, int argc, char **argv, char *name, int fds[2]);
+void pipeRightProc(ProcMain main, int argc, char **argv, char *name, int fds[2]);
 
 
 // TEST COMMANDS
