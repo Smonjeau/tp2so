@@ -7,8 +7,7 @@
 #include <screen_driver.h>
 #include <video_lib.h>
 #include <lib.h>
-#define READ 0
-#define WRITE 1
+
 static int semaphore_id = 0;
 
 pipe pipeList = NULL;

@@ -165,7 +165,8 @@ void cat(int argc, char ** argv) {
 			bufferAux[--idxBuffer] = 0;
 		else
 			bufferAux[idxBuffer++] = c;
-		putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
+		if(c != EOT)
+			putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
 		if(c == '\n' || c == EOT) {
 			bufferAux[idxBuffer] = 0;
 			printf(bufferAux, 0);
@@ -180,7 +181,6 @@ void cat(int argc, char ** argv) {
 
 	printf("\n", 0);
 	printf(bufferAux, 0); //Nuevamente, hacemos print a STDOUT
-	//putChar(EOT);
 
 	kill(-1); //Exit
 }
@@ -194,12 +194,12 @@ void wc(int argc, char ** argv) {
 	do{
 		read(0, &c, 1);
 
-		if(c == '\r'){
+		if(c == '\r' || c == '\n'){
 			lines += 1;
 			c = '\n';
 		}
-
-		putChar(c);
+		if(c != EOT)
+			putChar(c);
 	} while(c != EOT);
 
 

@@ -133,18 +133,18 @@ void copyFileDescriptorsFromParent(PCB pcb) {
 			pcb->pipes[i] = runningProc->pipes[i];
 			pcb->tipoBocas[i] = runningProc->tipoBocas[i];
 
+			
+
+			
+
 			if(pcb->pipes[i] != NULL) {
 				if(pcb->tipoBocas[i] == LECTURA)
 					pcb->pipes[i]->open_read_ports++;
 				else
 					pcb->pipes[i]->open_write_ports++;
-			}
-			
-
-			
-
-			if(pcb->pipes[i] != NULL)
+				
 				(pcb->pipes[i])->open_ports++;
+			}
 		}
 	}
 }
@@ -207,10 +207,10 @@ int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 			fds[i++] = j;
 			aux[j] = pipe_to_assign;
 			tipoBocas[j] = i - 1;
-			if((i-1) == LECTURA)
+			/*if((i-1) == LECTURA)
 				pipe_to_assign->open_read_ports++;
 			else
-				pipe_to_assign->open_write_ports++;
+				pipe_to_assign->open_write_ports++;*/
 		}
 	}
 	return i == 2;
@@ -226,21 +226,24 @@ void close_fd_proc(PCB pcb, int fd) {
     if(pcb != NULL && fd >= 0 && fd < MAX_PIPES) {
 
     	pipe aux = pcb->pipes[fd];
-        pcb->pipes[fd] = NULL;
-        aux->open_ports--;
-        if(pcb->tipoBocas[fd] == LECTURA)
-        	aux->open_read_ports--;
-        else{
-        	aux->open_write_ports--;
+    	if(aux != NULL) {
+    		pcb->pipes[fd] = NULL;
+	        aux->open_ports--;
+	        if(pcb->tipoBocas[fd] == LECTURA)
+	        	aux->open_read_ports--;
+	        else{
+	        	aux->open_write_ports--;
 
-			if(aux->open_write_ports == 0){
-				char c = EOT;
-				for(int i=0; i<aux->open_read_ports; i++)
-					pipe_write(fd, &c, 1);
+				if(aux->open_write_ports == 0){
+					char c = EOT;
+					for(int i=0; i<aux->open_read_ports; i++)
+						pipe_write(fd, &c, 1);
+				}
 			}
-		}
-		
-        free_pipe_if_empty(aux);
+			
+	        free_pipe_if_empty(aux);
+    	}
+        
     }
 }
 
@@ -663,6 +666,8 @@ int createProcessPCB(void * contextRSP, void * segmentAddress, char * name, int 
 	new->pid = pid++;
 	new->name=name;
 	new->nextPCB = NULL;
+	for(int i = 0; i < MAX_PIPES; i++)
+		new->pipes[i] = NULL;
 
 	if(foreground)
 		setForeground(new);
