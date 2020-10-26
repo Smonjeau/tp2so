@@ -25,4 +25,6 @@ int strncmp(char *s1, char *s2, int length);
 
 int strcpy(char *src, char *dest);
 
+void nap (uint64_t limit);
+
 #endif

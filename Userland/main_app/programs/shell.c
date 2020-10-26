@@ -275,6 +275,8 @@ int parseSimpleCommand(char *cmdBuff, int n){
 
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
 		createProcessExec(loop, 0, NULL, "loop", fg , n);
+	else if(strncmp(tokens[0],"phylo",6)==0 && j==1)
+		createProcessExec(phylo,0,NULL,"phyloAdmin",fg,n);
 
 
 	//Sync

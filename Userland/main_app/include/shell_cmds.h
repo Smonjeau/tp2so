@@ -16,6 +16,7 @@ void cat(int argc, char **argv);
 void wc(int argc, char **argv);
 void line(int argc, char **argv);
 void loop(int argc, char **argv);
+void phylo(int argc, char ** argv);
 
 
 // CPU COMMANDS
