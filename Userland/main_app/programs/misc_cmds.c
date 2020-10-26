@@ -38,7 +38,7 @@ void printHelp(int argc, char **argv){
     printf("- line              to draw a line (for testing)\n", 0);
     printf("- loop              to start loop (for testing)\n\n", 0);
 
-	printf("---------------------------------------------------", 0);
+	printf("---------------------------------------------------\n", 0);
 
 	printf("\4", 0);
 

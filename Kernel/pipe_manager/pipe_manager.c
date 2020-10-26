@@ -131,6 +131,12 @@ void copyPipeInfoToBuffer(char * buffer, pipe aux) {
 
     strcat("\nOpen ends: ", buffer);
     itoa(aux->open_ports, buffer + strlen(buffer), 10, -1);
+
+    strcat(" - Read ends: ", buffer);
+    itoa(aux->open_read_ports, buffer + strlen(buffer), 10, -1);
+
+    strcat(" - Write ends: ", buffer);
+    itoa(aux->open_write_ports, buffer + strlen(buffer), 10, -1);
   
     strcat("\nWritten bytes: ", buffer);
     itoa(aux->index_w, buffer + strlen(buffer), 10, -1);
