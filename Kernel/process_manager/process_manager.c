@@ -204,9 +204,10 @@ int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 	int * tipoBocas = runningProc->tipoBocas;
 	for(i = 0, j = 0; i < 2 && j < MAX_PIPES; j++) {
 		if(aux[j] == NULL) {
-			fds[i++] = j;
+			fds[i] = j;
 			aux[j] = pipe_to_assign;
-			tipoBocas[j] = i - 1;
+			tipoBocas[j] = i;
+			i++;
 			/*if((i-1) == LECTURA)
 				pipe_to_assign->open_read_ports++;
 			else
@@ -227,19 +228,21 @@ void close_fd_proc(PCB pcb, int fd) {
 
     	pipe aux = pcb->pipes[fd];
     	if(aux != NULL) {
-    		pcb->pipes[fd] = NULL;
-	        aux->open_ports--;
-	        if(pcb->tipoBocas[fd] == LECTURA)
-	        	aux->open_read_ports--;
-	        else{
-	        	aux->open_write_ports--;
-
-				if(aux->open_write_ports == 0){
+	        
+	        if(pcb->tipoBocas[fd] == ESCRITURA) {
+	        	if(aux->open_write_ports == 1) { //Esta cerrando la ultima boca de escritura
 					char c = EOT;
 					for(int i=0; i<aux->open_read_ports; i++)
-						pipe_write(fd, &c, 1);
+						pipe_write_nofd(aux, &c, 1); //pipe_write(fd, &c, 1);				
 				}
-			}
+	        }
+	        aux->open_ports--;
+			if(pcb->tipoBocas[fd] == LECTURA)
+	        	aux->open_read_ports--;
+	        else
+	        	aux->open_write_ports--;
+
+			pcb->pipes[fd] = NULL;
 			
 	        free_pipe_if_empty(aux);
     	}

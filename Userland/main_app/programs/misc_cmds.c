@@ -163,10 +163,12 @@ void cat(int argc, char ** argv) {
 			c = '\n';
 		else if (c == '\b' && idxBuffer > 0)
 			bufferAux[--idxBuffer] = 0;
-		else
-			bufferAux[idxBuffer++] = c;
-		if(c != EOT)
+		else if(c != EOT) {
 			putChar(c); //Al ser hijo de la shell, se hereda tambien el fd 1 STDOUT.
+			bufferAux[idxBuffer++] = c;
+		}
+		
+			
 		if(c == '\n' || c == EOT) {
 			bufferAux[idxBuffer] = 0;
 			printf(bufferAux, 0);
