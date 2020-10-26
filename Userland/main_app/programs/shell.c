@@ -262,7 +262,7 @@ void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
 		createProcessExec(loop, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"phylo",6)==0 && j==1)
+	else if(strncmp(tokens[0],"phyloproblem",13)==0 && j==1)
 		createProcessExec(phylo, 1, tokens, fg, processExec);
 
 

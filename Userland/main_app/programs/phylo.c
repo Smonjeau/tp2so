@@ -1,4 +1,5 @@
 
+/*Solución basada en la propuesta por Tanenmbaum en su libro SISTEMAS OPERATIVOS MODERNOS*/
 
 #include <syscalls.h>
 #include <std_lib.h>
@@ -7,6 +8,13 @@
 #define RIGHT_PHYLO ((phylo->index +1) % phylo_count)
 #define STARTERS 5
 #define MAX_PHYLOS 20
+
+#define KILL_ADMIN { kill(printer_pid);\
+                    closeSem(mutex);\
+                    closeSem(mutex_for_phylos_table);\
+                    kill(-1);\
+                    }
+                    
 
 typedef enum PhyloState{HUNGRY=0, EATING=1, THINKING=2} PhyloState;
 
@@ -25,7 +33,7 @@ typedef struct phylo{
 
 }*phylo;
 
-phylo phylos [MAX_PHYLOS] = {0};
+ phylo phylos [MAX_PHYLOS] = {0};
 
 int chars_in_screen = 0;
 
@@ -42,11 +50,7 @@ void eat (phylo phylo){
         // Podemos comer
         nap(1000000);
         phylo->state = EATING;
-     /*   chars_in_screen++;
-        if(chars_in_screen == phylo_count) {
-            putChar('\n');
-            chars_in_screen = 0;
-        }*/
+
         postSem(phylo->sem);
     }
 }
@@ -64,12 +68,7 @@ void grab_fork(phylo phylo){
 void drop_fork (phylo phylo){
     waitSem(mutex);
     nap(100000000);
-  /*  chars_in_screen++;
-    if(chars_in_screen == phylo_count) {
-        putChar('\n');
-        chars_in_screen = 0;
-    }
-    */
+  
     phylo->state= THINKING;
     eat(phylos[LEFT_PHYLO]);
     eat(phylos[RIGHT_PHYLO]);
@@ -81,7 +80,7 @@ void phylo_life(int argc, char ** argv){
     while(1){
         int index= atoi(*argv);
         //sleep
-        nap(600000000);
+        nap(6000000);
         grab_fork(phylos[index]);
         eat(phylos[index]);
         drop_fork(phylos[index]);
@@ -91,7 +90,8 @@ void phylo_life(int argc, char ** argv){
 void add_phylo(int id){
 
     openSem(phylo_sem,0);
-    phylo new = malloc(sizeof(struct phylo));
+   phylo new = malloc(sizeof(struct phylo)); //phylos[phylo_count];
+ //   phylo new = phylos + phylo_count;
     new->state=THINKING;
     new->sem = phylo_sem++;
 //    waitSem(mutex_for_phylos_table); //CAPAZ ES ESTOOo
@@ -109,14 +109,14 @@ void remove_last_phylo(){
     phylo aux = phylos[--phylo_count];
     closeSem(aux->sem);
     kill(aux->pid);    
-   // free(aux);
+    free(aux);
  //  postSem(mutex_for_phylos_table);
 
 }
 void status_printer(){
     //Lo hago otro proceso, si hago que lo haga el phyloAdmin no tiene sentido, pq este se bloquea en el getChar, entonces no va a llegar a esta parte
     while(1){
-        nap(40000000);
+        nap(20000000);
         //Estoy mirando la mesa
         waitSem(mutex_for_phylos_table);
         for(int i=0; i<phylo_count;i++){
@@ -124,7 +124,7 @@ void status_printer(){
         }
         putChar('\n');
         postSem(mutex_for_phylos_table);
-        nap(40000000);
+        nap(20000000);
 
     }
 
@@ -132,7 +132,7 @@ void status_printer(){
 void phyloAdmin(int argc, char ** argv){
     int mutex=10;
     int aux;
-    char * arg;
+    //char * arg;
     char * args [20] = {"0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18"};
     int printer_pid = startProcess(status_printer,0,(void*)0,"status_printer",0);
 
@@ -143,15 +143,17 @@ void phyloAdmin(int argc, char ** argv){
     mutex--; //para compensar el ultimo incremento
     openSem(mutex_for_phylos_table,1);
     while(phylo_count<STARTERS){
-        waitSem(mutex_for_phylos_table); //CAPAZ ES ESTOOo
-
+        waitSem(mutex_for_phylos_table); //si me rompo ya saben!!!!!!!
         add_phylo(startProcess(phylo_life,1,args+ phylo_count,"phylo",0));
+
         postSem(mutex_for_phylos_table);
 
 
     }
 
-    //Primero creo a los 5 filósofos que arrancan
+    //Primero creeé a los 5 filósofos que arrancan
+    
+
     //Leo a ver si tengo que agregar más o sacar
     char c;
 
@@ -171,20 +173,19 @@ void phyloAdmin(int argc, char ** argv){
             int condition = phylo_count == 0;
             postSem(mutex_for_phylos_table);
             if(condition){
-                kill(printer_pid);
-                kill(-1);
+            KILL_ADMIN;
             }
         
         }
         else if(c=='x')
         {
             waitSem(mutex_for_phylos_table);
-            for(int i=0;i<phylo_count;i++){
+            int aux = phylo_count;
+            for(int i=0;i<aux;i++){
                 remove_last_phylo();
             }
             postSem(mutex_for_phylos_table);
-            kill(printer_pid);
-            kill(-1);
+            KILL_ADMIN;
         }
      
 

@@ -1,8 +1,14 @@
 #include  <lib.h>
 
 #define NULL ((void*)0)
-#define FIRST_HEAP_ADRESS ((char*) 0x800000)
+#define FIRST_HEAP_ADRESS ((void*) 0x800000)
 #define MEM_SIZE (8*1024*1024)
+int div_ceil(int dividend, int divisor){
+    if (dividend%divisor == 0)
+        return  dividend / divisor;
+    else
+        return (dividend / divisor) +1;
+}
 #ifdef MM_BITMAP
 
 /* ---------------------------------------------------------------------------------------------------------------------------
@@ -33,12 +39,7 @@ char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
     0b11101111, 0b11011111, 0b10111111, 0b01111111};
 
 
-int div_ceil(int dividend, int divisor){
-    if (dividend%divisor == 0)
-        return  dividend / divisor;
-    else
-        return (dividend / divisor) +1;
-}
+
 
 
 void * malloc(int size) {
@@ -130,9 +131,9 @@ void free(void *address){
 
     int nblocks = assignationRecord.size; int k=0;
 
-    int bytePos = (((char *)address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) / BYTE_SIZE;
+    int bytePos = ((address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) / BYTE_SIZE;
 
-    int bitPos = (((char *)address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
+    int bitPos = ((address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
 
     for(int j=bitPos; k<nblocks && j<BYTE_SIZE; j++, k++){
         bitmap[bytePos] &= zeroMasks[j];

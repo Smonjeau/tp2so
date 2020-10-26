@@ -155,11 +155,10 @@ int closeSemaphore(int id){
     if(semaphore==NULL)
         return -1;
 
-    if(semaphore->listeners > 0){
-
+    if(semaphore->listeners > 0)
         semaphore->listeners -= 1;
 
-    }else{
+    if(semaphore->listeners==0){
 
         if(semaphore->blockedPIDsSize>0)
             return -1;
@@ -174,7 +173,7 @@ int closeSemaphore(int id){
         free(semaphore);
 
     }
-    
+
     return 0;
 
 }
