@@ -230,14 +230,17 @@ void close_fd_proc(PCB pcb, int fd) {
         aux->open_ports--;
         if(pcb->tipoBocas[fd] == LECTURA)
         	aux->open_read_ports--;
-        else
+        else{
         	aux->open_write_ports--;
+
+			if(aux->open_write_ports == 0){
+				char c = EOT;
+				for(int i=0; i<aux->open_read_ports; i++)
+					pipe_write(fd, &c, 1);
+			}
+		}
 		
-        char c = EOT;
-    	if(aux->open_ports == 1)
-    		pipe_write(fd, &c, 1); //Si queda una unica boca abierta, escribo EOT
-    	else
-        	free_pipe_if_empty(aux);
+        free_pipe_if_empty(aux);
     }
 }
 
@@ -782,7 +785,7 @@ void killProcess(int pid) {
 	// Close file descriptors
 
 	ProcState state = currentPCB->procState;
-	for(int pipe=0;pipe<MAX_PIPES;pipe++){
+	for(int pipe=0; pipe<MAX_PIPES; pipe++){
 	    if(currentPCB->pipes[pipe] != NULL)
 	        close_fd_proc(currentPCB, pipe);
 	}

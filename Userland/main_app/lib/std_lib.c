@@ -325,3 +325,7 @@ int strcpy(char *src, char *dest){
     dest[i] = 0;
     return i;
 }
+
+void nap(uint64_t limit){
+    for (int i =0;i<limit;i++);
+}

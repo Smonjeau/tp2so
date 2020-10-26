@@ -135,35 +135,35 @@ void printSemStatus(int argc, char **argv){
 }
 
 
-void pipeLeftProc(int argc, char **argv){
+void pipeLeftProcMediator(int argc, char **argv){
     int fds[2];
 
-    fds[0] = atoi(argv[argc]);
-    fds[1] = atoi(argv[argc+1]);
+    fds[0] = atoi(argv[argc+1]);
+    fds[1] = atoi(argv[argc+2]);
 
     close(1);
     dup(fds[0]);
 
     close(fds[1]);
 
-    startProcess(argv[argc+2], argc, argv, argv[0], 1);
+    startProcess(argv[argc], argc, argv, argv[0], 1);
 
     kill(-1);
 }
 
 
-void pipeRightProc(int argc, char ** argv){
+void pipeRightProcMediator(int argc, char ** argv){
     int fds[2];
 
-    fds[0] = atoi(argv[argc]);
-    fds[1] = atoi(argv[argc+1]);
+    fds[0] = atoi(argv[argc+1]);
+    fds[1] = atoi(argv[argc+2]);
 
     close(0);
     dup(fds[1]);
 
     close(fds[0]);
 
-    startProcess(argv[argc+2], argc, argv, argv[0], 0);
+    startProcess(argv[argc], argc, argv, argv[0], 0);
 
     kill(-1);
 }

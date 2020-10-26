@@ -210,10 +210,6 @@ void wc(int argc, char ** argv) {
 }
 
 
-void nap(uint64_t limit){
-    for (int i =0;i<limit;i++);
-}
-
 void loop(int argc, char **argv){
   int pid = getPid();
   int aux = 1;
@@ -228,27 +224,9 @@ void loop(int argc, char **argv){
   }
 }
 
+extern void phyloAdmin(int argc, char ** argv);
 
 void phylo(int argc, char **argv){
-
+	phyloAdmin(argc,argv);
 }
 
-void phyloAdmin(int argc, char ** argv){
-    // int phylo_count = 0;
-    // int mutex=8;
-    // int aux;
-    // //Como puede fallar 
-    // do{
-    //     aux=openSem(mutex++,1)
-    // }while(aux == -1);
-    // mutex--;
-
-    // while(phylo_count<5){
-    //     createProcess(phylo, 0, (void *) 0, "phylo");
-    // }
-    // //Primero creo a los 5 filósofos que arrancan
-    // //Leo a ver si tengo que agregar más o sacar
-    // while(1){
-    //     read(0,)...
-    // }
-}

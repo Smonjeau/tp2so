@@ -57,15 +57,18 @@ int initializePipe(pipe new, int isStdio) {
         return 0;
 
     new->id = pipeId++;
+    new->isStdio = isStdio;
+
     new->index_w = 0;
     new->index_r = 0;
-    new->open_ports = 2;
     new->write_bytes_sem = semaphore_id++;
     new->read_bytes_sem = semaphore_id++;
-    new->nextPipe = NULL;
-    new->isStdio = isStdio;
+
+    new->open_ports = 2;
     new->open_read_ports = 1;
     new->open_write_ports = 1;
+
+    new->nextPipe = NULL;
     
     addToPipeList(new);
 
@@ -261,10 +264,10 @@ int pipe_read_nofd(pipe pipe, char * buffer, int bytes) {
         return -1;
     }
 
-    if(pipe->open_write_ports == 0 && bytes > 0) {
-        buffer[0] = EOT;
-        return 0;
-    }
+    // if(pipe->open_write_ports == 0 && bytes > 0) {
+    //     buffer[0] = EOT;
+    //     return 0;
+    // }
 
     int i;
     for(i = 0; i < bytes; i++) {

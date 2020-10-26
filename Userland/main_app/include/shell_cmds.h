@@ -17,6 +17,7 @@ void cat(int argc, char **argv);
 void wc(int argc, char **argv);
 void line(int argc, char **argv);
 void loop(int argc, char **argv);
+void phylo(int argc, char ** argv);
 
 
 // CPU COMMANDS
@@ -45,8 +46,8 @@ void printSemStatus(int argc, char **argv);
 
 typedef void (*ProcMain)(int,char**);
 
-void pipeLeftProc(int argc, char **argv);
-void pipeRightProc(int argc, char **argv);
+void pipeLeftProcMediator(int argc, char **argv);
+void pipeRightProcMediator(int argc, char **argv);
 
 
 // TEST COMMANDS

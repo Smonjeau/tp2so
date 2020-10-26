@@ -130,16 +130,23 @@ void parseCommand(char *cmdBuff) {
 		int fds[2];
 		pipe(fds);
 
-		itoa(fds[0], lp.argv[lp.argc], 10, -1);
-    	itoa(fds[1], lp.argv[lp.argc+1], 10, -1);
-		lp.argv[lp.argc+2] = (char *) lp.main;
+		// Both pipeLeftProcMediator and pipeRightProcMediator will receive the following args:
+		// argv[0]: process name - argv[1]...argv[argc-1]: process arguments
+		// argv[argc]: read fd - argv[argc+1]: write fd - argv[argc+2]: process main
 
-		itoa(fds[0], rp.argv[rp.argc], 10, -1);
-    	itoa(fds[1], rp.argv[rp.argc+1], 10, -1);
-		rp.argv[rp.argc+2] = (char *) rp.main;
+		lp.argv[lp.argc] = (char *) lp.main;
+		itoa(fds[0], lp.argv[lp.argc+1], 10, -1);
+    	itoa(fds[1], lp.argv[lp.argc+2], 10, -1);
 
-		startProcess(pipeLeftProc, lp.argc, lp.argv, "left_proc", 1);
-		startProcess(pipeRightProc, rp.argc, rp.argv, "right_proc", 0);
+		rp.argv[rp.argc] = (char *) rp.main;
+		itoa(fds[0], rp.argv[rp.argc+1], 10, -1);
+    	itoa(fds[1], rp.argv[rp.argc+2], 10, -1);
+		
+		startProcess(pipeLeftProcMediator, lp.argc, lp.argv, "left_proc", 1);
+		startProcess(pipeRightProcMediator, rp.argc, rp.argv, "right_proc", 0);
+
+		close(fds[0]);
+		close(fds[1]);
 
 	}
 	
@@ -254,6 +261,9 @@ void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
 		createProcessExec(loop, 1, tokens, fg, processExec);
+
+	else if(strncmp(tokens[0],"phylo",6)==0 && j==1)
+		createProcessExec(phylo, 1, tokens, fg, processExec);
 
 
 	//Sync
