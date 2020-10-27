@@ -4,7 +4,7 @@
 #include  <lib.h>
 
 #define NULL ((void*)0)
-#define FIRST_HEAP_ADRESS ((void*) 0x800000)
+#define FIRST_HEAP_ADRESS ((char*) 0x800000)
 #define MEM_SIZE (8*1024*1024)
 int div_ceil(int dividend, int divisor){
     if (dividend%divisor == 0)
