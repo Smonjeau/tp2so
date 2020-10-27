@@ -353,6 +353,32 @@ void ps(char * buffer) {
 
 }
 
+PCB findProc (int pid){
+	ProcQueue * queue;
+	PCB pcb;
+	int found=0;
+	for(int prio=0;prio<40 && ! found;prio++){
+		queue = actives + prio;
+		pcb = queue->first;
+		if(pcb->pid==pid)
+			found=1;
+		while(pcb!=NULL)
+			pcb=pcb->nextPCB;
+	}
+	for(int prio=0;prio<40 && !found;prio++){
+		queue = expireds + prio;
+		pcb = queue->first;
+		if(pcb->pid==pid)
+			found=1;
+		while(pcb!=NULL)
+			pcb=pcb->nextPCB;
+
+	}
+	if(!found)
+		pcb=NULL;
+	return pcb;
+}
+
 void swapIfNeeded() {
 	int idx, found = 0;
 	for(idx = 0; idx < 40 && found == 0; idx++)
