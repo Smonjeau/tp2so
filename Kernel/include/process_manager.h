@@ -107,4 +107,8 @@ void getProcName(int pid, char * buffer);
 /* Returns whether the running process has the foreground */
 int hasForeground();
 
+
+/*Me da el pcb si lo encuentra, null si no*/
+PCB findProc (int pid);
+
 #endif

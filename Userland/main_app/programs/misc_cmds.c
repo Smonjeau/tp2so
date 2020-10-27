@@ -21,13 +21,8 @@ void printHelp(int argc, char **argv){
 	printf("- divzero           to execute a Div by Zero\n", 0);
 	printf("- invopcode         to exectue an invalid opcode\n\n", 0);
 
-	printf("- display anon      to show an image of Anonymous\n", 0);
-	printf("- display matrix    to show an image of Matrix\n\n", 0);
-
 	printf("- cputemp           to get the CPU Temp\n", 0);
 	printf("- cpuinfo           to get the CPU Brand Data\n", 0);
-	printf("- inforeg           to get the Register's Values\n", 0);
-	printf("- storedreg         to get the Stored Register's Values\n\n", 0);
 
 	printf("- memdump n         to print memory starting at n\n", 0);
 	printf("- mem               to print heap status\n\n", 0);
@@ -37,14 +32,19 @@ void printHelp(int argc, char **argv){
 	printf("- block pid         to block a process\n", 0);
 	printf("- nice pid priority to change priority (100 - 139)\n", 0);
 	printf("- pipe              to list all pipes\n", 0);
+	printf("- sem               to list all sems\n", 0);
 	printf("- filter            filters input vowels\n", 0);
 	printf("- cat               to exec cat\n", 0);
+	printf("- wc                to count lines\n", 0);
     printf("- line              to draw a line (for testing)\n", 0);
-    printf("- loop              to start loop (for testing)\n\n", 0);
+    printf("- loop              to start loop (for testing)\n", 0);
+    printf("- phyloproblem      to execute phylo. Then use a, r and x\n\n", 0);
+    printf("@ \"command &\" for BG process\n", 0);
+    printf("@ \"command1 | command2\" for pipe\n", 0);
+    printf("@  testing commands available. (Sec. 12. Informe) \n", 0);
 
 	printf("---------------------------------------------------\n", 0);
 
-	printf("\4", 0);
 
 	kill(-1);
 }

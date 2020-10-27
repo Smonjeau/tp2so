@@ -66,6 +66,7 @@ void shell(){
 				continue;
 			}
 
+
 			putChar('\n');
 
 			cmdBuff[buffPos] = 0;

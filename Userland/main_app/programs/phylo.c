@@ -36,7 +36,7 @@ typedef struct phylo{
 
 }*phylo;
 
- phylo phylos [MAX_PHYLOS] = {0};
+ phylo * phylos;
 
 int chars_in_screen = 0;
 
@@ -51,7 +51,8 @@ void eat (phylo phylo){
     postSem(mutex_for_phylos_table);
     if(condition){
         // Podemos comer
-        nap(1000000);
+       nap(1000000);
+        
         phylo->state = EATING;
 
         postSem(phylo->sem);
@@ -83,9 +84,9 @@ void phylo_life(int argc, char ** argv){
     while(1){
         int index= atoi(*argv);
         //sleep
-        nap(6000000);
+       nap(6000000);
         grab_fork(phylos[index]);
-        eat(phylos[index]);
+    //  eat(phylos[index]);
         drop_fork(phylos[index]);
     }
 }
@@ -93,27 +94,23 @@ void phylo_life(int argc, char ** argv){
 void add_phylo(int id){
 
     openSem(phylo_sem,0);
-   phylo new = malloc(sizeof(struct phylo)); //phylos[phylo_count];
- //   phylo new = phylos + phylo_count;
+    phylo new = malloc(sizeof(struct phylo)); 
+
     new->state=THINKING;
     new->sem = phylo_sem++;
-//    waitSem(mutex_for_phylos_table); //CAPAZ ES ESTOOo
 
     new->index=phylo_count;
     new->pid = id;
 
     phylos[phylo_count++] = new;
-  //  postSem(mutex_for_phylos_table); //CAPAZ ES ESTOOo
 
 }
 void remove_last_phylo(){
- //   waitSem(mutex_for_phylos_table);
 
     phylo aux = phylos[--phylo_count];
     closeSem(aux->sem);
     kill(aux->pid);    
     free(aux);
- //  postSem(mutex_for_phylos_table);
 
 }
 void status_printer(){
@@ -135,7 +132,6 @@ void status_printer(){
 void phyloAdmin(int argc, char ** argv){
     int mutex=10;
     int aux;
-    //char * arg;
     char * args [20] = {"0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18"};
     int printer_pid = startProcess(status_printer,0,(void*)0,"status_printer",0);
 
@@ -174,7 +170,7 @@ void phyloAdmin(int argc, char ** argv){
             int condition = phylo_count == 0;
             postSem(mutex_for_phylos_table);
             if(condition){
-            KILL_ADMIN;
+                KILL_ADMIN;
             }
         
         }

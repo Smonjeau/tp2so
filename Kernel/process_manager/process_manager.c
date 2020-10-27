@@ -11,15 +11,6 @@
 
 int procCount = 0;
 
-void drawLine(){
-	static int c=0;
-	c+=1;
-
-		for(int x=0; x<1024; x++)
-			draw(x,c*80,0xFFFFFF);
-
-}
-
 
 ProcQueue queue1[40] = {{0}};
 ProcQueue queue2[40] = {{0}};
@@ -35,12 +26,12 @@ PCB foregroundProc = NULL;
 
 
 void setForeground(PCB proc){
+	if(proc != NULL) {
+		if(proc->procState == BLOCKED)
+			blockProcess(proc->pid, 1);
 
-	if(proc->procState == BLOCKED)
-		blockProcess(proc->pid, 1);
-
-	foregroundProc = proc;
-
+		foregroundProc = proc;
+	}
 }
 
 int hasForeground(){
@@ -211,10 +202,6 @@ int assign_pipe_to_pcb(int  fds [2], pipe pipe_to_assign) {
 			aux[j] = pipe_to_assign;
 			tipoBocas[j] = i;
 			i++;
-			/*if((i-1) == LECTURA)
-				pipe_to_assign->open_read_ports++;
-			else
-				pipe_to_assign->open_write_ports++;*/
 		}
 	}
 	return i == 2;
@@ -236,7 +223,7 @@ void close_fd_proc(PCB pcb, int fd) {
 	        	if(aux->open_write_ports == 1) { //Esta cerrando la ultima boca de escritura
 					char c = EOT;
 					for(int i=0; i<aux->open_read_ports; i++)
-						pipe_write_nofd(aux, &c, 1); //pipe_write(fd, &c, 1);				
+						pipe_write_nofd(aux, &c, 1);			
 				}
 	        }
 	        aux->open_ports--;
@@ -305,7 +292,7 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
             break;
 	}
 
-	strcat("- Priority: ", buffer);
+	strcat(" - Priority: ", buffer);
 	itoa(priority, buffer + strlen(buffer), 10, -1);
 
 	if(foregroundProc == pcb)
@@ -353,6 +340,32 @@ void ps(char * buffer) {
 		}
 	}
 
+}
+
+PCB findProc (int pid){
+	ProcQueue * queue;
+	PCB pcb;
+	int found=0;
+	for(int prio=0;prio<40 && ! found;prio++){
+		queue = actives + prio;
+		pcb = queue->first;
+		if(pcb->pid==pid)
+			found=1;
+		while(pcb!=NULL)
+			pcb=pcb->nextPCB;
+	}
+	for(int prio=0;prio<40 && !found;prio++){
+		queue = expireds + prio;
+		pcb = queue->first;
+		if(pcb->pid==pid)
+			found=1;
+		while(pcb!=NULL)
+			pcb=pcb->nextPCB;
+
+	}
+	if(!found)
+		pcb=NULL;
+	return pcb;
 }
 
 void swapIfNeeded() {
@@ -427,10 +440,6 @@ void niceProcess(int pid, int priority) {
 
 
 void blockProcess(int pid, int tick) {
-    //OJO
-    /*if(pid == 0)
-		return;*/
-
 
 	int found = 0, idx;
 	PCB currentPCB = NULL;
@@ -465,11 +474,8 @@ void blockProcess(int pid, int tick) {
 		idx--;
 		if(currentPCB->procState == READY) {
 			currentPCB->procState = BLOCKED;			
-			//_sti();
 		} else if(currentPCB->procState == BLOCKED) {
 			currentPCB->procState = READY;
-			// if(tick == 1)
-			// 	_sti(); //Cuando post semaphore desbloquea un proceso no queremos que se haga sti
 		} else if(currentPCB->procState == RUN) {
 
 			//Tengo que actualizar mi RSP
@@ -482,8 +488,6 @@ void blockProcess(int pid, int tick) {
 			    _timer_tick();
 		}
 		
-	} else {
-		//_sti();
 	}
 	
 }
@@ -510,10 +514,6 @@ void * schedule(void * currContextRSP) {
 			while(currentPCB != NULL && (currentPCB->procState == BLOCKED || currentPCB->procState== RECENTLY_BLOCKED)) {
 				//Al proceso que le correspondía ejecutarse sigue bloqueado. Lo mando a expirados para la proxima tanda.
 				//Primero lo sacamos de esta cola
-		/*		if(primerProcEncontrado == 1) {
-				    primerProcEncontrado = 0;
-				    currentPCB->contextRSP = currContextRSP;
-				}*/
                 if(currentPCB->procState == RECENTLY_BLOCKED){
                     //Le actualizamos el contexto
                     currentPCB->contextRSP=currContextRSP;
@@ -535,7 +535,6 @@ void * schedule(void * currContextRSP) {
 
 		} while(priorityIdx < 40 && currentPCB == NULL);
 		if(priorityIdx == 40 && currentPCB == NULL) {
-			//drawLine();
 			swapQueues(); //Es necesario cuando un proceso se autobloquea y no quedan activos en estado READY
 		}
 	} while(priorityIdx == 40 && currentPCB == NULL);
@@ -642,7 +641,6 @@ void * schedule(void * currContextRSP) {
 		return currentPCB->contextRSP;
 
 	} else {
-		//idx--; //Compenso
 		currentPCB->procState = RUN;
 		runningProc = currentPCB;
 		return currentPCB->contextRSP;

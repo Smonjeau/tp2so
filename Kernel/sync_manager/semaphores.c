@@ -164,8 +164,12 @@ int closeSemaphore(int id){
 
     if(semaphore->listeners==0){
 
-        if(semaphore->blockedPIDsSize>0)
-            return -1;
+        if(semaphore->blockedPIDsSize>0){
+            //Puede ser que hagamos close de un proceso que estaba bloqueado pero ya lo matamos, pero acá va a seguir en la 
+            for(int i=0;i<semaphore->blockedPIDsSize;i++)
+                if(findProc(semaphore->blockedPIDs[i])!=NULL)
+                    return -1;
+        }
 
         Semaphore *prevSemaphore = findSemaphore(id, 1);
 
@@ -181,3 +185,4 @@ int closeSemaphore(int id){
     return 0;
 
 }
+
