@@ -35,8 +35,9 @@ void printHelp(int argc, char **argv){
     printf("- line              to draw a line (for testing)\n", 0);
     printf("- loop              to start loop (for testing)\n", 0);
     printf("- phyloproblem      to execute phylo. Then use a, r and x\n\n", 0);
-    printf("- \"command &\" for BG process\n", 0);
-    printf("- \"command1 | command2\" for pipe\n", 0);
+    printf("@ \"command &\" for BG process\n", 0);
+    printf("@ \"command1 | command2\" for pipe\n", 0);
+    printf("@  testing commands available. (Sec. 12. Informe) \n", 0);
 
 	printf("---------------------------------------------------\n", 0);
 
