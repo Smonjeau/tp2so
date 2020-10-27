@@ -84,31 +84,25 @@ void * malloc(int size) {
 
         // Fill with ones the last blocks byte to assign
 
-        for(int j=bitPos/*-1*/; k<nblocks && j>=0; j--, k++){
-            bitmap[bytePos/*-1*/] |= oneMasks[j];
-            //occupied_bits++; //Se refiere a los bloques ocupados
+        for(int j=bitPos; k<nblocks && j>=0; j--, k++){
+            bitmap[bytePos] |= oneMasks[j];
         }
 
         bytePos--;
 
-        /*if(k < nblocks)
-            k--; //Compenso*/
 
         // Fill with ones the lefting blocks bytes to assign
 
         //________ ________
 
-        for(int i=bytePos/*-2*/; k<nblocks && i>=0; i--){
+        for(int i=bytePos; k<nblocks && i>=0; i--){
             for(int j=BYTE_SIZE-1; k<nblocks && j>=0; j--, k++){
                 bitmap[i] |= oneMasks[j];
-                //occupied_bits++;
             }
 
-            /*if(k < nblocks)
-                k--; //Compenso*/
         }
 
-        occupied_bits += nblocks; //nblocks == k
+        occupied_bits += nblocks;
 
         // Create an assignation record
 
@@ -127,13 +121,6 @@ void * malloc(int size) {
 
     
 
-}
-
-void * mallocFromKernel(int size) {
-    _cli();
-    void * result = malloc(size);
-    _sti();
-    return result;
 }
 
 
@@ -160,32 +147,22 @@ void free(void *address){
 
     int bitPos = ((address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
 
-    /*_______1 11111111
-
-      _______1
-          &
-      11111101*/
 
 
     for(int j=bitPos; k<nblocks && j<BYTE_SIZE; j++, k++){
         bitmap[bytePos] &= zeroMasks[j];
-        //occupied_bits--;
     }
 
-    /*if(k < nblocks)
-        k--;*/
     bytePos++;
 
     for(int i=bytePos; k<nblocks && i < BITMAP_SIZE; i++){
         for(int j=0; k<nblocks && j<BYTE_SIZE; j++, k++){
             bitmap[i] &= zeroMasks[j];
-            //occupied_bits--;
         }
     }
     // Remove the assignation record
     occupied_bits -= k;
 
-    //memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
     for(int i = assignationCounterIndex; i < (assignationCounter - 1); i++)
         memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
     

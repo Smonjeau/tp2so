@@ -23,12 +23,12 @@ PCB foregroundProc = NULL;
 
 
 void setForeground(PCB proc){
+	if(proc != NULL) {
+		if(proc->procState == BLOCKED)
+			blockProcess(proc->pid, 1);
 
-	if(proc->procState == BLOCKED)
-		blockProcess(proc->pid, 1);
-
-	foregroundProc = proc;
-
+		foregroundProc = proc;
+	}
 }
 
 int hasForeground(){
@@ -291,7 +291,7 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
 	        break;
 	}
 
-	strcat("- Priority: ", buffer);
+	strcat(" - Priority: ", buffer);
 	itoa(priority, buffer + strlen(buffer), 10, -1);
 
 	if(foregroundProc == pcb)
