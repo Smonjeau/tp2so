@@ -16,11 +16,12 @@
 - Pass synch test           ✓
 
 - Process background (&)    ✓
-- Process piping (|)        X
+- Process piping (|)        ✓
 
 - Filter command            ✓
 - Cat command               ✓
 - Wc command                ✓
-- Phylo command             X
+- Phylo command             ✓
 
-- Add named pipes           X
+- Pass PSV Studio check     ✓
+- Pass CPP check            ✓

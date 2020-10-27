@@ -45,9 +45,8 @@ void shell(){
 
 	printf("\f", 0);
 
-	char c;
 	while (1) {
-		c = getChar();
+		char c = getChar();
 
 		// Handle the chars that are not CR
 

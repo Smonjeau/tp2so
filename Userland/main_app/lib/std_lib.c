@@ -270,7 +270,7 @@ void printf(char *format, int nargs, ...){
 
             if (format[pos] == 'f'){
                 int len = dtoa(va_arg(valist, double), buffer + buffPos);
-                len += buffPos;
+                buffPos += len;
                 formatChar = 0;
                 continue;
             }
@@ -301,9 +301,9 @@ void printf(char *format, int nargs, ...){
 -------------------------------------------------------------- */
 
 int strncmp(char *s1, char *s2, int n){
-    unsigned char u1, u2;
 
     while (n-- > 0){
+        unsigned char u1, u2;
         u1 = (unsigned char) *s1++;
         u2 = (unsigned char) *s2++;
         if (u1 != u2)

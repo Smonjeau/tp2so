@@ -157,12 +157,10 @@ void phyloAdmin(int argc, char ** argv){
     //Primero creeé a los 5 filósofos que arrancan
     
 
-    //Leo a ver si tengo que agregar más o sacar
-    char c;
 
     printf("Welcome to the philosophers problem! Press a to add one, r to remove and x to kill the process. Bye!\n",0);
     while(1){
-        c=getChar();
+        char c = getChar();
         if(c=='a'){
             waitSem(mutex_for_phylos_table);
             add_phylo(startProcess(phylo_life,1,args+phylo_count,"phylo",0));

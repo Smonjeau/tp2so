@@ -19,7 +19,7 @@ void semStatus(void * buffer, int * sem_count){
     int size= sizeof(Semaphore);
 
     while (semaphore!=NULL) {
-        memcpy(buffer + size * count++, semaphore, size);
+        memcpy(((char *) buffer) + size * count++, semaphore, size);
         semaphore = semaphore->next;
     }
 

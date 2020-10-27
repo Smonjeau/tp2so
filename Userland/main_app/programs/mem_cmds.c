@@ -22,8 +22,7 @@ void printMemDump(int argc, char **argv){
 		sourceHex = sourceHex * 16 + sourceStr[i] - c;
 	}
 
-	char *src = (void *) 0;
-	src = (char *) sourceHex;
+	char *src = (char *) sourceHex;
 	char *dst = src + 32;
 
 	memDump((void *)src, (void *)dst);

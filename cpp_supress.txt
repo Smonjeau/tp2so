@@ -1,0 +1,10 @@
+*:Bootloader/BMFS/bmfs.c
+*:Toolchain/ModulePacker/main.c
+
+unusedFunction
+wrongPrintfScanfArgNum
+
+unreadVariable:Userland/main_app/programs/misc_cmds.c:84
+zerodiv:Userland/main_app/programs/misc_cmds.c:84
+nullPointer:Userland/main_app/programs/cpu_cmds.c:29
+memleak:Kernel/pipe_manager/pipe_manager.c
