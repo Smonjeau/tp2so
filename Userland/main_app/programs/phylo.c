@@ -7,6 +7,9 @@
 #include <syscalls.h>
 #include <std_lib.h>
 #include <std_io.h>
+
+#define NULL (void *) 0
+
 #define LEFT_PHYLO ((phylo->index+ phylo_count-1)% phylo_count)
 #define RIGHT_PHYLO ((phylo->index +1) % phylo_count)
 #define STARTERS 5
@@ -84,7 +87,7 @@ void phylo_life(int argc, char ** argv){
     while(1){
         int index= atoi(*argv);
         //sleep
-       nap(6000000);
+        nap(6000000);
         grab_fork(phylos[index]);
     //  eat(phylos[index]);
         drop_fork(phylos[index]);
@@ -94,21 +97,29 @@ void phylo_life(int argc, char ** argv){
 void add_phylo(int id){
 
     openSem(phylo_sem,0);
+    openSem(mutex, 1);
+    openSem(mutex_for_phylos_table, 1);
+
     phylo new = malloc(sizeof(struct phylo)); 
+    if(new != NULL) {
+        new->state=THINKING;
+        new->sem = phylo_sem++;
 
-    new->state=THINKING;
-    new->sem = phylo_sem++;
+        new->index=phylo_count;
+        new->pid = id;
 
-    new->index=phylo_count;
-    new->pid = id;
-
-    phylos[phylo_count++] = new;
+        phylos[phylo_count++] = new;
+    } else {
+        printf("Error heap\n", 0);
+    }
 
 }
 void remove_last_phylo(){
 
     phylo aux = phylos[--phylo_count];
     closeSem(aux->sem);
+    closeSem(mutex);
+    closeSem(mutex_for_phylos_table);
     kill(aux->pid);    
     free(aux);
 
