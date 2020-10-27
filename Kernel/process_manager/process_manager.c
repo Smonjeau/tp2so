@@ -268,6 +268,7 @@ int dup_fd(int fd) {
 	pipe aux = runningProc->pipes[fd];
 	runningProc->pipes[fd] = NULL;
 	runningProc->pipes[i] = aux;
+    runningProc->tipoBocas[i] = runningProc->tipoBocas[fd];
 	return 0;
 
 
