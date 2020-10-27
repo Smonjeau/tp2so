@@ -80,7 +80,7 @@ void printPipeInfo(int argc, char **argv) {
     printf(buffer, 0);
     free(buffer);
 
-    printf("\n----------------------------------------------------------", 0);
+    printf("\n----------------------------------------------------------\n", 0);
 
     kill(-1);
 	
@@ -132,7 +132,7 @@ void printSemStatus(int argc, char **argv){
         printf("\n", 0);
     }
 
-    printf("\n----------------------------------------------------------", 0);
+    printf("\n----------------------------------------------------------\n", 0);
 
     free(buffer);
 
@@ -148,9 +148,9 @@ void pipeLeftProcMediator(int argc, char **argv){
     fds[1] = atoi(argv[argc+2]);
 
     close(1);
-    dup(fds[0]);
+    dup(fds[1]);
 
-    close(fds[1]);
+    close(fds[0]);
 
     startProcess(argv[argc], argc, argv, argv[0], 1);
 
@@ -165,9 +165,9 @@ void pipeRightProcMediator(int argc, char ** argv){
     fds[1] = atoi(argv[argc+2]);
 
     close(0);
-    dup(fds[1]);
+    dup(fds[0]);
 
-    close(fds[0]);
+    close(fds[1]);
 
     startProcess(argv[argc], argc, argv, argv[0], 0);
 
