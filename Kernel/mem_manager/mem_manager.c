@@ -244,7 +244,7 @@ void *  recursive_malloc (int size, node * node, int offset){
         return NULL;
     if((size <= (node->size) /2)) {
         //Si es hoja no puedo seguir recorriendo el arbol en busca de un nodo mas chico
-        if (node->right==NULL && node->left==NULL) {
+        if (node->right==NULL || node->left==NULL) {
             node->free = FALSE;
             bytes_occupied += node->size;
             return FIRST_HEAP_ADRESS + offset;
@@ -293,7 +293,7 @@ void * malloc (int size){
 
 
 
-int free_rec (void * adress, node * node, int offset, int type){
+int free_rec (char * adress, node * node, int offset, int type){
     if(node==NULL || (node->free==FALSE && node->l_subtree_occuppied==FALSE && node->r_subtree_occuppied==TRUE))
         return FALSE;
     if(FIRST_HEAP_ADRESS+offset == adress && node->free==FALSE){
