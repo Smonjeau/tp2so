@@ -28,6 +28,7 @@ void printHelp(int argc, char **argv){
 	printf("- block pid         to block a process\n", 0);
 	printf("- nice pid priority to change priority (100 - 139)\n", 0);
 	printf("- pipe              to list all pipes\n", 0);
+	printf("- sem               to list all sems\n", 0);
 	printf("- filter            filters input vowels\n", 0);
 	printf("- cat               to exec cat\n", 0);
 	printf("- wc                to count lines\n", 0);
