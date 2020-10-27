@@ -42,6 +42,7 @@ char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
 
 
 
+
 void * malloc(int size) {
 
     
@@ -74,25 +75,40 @@ void * malloc(int size) {
 
     }
 
+    bytePos--;
+    bitPos--;
+
     if(freeBlocks == nblocks) {
 
         int k=0;
 
         // Fill with ones the last blocks byte to assign
 
-        for(int j=bitPos-1; k<nblocks && j>=0; j--, k++){
-            bitmap[bytePos-1] |= oneMasks[j];
-            occupied_bits++;
+        for(int j=bitPos/*-1*/; k<nblocks && j>=0; j--, k++){
+            bitmap[bytePos/*-1*/] |= oneMasks[j];
+            //occupied_bits++; //Se refiere a los bloques ocupados
         }
+
+        bytePos--;
+
+        /*if(k < nblocks)
+            k--; //Compenso*/
 
         // Fill with ones the lefting blocks bytes to assign
 
-        for(int i=bytePos-2; k<nblocks && i>=0; i--){
+        //________ ________
+
+        for(int i=bytePos/*-2*/; k<nblocks && i>=0; i--){
             for(int j=BYTE_SIZE-1; k<nblocks && j>=0; j--, k++){
                 bitmap[i] |= oneMasks[j];
-                occupied_bits++;
+                //occupied_bits++;
             }
+
+            /*if(k < nblocks)
+                k--; //Compenso*/
         }
+
+        occupied_bits += nblocks; //nblocks == k
 
         // Create an assignation record
 
@@ -105,7 +121,7 @@ void * malloc(int size) {
     
         return candidateAddress;
 
-    }else
+    }
 
     return NULL;    // Not enough space
 
@@ -113,16 +129,25 @@ void * malloc(int size) {
 
 }
 
+void * mallocFromKernel(int size) {
+    _cli();
+    void * result = malloc(size);
+    _sti();
+    return result;
+}
+
 
 void free(void *address){
 
 
     // Get the assignation record
+    int assignationCounterIndex;
 
     Assignation assignationRecord; int i;
     for(i=0; i<assignationCounter; i++){
         if(assignations[i].startAddress == address){
             assignationRecord = assignations[i];
+            assignationCounterIndex = i;
             break;
         }
     }
@@ -135,20 +160,36 @@ void free(void *address){
 
     int bitPos = ((address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
 
+    /*_______1 11111111
+
+      _______1
+          &
+      11111101*/
+
+
     for(int j=bitPos; k<nblocks && j<BYTE_SIZE; j++, k++){
         bitmap[bytePos] &= zeroMasks[j];
-        occupied_bits--;
+        //occupied_bits--;
     }
 
-    for(int i=bytePos+1; k<nblocks && i < BITMAP_SIZE; i++){
+    /*if(k < nblocks)
+        k--;*/
+    bytePos++;
+
+    for(int i=bytePos; k<nblocks && i < BITMAP_SIZE; i++){
         for(int j=0; k<nblocks && j<BYTE_SIZE; j++, k++){
             bitmap[i] &= zeroMasks[j];
-            occupied_bits--;
+            //occupied_bits--;
         }
     }
     // Remove the assignation record
+    occupied_bits -= k;
 
-    memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
+    //memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
+    for(int i = assignationCounterIndex; i < (assignationCounter - 1); i++)
+        memcpy(assignations+i, assignations+i+1, sizeof(Assignation));
+    
+    
     assignationCounter -= 1;
 
 }

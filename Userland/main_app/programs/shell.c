@@ -41,6 +41,7 @@ void shell(){
 
 	printf("\f", 0);
 
+
 	char c;
 	while (1) {
 		c = getChar();
@@ -62,6 +63,7 @@ void shell(){
 				putChar('\n');
 				continue;
 			}
+
 
 			putChar('\n');
 
