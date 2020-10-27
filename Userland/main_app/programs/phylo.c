@@ -132,7 +132,7 @@ void status_printer(){
 void phyloAdmin(int argc, char ** argv){
     int mutex=10;
     int aux;
-    char * args [20] = {"0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18"};
+    char * args [20] = {"0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19"};
     int printer_pid = startProcess(status_printer,0,(void*)0,"status_printer",0);
 
     //Como puede fallar vamos probando hasta que tenemos un id de sem válido

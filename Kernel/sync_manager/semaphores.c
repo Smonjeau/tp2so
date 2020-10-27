@@ -85,7 +85,30 @@ int waitSemaphore(int id) {
     
     acquire(&(semaphore->lock));
 
-    if(semaphore->value > 0){
+        if(semaphore->value > 0){
+
+        semaphore->value -= 1;
+        release(&(semaphore->lock));
+
+    }else{
+        
+        if(semaphore->value==0)
+            semaphore->value--;
+
+        int currPid = getPID();
+
+        semaphore->blockedPIDs[semaphore->blockedPIDsSize++] = currPid;
+        
+        release(&(semaphore->lock));
+
+        blockProcess(currPid,1);
+
+      //  acquire(&(semaphore->lock));
+
+     //   semaphore->value -= 1;
+    } 
+
+ /*   if(semaphore->value > 0){
         semaphore->value -= 1;
     }else{
         int currPid = getPID();
@@ -99,9 +122,10 @@ int waitSemaphore(int id) {
         acquire(&(semaphore->lock));
 
         semaphore->value -= 1;
-    }
+    } */
 
-    release(&(semaphore->lock));
+
+    //release(&(semaphore->lock));
 
     return 0;
 
@@ -119,7 +143,12 @@ int postSemaphore(int id){
     semaphore->value += 1;
 
     if(semaphore->blockedPIDsSize > 0){
-        int unblockPID = semaphore->blockedPIDs[--semaphore->blockedPIDsSize];
+       // int unblockPID = semaphore->blockedPIDs[--semaphore->blockedPIDsSize];
+        int unblockPID = semaphore->blockedPIDs[0];
+        for(int i=0; i<semaphore->blockedPIDsSize-1;i++){
+            semaphore->blockedPIDs[i] = semaphore->blockedPIDs[i+1];
+        }
+        semaphore->blockedPIDsSize--;
         blockProcess(unblockPID, 0);
     }
 
