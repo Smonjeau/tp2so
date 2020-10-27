@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 /*---------------------------------------------------------------------------------------------------
 |   STDLIB.C    |                                                                                      |
 |----------------                                                                            |
@@ -185,7 +187,7 @@ int dtoa(double num, char *str)
 
     int auxNum = (int)num;
     // --- Building the int part ---
-    while (auxNum > EPSILON)
+    while (auxNum > 0)
     {
         int rem = auxNum % 10;
         str[i++] = rem + '0';
@@ -195,7 +197,6 @@ int dtoa(double num, char *str)
     if (isNegative == 1)
         str[i++] = '-';
 
-    str[i] = '\0';
     str[i] = '\0';
     reverseStr(str, i);
     str[i++] = '.';
@@ -224,7 +225,7 @@ void printf(char *format, int nargs, ...){
     int pos, formatChar = 0, fixLen = -1;
     int buffPos=0;
     char buffer[255]={0};
-    for (pos = 0; format[pos] != 0; pos++){
+    for (pos = 0; format[pos]; pos++){
 
   
         if(format[pos]=='\n'){
@@ -283,11 +284,12 @@ void printf(char *format, int nargs, ...){
                 continue;
             }
         }
-        else if(format[pos]!=0)
+        else
             buffer[buffPos++] = format[pos];
 
     }
-        write(1,buffer,buffPos+1);
+    
+    write(1,buffer,buffPos+1);
 
     va_end(valist);
 }

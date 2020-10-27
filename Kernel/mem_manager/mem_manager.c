@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::566
 #include  <lib.h>
 
 #define NULL ((void*)0)
@@ -33,9 +36,9 @@ Assignation assignations[BITMAP_SIZE];
 int assignationCounter = 0;
 
 int occupied_bits = 0;
-char oneMasks[] = {1, 2, 4, 8, 16, 32, 64, 128};
+unsigned char oneMasks[] = {1, 2, 4, 8, 16, 32, 64, 128};
     
-char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
+unsigned char zeroMasks[] = {0b11111110, 0b11111101, 0b11111011, 0b11110111,
     0b11101111, 0b11011111, 0b10111111, 0b01111111};
 
 
@@ -105,7 +108,7 @@ void * malloc(int size) {
     
         return candidateAddress;
 
-    }else
+    }
 
     return NULL;    // Not enough space
 
@@ -119,7 +122,7 @@ void free(void *address){
 
     // Get the assignation record
 
-    Assignation assignationRecord; int i;
+    Assignation assignationRecord = {0}; int i;
     for(i=0; i<assignationCounter; i++){
         if(assignations[i].startAddress == address){
             assignationRecord = assignations[i];
@@ -131,9 +134,9 @@ void free(void *address){
 
     int nblocks = assignationRecord.size; int k=0;
 
-    int bytePos = ((address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) / BYTE_SIZE;
+    int bytePos = ((((char *) address)-FIRST_HEAP_ADRESS)/BLOCK_SIZE) / BYTE_SIZE;
 
-    int bitPos = ((address-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
+    int bitPos = ((((char *) address)-FIRST_HEAP_ADRESS)/BLOCK_SIZE) % BYTE_SIZE;
 
     for(int j=bitPos; k<nblocks && j<BYTE_SIZE; j++, k++){
         bitmap[bytePos] &= zeroMasks[j];

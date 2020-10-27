@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+// GENERIC METHODS
+
+void _hlt(void);
+
+
 // MEMORY METHODS
 
 void * memset(void * destination, int32_t c, uint64_t length);

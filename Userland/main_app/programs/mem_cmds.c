@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::576
+
 #include <syscalls.h>
 #include <std_io.h>
 #include <std_lib.h>
@@ -11,18 +15,11 @@ void printMemDump(int argc, char **argv){
 	uint64_t sourceHex = 0;
 	for (int i = 2; sourceStr[i]; i++){
 		char c = '0';
-		if (sourceStr[i] >= '0' && sourceStr[i] <= '9')
-			c = '0';
-		else if (sourceStr[i] >= 'a' && sourceStr[i] <= 'z')
+		if (sourceStr[i] >= 'a' && sourceStr[i] <= 'z')
 			c = 'a';
 		else
 			c = 'A';
 		sourceHex = sourceHex * 16 + sourceStr[i] - c;
-	}
-
-	if (sourceHex < 0){
-		printf("Parameter not allowed\n", 0);
-		kill(-1);
 	}
 
 	char *src = (void *) 0;

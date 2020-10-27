@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::575,769,522,576
+
 #include <syscalls.h>
 #include <std_lib.h>
 #include <shell_cmds.h>
@@ -76,7 +80,7 @@ void printPipeInfo(int argc, char **argv) {
     printf(buffer, 0);
     free(buffer);
 
-    printf("\n----------------------------------------------------------\n", 0);
+    printf("\n----------------------------------------------------------", 0);
 
     kill(-1);
 	
@@ -103,6 +107,8 @@ void niceProcess(int argc, char **argv) {
 void printSemStatus(int argc, char **argv){
 
     Semaphore * buffer = malloc(20*sizeof(struct Semaphore));
+    if(buffer == NULL)
+        kill(-1);
 
     int qty =0;
     semStatus(buffer,&qty);
@@ -126,7 +132,7 @@ void printSemStatus(int argc, char **argv){
         printf("\n", 0);
     }
 
-    printf("\n----------------------------------------------------------\n", 0);
+    printf("\n----------------------------------------------------------", 0);
 
     free(buffer);
 
@@ -142,9 +148,9 @@ void pipeLeftProcMediator(int argc, char **argv){
     fds[1] = atoi(argv[argc+2]);
 
     close(1);
-    dup(fds[1]);
+    dup(fds[0]);
 
-    close(fds[0]);
+    close(fds[1]);
 
     startProcess(argv[argc], argc, argv, argv[0], 1);
 
@@ -159,9 +165,9 @@ void pipeRightProcMediator(int argc, char ** argv){
     fds[1] = atoi(argv[argc+2]);
 
     close(0);
-    dup(fds[0]);
+    dup(fds[1]);
 
-    close(fds[1]);
+    close(fds[0]);
 
     startProcess(argv[argc], argc, argv, argv[0], 0);
 

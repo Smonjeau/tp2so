@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 /*--------------------------------------------------------------------------------------------------------
 |   KEYBOARD_DRIVER.C    |                                                                               |
 |----------------------                                                                                  |
@@ -21,8 +23,8 @@ int read();
 
 #define BUFF_SIZE 1024
 
-// Escape: 1, Backspace: 14, Tab: 15, Enter: 28, Ctrl: 29, LShift: 42/170, RShift: 54/182, Alt: 56, Space: 57, F1-F10: 59-68, Cmd: 91
-// These keys are preceded by a 224. LA: 75/203, RA: 77/205, DEL: 83/211
+// Escape: 1, Backspace: 14, Tab: 15, Enter: 28, Ctrl: 29, LShift: 42/170, RShift: 54/182, Alt: 56, Space: 57,
+// F1-F10: 59-68, Cmd: 91
 // Keys represented with a 0 are not ASCII representable
 
 char keyboard_map[64] = {
@@ -72,7 +74,7 @@ char keyCodeToChar(int keyCode){
         return 4;
 
     // Unmapped key
-    if(keyCode >= 129)
+    if(keyCode > 63)
         return 0;
     
     // If it is a letter check for shift/caps

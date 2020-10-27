@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::576
+
 /*---------------------------------------------------------------------------------------------------
 |   EXCEPTIONS_DISPATCHER.C    |                                                                    |
 |-------------------------------                                                                    |
@@ -38,10 +42,10 @@ int handleException(int id, void *eip){
 
     printf("\nFeed this information to the developers:", 0);
     printf("\nRAX: %x - RBX: %x - RCX: %x - RDX: %x", 4, bkp.rax, bkp.rbx, bkp.rcx, bkp.rcx);
-    printf("\nRIP: %x - RBP: %x - RSI: %x - RDI: %x", 4, eip, bkp.rbp, bkp.rsi, bkp.rdi);
+    printf("\nRIP: %x - RBP: %x - RSI: %x - RDI: %x", 4, (uint64_t) eip, bkp.rbp, bkp.rsi, bkp.rdi);
     printf("\n\nPlease restart the system", 0);
 
-    while(1);
+    _hlt();
 
     return 1;
     

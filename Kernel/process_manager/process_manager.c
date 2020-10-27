@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::675
 
 #include <process_manager.h>
 #include <lib.h>
@@ -292,6 +295,7 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
             strcat("RUNNING", buffer);
             break;
 
+		case RECENTLY_BLOCKED:
         case BLOCKED:
             strcat("BLOCKED", buffer);
             break;
@@ -299,9 +303,6 @@ void copyPSInfoToBuffer(char * buffer, PCB pcb, int priority) {
         case DEAD:
             strcat("DEAD", buffer);
             break;
-	    case RECENTLY_BLOCKED:
-	        strcat("BLOCKED",buffer);
-	        break;
 	}
 
 	strcat("- Priority: ", buffer);

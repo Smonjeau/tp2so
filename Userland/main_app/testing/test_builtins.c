@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::576
+
 /*---------------------------------------------------------------------------------------------------
 |   TEST_WINDOW.C    |                                                                              |
 |----------------------                                                                             |
@@ -122,7 +126,7 @@ static void testRegDump(){
 static void testMemDump(){
 
     // Reserve 33 bytes and differ the last one
-    char ptr[33], ptrDmp[33];
+    char ptr[33]={0}, ptrDmp[33]={0};
 	ptrDmp[32] = ptr[32]+1;
 
     // Do a dump of 32 bytes
@@ -130,7 +134,7 @@ static void testMemDump(){
 	
     // Check that exactly 32 bytes are equal between addresses
 	int i;
-	for(i=0; ptr[i]==ptrDmp[i]; i++);
+	for(i=0; ptr[i]==ptrDmp[i]; i++){}
     if(i==32)
         printf("\nMemDump test passed\n", 0);
     else
@@ -162,8 +166,8 @@ static void testCPUInfo(){
 
     cpuInfo(&info);
 
-    if(strncmp(info.brandName, "QEMU Virtual CPU version 2.5+", 50) == 1 
-        && strncmp(info.brandDesc, "This processor does not support the brand identification feature", 70) == 1)
+    if(strncmp(info.brandName, "QEMU Virtual CPU version 2.5+", 50) == 0 
+        && strncmp(info.brandDesc, "This processor does not support the brand identification feature", 70) == 0)
         printf("\nCPUInfo test passed\n", 0);
     else
         printf("\nCPUInfo test failed\n", 0);

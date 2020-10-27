@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::576
+
 #include <stdint.h>
 #include <stdio.h>
 #include <syscalls.h>
@@ -63,19 +67,7 @@ void test_prio(){
   printf("\nChanging priorities while blocked...\n");
 
   for(i = 0; i < TOTAL_PROCESSES; i++){
-    switch (i % 3){
-      case 0:
-        nice(pids[i], 119);
-        break;
-        
-      case 1:
-        nice(pids[i], 119);
-        break;
-
-      case 2:
-        nice(pids[i], 119);
-        break;
-    }
+    nice(pids[i], 119);
   }
 
   printf("\n\nUnblocking processes...\n\n");

@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdarg.h>
 #include <stdint.h>
 #include <video_lib.h>
@@ -136,7 +138,7 @@ char *itoa(int num, char *str, int base, int fixLen)
 
     if (num < 0)
     {
-        isNegative = -1;
+        isNegative = 1;
         num = -num;
     }
 
@@ -191,7 +193,7 @@ char *dtoa(double num, char *str)
 
     int auxNum = (int)num;
     // --- Building the int part ---
-    while (auxNum > EPSILON)
+    while (auxNum > 0)
     {
         int rem = auxNum % 10;
         str[i++] = rem + '0';
@@ -201,7 +203,6 @@ char *dtoa(double num, char *str)
     if (isNegative == 1)
         str[i++] = '-';
 
-    str[i] = '\0';
     str[i] = '\0';
     reverseStr(str, i);
     str[i++] = '.';

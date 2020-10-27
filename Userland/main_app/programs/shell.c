@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+//-V::576
+
 /*---------------------------------------------------------------------------------------------------
 |   SHELL.C    |                                                                             	    |
 |---------------                                                                                    |
@@ -19,7 +23,7 @@
 
 #define MAX_TOKENS 10
 #define MAX_TOKEN_LEN 20
-#define MAX_CMD_LEN MAX_TOKENS*MAX_TOKEN_LEN
+#define MAX_CMD_LEN (MAX_TOKENS*MAX_TOKEN_LEN)
 
 void parseCommand(char *cmdBuff);
 
@@ -50,7 +54,7 @@ void shell(){
 		if (c == '\b' && buffPos > 0)
 			cmdBuff[--buffPos] = 0;
 		
-		if (c >= 32 && c <= 127 && buffPos < MAX_CMD_LEN)
+		if (c >= 32 && buffPos < MAX_CMD_LEN)
 			cmdBuff[buffPos++] = c;
 
 		putChar(c);
@@ -174,8 +178,7 @@ void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 
 	int j=1;
 	for (int i=0; cmdBuff[i]; i++){
-		if (cmdBuff[i] == ' ' || cmdBuff[i] == '\t' || cmdBuff[i] == '\n' 
-				|| cmdBuff[i] == '\r' || cmdBuff[i] == 0){
+		if (cmdBuff[i] == ' ' || cmdBuff[i] == '\t' || cmdBuff[i] == '\n' || cmdBuff[i] == '\r'){
 			cmdBuff[i] = 0;
 			tokens[j++] = cmdBuff+i+1;
 		}
@@ -250,7 +253,7 @@ void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 	else if (strncmp(tokens[0], "nice", 5) == 0 && j == 3)
 		createProcessExec(niceProcess, 3, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"ps",3)==0 && j==1)
+	else if(strncmp(tokens[0], "ps", 3)==0 && j==1)
 		createProcessExec(printProcData, 2, tokens, fg, processExec);
 
 
@@ -262,7 +265,7 @@ void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 	else if (strncmp(tokens[0], "loop", 5) == 0 && j==1)
 		createProcessExec(loop, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"phyloproblem",13)==0 && j==1)
+	else if(strncmp(tokens[0],"phyloproblem", 13)==0 && j==1)
 		createProcessExec(phylo, 1, tokens, fg, processExec);
 
 
@@ -277,19 +280,19 @@ void parseSimpleCommand(char *cmdBuff, ProcessExec *processExec){
 
 	//Testing
 
-	else if(strncmp(tokens[0],"testmm",7) == 0 && j==1)
+	else if(strncmp(tokens[0], "testmm", 7) == 0 && j==1)
 		createProcessExec(test_mm, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"testproc",7) == 0)
+	else if(strncmp(tokens[0], "testproc", 9) == 0)
 		createProcessExec(test_proc, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"testprio",7) == 0 && j==1)
+	else if(strncmp(tokens[0], "testprio", 9) == 0 && j==1)
 		createProcessExec(test_prio, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"testsync",7) == 0 && j==1)
+	else if(strncmp(tokens[0], "testsync", 9) == 0 && j==1)
 		createProcessExec(test_sync, 1, tokens, fg, processExec);
 
-	else if(strncmp(tokens[0],"testnosync",7) == 0 && j==1)
+	else if(strncmp(tokens[0], "testnosync", 11) == 0 && j==1)
 		createProcessExec(test_no_sync, 1, tokens, fg, processExec);
 
 	else if(strncmp(tokens[0], "clear", 6) == 0 && j==1)
